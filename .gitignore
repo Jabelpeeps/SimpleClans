@@ -1,3 +1,5 @@
 /target/
 /.idea/
 SimpleClans.iml
+/.classpath
+/.project

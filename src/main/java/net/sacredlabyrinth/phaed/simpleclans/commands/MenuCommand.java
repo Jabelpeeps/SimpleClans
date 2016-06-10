@@ -1,13 +1,18 @@
 package net.sacredlabyrinth.phaed.simpleclans.commands;
 
-import net.sacredlabyrinth.phaed.simpleclans.*;
+import java.text.MessageFormat;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.text.MessageFormat;
-import java.util.LinkedList;
-import java.util.List;
+import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
+import net.sacredlabyrinth.phaed.simpleclans.Clan;
+import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
+import net.sacredlabyrinth.phaed.simpleclans.Helper;
+import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 
 /**
  * @author phaed
@@ -155,17 +160,17 @@ public class MenuCommand
         {
             chatBlock.addRow(ChatColor.AQUA + "  " + MessageFormat.format(plugin.getLang("0.modtag.tag.1.modify.the.clan.s.tag"), clanCommand, ChatColor.WHITE));
         }
-        if (isVerified && isLeader && plugin.getSpoutPluginManager().isHasSpout() && plugin.getSettingsManager().isClanCapes() && plugin.getPermissionsManager().has(player, "simpleclans.leader.cape"))
-        {
-            chatBlock.addRow(ChatColor.AQUA + "  " + MessageFormat.format(plugin.getLang("0.cape.url.1.change.your.clan.s.cape"), clanCommand, ChatColor.WHITE));
-        }
+//        if (isVerified && isLeader && plugin.getSpoutPluginManager().isHasSpout() && plugin.getSettingsManager().isClanCapes() && plugin.getPermissionsManager().has(player, "simpleclans.leader.cape"))
+//        {
+//            chatBlock.addRow(ChatColor.AQUA + "  " + MessageFormat.format(plugin.getLang("0.cape.url.1.change.your.clan.s.cape"), clanCommand, ChatColor.WHITE));
+//        }
 
         String toggles = "";
 
-        if (isVerified && plugin.getSpoutPluginManager().isHasSpout() && plugin.getSettingsManager().isClanCapes() && plugin.getPermissionsManager().has(player, " simpleclans.member.cape-toggle"))
-        {
-            toggles += "cape/";
-        }
+//        if (isVerified && plugin.getSpoutPluginManager().isHasSpout() && plugin.getSettingsManager().isClanCapes() && plugin.getPermissionsManager().has(player, " simpleclans.member.cape-toggle"))
+//        {
+//            toggles += "cape/";
+//        }
 
         if (isVerified && isTrusted && plugin.getPermissionsManager().has(player, "simpleclans.member.bb-toggle"))
         {

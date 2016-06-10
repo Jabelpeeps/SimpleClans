@@ -1,18 +1,30 @@
 package net.sacredlabyrinth.phaed.simpleclans.listeners;
 
-import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
-import net.sacredlabyrinth.phaed.simpleclans.Helper;
-import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
-import net.sacredlabyrinth.phaed.simpleclans.executors.*;
+import java.util.Iterator;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
-import java.util.Iterator;
+import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
+import net.sacredlabyrinth.phaed.simpleclans.Helper;
+import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.executors.AcceptCommandExecutor;
+import net.sacredlabyrinth.phaed.simpleclans.executors.AllyCommandExecutor;
+import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor;
+import net.sacredlabyrinth.phaed.simpleclans.executors.DenyCommandExecutor;
+import net.sacredlabyrinth.phaed.simpleclans.executors.GlobalCommandExecutor;
+import net.sacredlabyrinth.phaed.simpleclans.executors.MoreCommandExecutor;
 
 /**
  * @author phaed
@@ -301,14 +313,14 @@ public class SCPlayerListener implements Listener
         }
         cp.setName(player.getName());
 
-        if (SimpleClans.getInstance().hasUUID())
-        {
-            SimpleClans.getInstance().getSpoutPluginManager().processPlayer(cp.getUniqueId());
-        }
-        else
-        {
-            SimpleClans.getInstance().getSpoutPluginManager().processPlayer(cp.getName());
-        }
+//        if (SimpleClans.getInstance().hasUUID())
+//        {
+//            SimpleClans.getInstance().getSpoutPluginManager().processPlayer(cp.getUniqueId());
+//        }
+//        else
+//        {
+//            SimpleClans.getInstance().getSpoutPluginManager().processPlayer(cp.getName());
+//        }
         SimpleClans.getInstance().getPermissionsManager().addPlayerPermissions(cp);
 
         if (plugin.getSettingsManager().isBbShowOnLogin() && cp.isBbEnabled())
@@ -404,15 +416,15 @@ public class SCPlayerListener implements Listener
             return;
         }
 
-        plugin.getSpoutPluginManager().processPlayer(event.getPlayer());
+//        plugin.getSpoutPluginManager().processPlayer(event.getPlayer());
     }
 
-    /**
-     * @param event
-     */
-    @EventHandler
-    public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
-    {
-        plugin.getSpoutPluginManager().processPlayer(event.getPlayer());
-    }
+//    /**
+//     * @param event
+//     */
+//    @EventHandler
+//    public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
+//    {
+//        plugin.getSpoutPluginManager().processPlayer(event.getPlayer());
+//    }
 }

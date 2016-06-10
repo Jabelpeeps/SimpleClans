@@ -1,14 +1,5 @@
 package net.sacredlabyrinth.phaed.simpleclans;
 
-import net.sacredlabyrinth.phaed.simpleclans.executors.*;
-import net.sacredlabyrinth.phaed.simpleclans.listeners.SCEntityListener;
-import net.sacredlabyrinth.phaed.simpleclans.listeners.SCPlayerListener;
-import net.sacredlabyrinth.phaed.simpleclans.managers.*;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
-
-import org.bukkit.ChatColor;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,10 +8,28 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.bukkit.ChatColor;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import net.sacredlabyrinth.phaed.simpleclans.executors.AcceptCommandExecutor;
+import net.sacredlabyrinth.phaed.simpleclans.executors.AllyCommandExecutor;
+import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor;
+import net.sacredlabyrinth.phaed.simpleclans.executors.DenyCommandExecutor;
+import net.sacredlabyrinth.phaed.simpleclans.executors.GlobalCommandExecutor;
+import net.sacredlabyrinth.phaed.simpleclans.executors.MoreCommandExecutor;
+import net.sacredlabyrinth.phaed.simpleclans.listeners.SCEntityListener;
+import net.sacredlabyrinth.phaed.simpleclans.listeners.SCPlayerListener;
+import net.sacredlabyrinth.phaed.simpleclans.managers.ClanManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.PermissionsManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.RequestManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.StorageManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.TeleportManager;
+import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
 
 /**
  * @author Phaed
@@ -33,7 +42,7 @@ public class SimpleClans extends JavaPlugin {
     private ClanManager clanManager;
     private RequestManager requestManager;
     private StorageManager storageManager;
-    private SpoutPluginManager spoutPluginManager;
+//    private SpoutPluginManager spoutPluginManager;
     private SettingsManager settingsManager;
     private PermissionsManager permissionsManager;
     private TeleportManager teleportManager;
@@ -83,7 +92,7 @@ public class SimpleClans extends JavaPlugin {
         this.hasUUID = UUIDMigration.canReturnUUID();
         languageManager = new LanguageManager();
 
-        spoutPluginManager = new SpoutPluginManager();
+//        spoutPluginManager = new SpoutPluginManager();
         permissionsManager = new PermissionsManager();
         requestManager = new RequestManager();
         clanManager = new ClanManager();
@@ -95,7 +104,7 @@ public class SimpleClans extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SCEntityListener(), this);
         getServer().getPluginManager().registerEvents(new SCPlayerListener(), this);
 
-        spoutPluginManager.processAllPlayers();
+//        spoutPluginManager.processAllPlayers();
         permissionsManager.loadPermissions();
 
         CommandHelper.registerCommand(getSettingsManager().getCommandClan());
@@ -179,13 +188,13 @@ public class SimpleClans extends JavaPlugin {
         return storageManager;
     }
 
-    /**
-     * @return the spoutManager
-     */
-    public SpoutPluginManager getSpoutPluginManager()
-    {
-        return spoutPluginManager;
-    }
+//    /**
+//     * @return the spoutManager
+//     */
+//    public SpoutPluginManager getSpoutPluginManager()
+//    {
+//        return spoutPluginManager;
+//    }
 
     /**
      * @return the settingsManager

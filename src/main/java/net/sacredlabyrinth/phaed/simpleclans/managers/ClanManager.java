@@ -1,17 +1,29 @@
 package net.sacredlabyrinth.phaed.simpleclans.managers;
 
-import net.sacredlabyrinth.phaed.simpleclans.*;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
-import net.sacredlabyrinth.phaed.simpleclans.events.CreateClanEvent;
+import java.text.DecimalFormat;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.text.DecimalFormat;
-import java.text.MessageFormat;
-import java.util.*;
+import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
+import net.sacredlabyrinth.phaed.simpleclans.Clan;
+import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
+import net.sacredlabyrinth.phaed.simpleclans.Helper;
+import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.events.CreateClanEvent;
+import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
 
 /**
  * @author phaed
@@ -101,14 +113,14 @@ public final class ClanManager
 
         SimpleClans.getInstance().getPermissionsManager().updateClanPermissions(clan);
 
-        if (SimpleClans.getInstance().hasUUID())
-        {
-            SimpleClans.getInstance().getSpoutPluginManager().processPlayer(cp.getUniqueId());
-        }
-        else
-        {
-            SimpleClans.getInstance().getSpoutPluginManager().processPlayer(cp.getName());
-        }
+//        if (SimpleClans.getInstance().hasUUID())
+//        {
+//            SimpleClans.getInstance().getSpoutPluginManager().processPlayer(cp.getUniqueId());
+//        }
+//        else
+//        {
+//            SimpleClans.getInstance().getSpoutPluginManager().processPlayer(cp.getName());
+//        }
 
         SimpleClans.getInstance().getServer().getPluginManager().callEvent(new CreateClanEvent(clan));
     }

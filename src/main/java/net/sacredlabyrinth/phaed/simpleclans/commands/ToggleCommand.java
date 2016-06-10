@@ -1,11 +1,12 @@
 package net.sacredlabyrinth.phaed.simpleclans.commands;
 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+
 import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
 import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 
 /**
  * @author phaed
@@ -41,7 +42,7 @@ public class ToggleCommand {
                         if (cp.isCapeEnabled()) {
                             ChatBlock.sendMessage(player, ChatColor.AQUA + plugin.getLang("capeoff"));
                             cp.setCapeEnabled(false);
-                            plugin.getSpoutPluginManager().clearCape(player);
+//                            plugin.getSpoutPluginManager().clearCape(player);
                         } else {
                             ChatBlock.sendMessage(player, ChatColor.AQUA + plugin.getLang("capeon"));
                             cp.setCapeEnabled(true);

@@ -1,5 +1,16 @@
 package net.sacredlabyrinth.phaed.simpleclans;
 
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.text.MessageFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -7,16 +18,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.text.MessageFormat;
-import java.util.*;
-
 /**
  * @author phaed
  */
-public class ClanPlayer implements Serializable, Comparable<ClanPlayer>
-{
+public class ClanPlayer implements Serializable, Comparable<ClanPlayer> {
     private static final long serialVersionUID = 1L;
     private UUID uniqueId;
     private String displayName;
@@ -51,8 +56,7 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer>
     /**
      *
      */
-    public ClanPlayer()
-    {
+    public ClanPlayer() {
         this.tag = "";
         this.channel = Channel.NONE;
     }
@@ -61,8 +65,7 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer>
      * @param playerName
      */
     @Deprecated
-    public ClanPlayer(String playerName)
-    {
+    public ClanPlayer(String playerName) {
         this.displayName = playerName;
         this.lastSeen = (new Date()).getTime();
         this.joinDate = (new Date()).getTime();
@@ -76,16 +79,13 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer>
     /**
      * @param playerUniqueId
      */
-    public ClanPlayer(UUID playerUniqueId)
-    {
+    public ClanPlayer(UUID playerUniqueId) {
         this.uniqueId = playerUniqueId;
-        Player OnlinePlayer = SimpleClans.getInstance().getServer().getPlayer(playerUniqueId);
-        if (OnlinePlayer != null)
-        {
+        Player OnlinePlayer = Bukkit.getPlayer(playerUniqueId);
+        if (OnlinePlayer != null) {
             this.displayName = OnlinePlayer.getName();
-        } else
-        {
-            OfflinePlayer OfflinePlayer = SimpleClans.getInstance().getServer().getOfflinePlayer(playerUniqueId);
+        } else {
+            OfflinePlayer OfflinePlayer = Bukkit.getOfflinePlayer(playerUniqueId);
             this.displayName = OfflinePlayer.getName();
         }
         this.lastSeen = (new Date()).getTime();
@@ -98,38 +98,26 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer>
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return getName().hashCode() >> 13;
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
-        if (!(obj instanceof ClanPlayer))
-        {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ClanPlayer)) {
             return false;
         }
-
         ClanPlayer other = (ClanPlayer) obj;
         return other.getName().equals(this.getName());
     }
 
     @Override
-    public int compareTo(ClanPlayer other)
-    {
-        if (SimpleClans.getInstance().hasUUID())
-        {
-            return this.getUniqueId().compareTo(other.getUniqueId());
-        } else
-        {
-            return this.getName().compareToIgnoreCase(other.getName());
-        }
+    public int compareTo(ClanPlayer other) {        
+        return this.getUniqueId().compareTo(other.getUniqueId());
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return displayName;
     }
 
@@ -466,7 +454,7 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer>
     public double getWeightedKills()
     {
         SimpleClans plugin = SimpleClans.getInstance();
-        return ((double) rivalKills * plugin.getSettingsManager().getKwRival()) + ((double) neutralKills * plugin.getSettingsManager().getKwNeutral()) + ((double) civilianKills * plugin.getSettingsManager().getKwCivilian());
+        return (rivalKills * plugin.getSettingsManager().getKwRival()) + (neutralKills * plugin.getSettingsManager().getKwNeutral()) + (civilianKills * plugin.getSettingsManager().getKwCivilian());
     }
 
     /**
@@ -483,7 +471,7 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer>
             totalDeaths = 1;
         }
 
-        return ((float) getWeightedKills()) / ((float) totalDeaths);
+        return ((float) getWeightedKills()) / (totalDeaths);
     }
 
     /**

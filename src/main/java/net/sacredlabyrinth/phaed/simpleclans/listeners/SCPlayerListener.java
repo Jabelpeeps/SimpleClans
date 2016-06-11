@@ -2,6 +2,7 @@ package net.sacredlabyrinth.phaed.simpleclans.listeners;
 
 import java.util.Iterator;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -128,7 +129,7 @@ public class SCPlayerListener implements Listener
         {
             if (command.equalsIgnoreCase(plugin.getSettingsManager().getCommandAlly()))
             {
-                if (!plugin.getServer().getPluginCommand(plugin.getSettingsManager().getCommandAlly()).equals(plugin.getCommand(plugin.getSettingsManager().getCommandAlly())))
+                if (!Bukkit.getPluginCommand(plugin.getSettingsManager().getCommandAlly()).equals(plugin.getCommand(plugin.getSettingsManager().getCommandAlly())))
                 {
                     new AllyCommandExecutor().onCommand(player, null, null, Helper.removeFirst(split));
                     event.setCancelled(true);
@@ -136,7 +137,7 @@ public class SCPlayerListener implements Listener
             }
             else if (command.equalsIgnoreCase(plugin.getSettingsManager().getCommandGlobal()))
             {
-                if (!plugin.getServer().getPluginCommand(plugin.getSettingsManager().getCommandGlobal()).equals(plugin.getCommand(plugin.getSettingsManager().getCommandGlobal())))
+                if (!Bukkit.getPluginCommand(plugin.getSettingsManager().getCommandGlobal()).equals(plugin.getCommand(plugin.getSettingsManager().getCommandGlobal())))
                 {
                     new GlobalCommandExecutor().onCommand(player, null, null, Helper.removeFirst(split));
                     event.setCancelled(true);
@@ -144,7 +145,7 @@ public class SCPlayerListener implements Listener
             }
             else if (command.equalsIgnoreCase(plugin.getSettingsManager().getCommandClan()))
             {
-                if (!plugin.getServer().getPluginCommand(plugin.getSettingsManager().getCommandClan()).equals(plugin.getCommand(plugin.getSettingsManager().getCommandClan())))
+                if (!Bukkit.getPluginCommand(plugin.getSettingsManager().getCommandClan()).equals(plugin.getCommand(plugin.getSettingsManager().getCommandClan())))
                 {
                     new ClanCommandExecutor().onCommand(player, null, null, Helper.removeFirst(split));
                     event.setCancelled(true);
@@ -152,7 +153,7 @@ public class SCPlayerListener implements Listener
             }
             else if (command.equalsIgnoreCase(plugin.getSettingsManager().getCommandAccept()))
             {
-                if (!plugin.getServer().getPluginCommand(plugin.getSettingsManager().getCommandAccept()).equals(plugin.getCommand(plugin.getSettingsManager().getCommandAccept())))
+                if (!Bukkit.getPluginCommand(plugin.getSettingsManager().getCommandAccept()).equals(plugin.getCommand(plugin.getSettingsManager().getCommandAccept())))
                 {
                     new AcceptCommandExecutor().onCommand(player, null, null, Helper.removeFirst(split));
                     event.setCancelled(true);
@@ -160,7 +161,7 @@ public class SCPlayerListener implements Listener
             }
             else if (command.equalsIgnoreCase(plugin.getSettingsManager().getCommandDeny()))
             {
-                if (!plugin.getServer().getPluginCommand(plugin.getSettingsManager().getCommandDeny()).equals(plugin.getCommand(plugin.getSettingsManager().getCommandDeny())))
+                if (!Bukkit.getPluginCommand(plugin.getSettingsManager().getCommandDeny()).equals(plugin.getCommand(plugin.getSettingsManager().getCommandDeny())))
                 {
                     new DenyCommandExecutor().onCommand(player, null, null, Helper.removeFirst(split));
                     event.setCancelled(true);
@@ -168,7 +169,7 @@ public class SCPlayerListener implements Listener
             }
             else if (command.equalsIgnoreCase(plugin.getSettingsManager().getCommandMore()))
             {
-                if (!plugin.getServer().getPluginCommand(plugin.getSettingsManager().getCommandMore()).equals(plugin.getCommand(plugin.getSettingsManager().getCommandMore())))
+                if (!Bukkit.getPluginCommand(plugin.getSettingsManager().getCommandMore()).equals(plugin.getCommand(plugin.getSettingsManager().getCommandMore())))
                 {
                     new MoreCommandExecutor().onCommand(player, null, null, Helper.removeFirst(split));
                     event.setCancelled(true);
@@ -215,7 +216,7 @@ public class SCPlayerListener implements Listener
             boolean isClanChat = event.getMessage().contains("" + ChatColor.RED + ChatColor.WHITE + ChatColor.RED + ChatColor.BLACK);
             boolean isAllyChat = event.getMessage().contains("" + ChatColor.AQUA + ChatColor.WHITE + ChatColor.AQUA + ChatColor.BLACK);
 
-            for (Iterator iter = event.getRecipients().iterator(); iter.hasNext(); )
+            for (Iterator<?> iter = event.getRecipients().iterator(); iter.hasNext(); )
             {
                 Player player = (Player) iter.next();
 
@@ -288,24 +289,24 @@ public class SCPlayerListener implements Listener
     {
         final Player player = event.getPlayer();
 
-        if (SimpleClans.getInstance().getSettingsManager().isBlacklistedWorld(player.getLocation().getWorld().getName()))
+        if (plugin.getSettingsManager().isBlacklistedWorld(player.getLocation().getWorld().getName()))
         {
             return;
         }
 
         ClanPlayer cp;
-        if (SimpleClans.getInstance().getSettingsManager().getUseBungeeCord())
+        if (plugin.getSettingsManager().getUseBungeeCord())
         {
-            cp = SimpleClans.getInstance().getClanManager().getClanPlayerJoinEvent(player);
+            cp = plugin.getClanManager().getClanPlayerJoinEvent(player);
         }
         else
         {
-            cp = SimpleClans.getInstance().getClanManager().getClanPlayer(player);
+            cp = plugin.getClanManager().getClanPlayer(player);
         }
         
-        SimpleClans.getInstance().getStorageManager().updatePlayerNameAsync(player);
-        SimpleClans.getInstance().getClanManager().updateLastSeen(player);
-        SimpleClans.getInstance().getClanManager().updateDisplayName(player);
+        plugin.getStorageManager().updatePlayerNameAsync(player);
+        plugin.getClanManager().updateLastSeen(player);
+        plugin.getClanManager().updateDisplayName(player);
         
         if (cp == null)
         {
@@ -313,22 +314,15 @@ public class SCPlayerListener implements Listener
         }
         cp.setName(player.getName());
 
-//        if (SimpleClans.getInstance().hasUUID())
-//        {
-//            SimpleClans.getInstance().getSpoutPluginManager().processPlayer(cp.getUniqueId());
-//        }
-//        else
-//        {
-//            SimpleClans.getInstance().getSpoutPluginManager().processPlayer(cp.getName());
-//        }
-        SimpleClans.getInstance().getPermissionsManager().addPlayerPermissions(cp);
+
+        plugin.getPermissionsManager().addPlayerPermissions(cp);
 
         if (plugin.getSettingsManager().isBbShowOnLogin() && cp.isBbEnabled())
         {
         	cp.getClan().displayBb(player);
         }
 
-        SimpleClans.getInstance().getPermissionsManager().addClanPermissions(cp);
+        plugin.getPermissionsManager().addClanPermissions(cp);
 
         if (event.getPlayer().isOp())
         {
@@ -381,7 +375,7 @@ public class SCPlayerListener implements Listener
 
         ClanPlayer cp = plugin.getClanManager().getClanPlayer(event.getPlayer());
 
-        SimpleClans.getInstance().getPermissionsManager().removeClanPlayerPermissions(cp);
+        plugin.getPermissionsManager().removeClanPlayerPermissions(cp);
         plugin.getClanManager().updateLastSeen(event.getPlayer());
         plugin.getRequestManager().endPendingRequest(event.getPlayer().getName());
     }
@@ -415,16 +409,5 @@ public class SCPlayerListener implements Listener
         {
             return;
         }
-
-//        plugin.getSpoutPluginManager().processPlayer(event.getPlayer());
     }
-
-//    /**
-//     * @param event
-//     */
-//    @EventHandler
-//    public void onPlayerToggleSneak(PlayerToggleSneakEvent event)
-//    {
-//        plugin.getSpoutPluginManager().processPlayer(event.getPlayer());
-//    }
 }

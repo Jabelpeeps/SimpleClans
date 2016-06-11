@@ -1,21 +1,21 @@
 package net.sacredlabyrinth.phaed.simpleclans.managers;
 
-import net.sacredlabyrinth.phaed.simpleclans.Helper;
-import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
-import org.bukkit.configuration.file.FileConfiguration;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.configuration.file.FileConfiguration;
+
+import net.sacredlabyrinth.phaed.simpleclans.Helper;
+import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
+
 /**
  * @author phaed
  */
-public final class SettingsManager
-{
+public final class SettingsManager {
     private boolean onlineMode;
     private boolean disableMessages;
     private String clanChatRankColor;
@@ -145,8 +145,7 @@ public final class SettingsManager
     /**
      *
      */
-    public SettingsManager()
-    {
+    public SettingsManager() {
         plugin = SimpleClans.getInstance();
         config = plugin.getConfig();
         main = new File(plugin.getDataFolder() + File.separator + "config.yml");
@@ -157,24 +156,19 @@ public final class SettingsManager
      * Load the configuration
      */
 
-    public void load()
-    {
+    public void load() {
         boolean exists = (main).exists();
 
-        if (exists)
-        {
-            try
-            {
+        if (exists) {
+            try {
                 getConfig().options().copyDefaults(true);
                 getConfig().load(main);
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        else
-        {
+        else {
             getConfig().options().copyDefaults(true);
         }
 
@@ -307,18 +301,14 @@ public final class SettingsManager
             database = strings[0];
             port = Integer.valueOf(strings[1]);
         }
-
         save();
     }
 
-    public void save()
-    {
-        try
-        {
+    public void save() {
+        try {
             getConfig().save(main);
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -329,8 +319,7 @@ public final class SettingsManager
      * @param typeId the type
      * @return whether the world is blacklisted
      */
-    public boolean isItemInList(int typeId)
-    {
+    public boolean isItemInList(int typeId) {
         return itemsList.contains(typeId);
     }
 
@@ -341,16 +330,12 @@ public final class SettingsManager
      * @param world the world
      * @return whether the world is blacklisted
      */
-    public boolean isBlacklistedWorld(String world)
-    {
-        for (Object w : blacklistedWorlds)
-        {
-            if (((String) w).equalsIgnoreCase(world))
-            {
+    public boolean isBlacklistedWorld(String world) {
+        for (Object w : blacklistedWorlds) {
+            if (((String) w).equalsIgnoreCase(world)) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -360,18 +345,13 @@ public final class SettingsManager
      * @param word the world
      * @return whether its a disallowed word
      */
-    public boolean isDisallowedWord(String word)
-    {
-        for (Object w : disallowedWords)
-        {
-            if (((String) w).equalsIgnoreCase(word))
-            {
+    public boolean isDisallowedWord(String word) {
+        for (Object w : disallowedWords) {
+            if (((String) w).equalsIgnoreCase(word)) {
                 return true;
             }
         }
-
         return word.equalsIgnoreCase("clan") || word.equalsIgnoreCase(commandMore) || word.equalsIgnoreCase(commandDeny) || word.equalsIgnoreCase(commandAccept);
-
     }
 
     /**
@@ -380,31 +360,24 @@ public final class SettingsManager
      * @param str the string
      * @return whether the string contains the color code
      */
-    public boolean hasDisallowedColor(String str)
-    {
-        for (Object c : getDisallowedColors())
-        {
-            if (str.contains("&" + c))
-            {
+    public boolean hasDisallowedColor(String str) {
+        for (Object c : getDisallowedColors()) {
+            if (str.contains("&" + c)) {
                 return true;
             }
         }
-
         return false;
     }
 
     /**
      * @return a comma delimited string with all disallowed colors
      */
-    public String getDisallowedColorString()
-    {
+    public String getDisallowedColorString() {
         String out = "";
 
-        for (Object c : getDisallowedColors())
-        {
+        for (Object c : getDisallowedColors()) {
             out += c + ", ";
         }
-
         return Helper.stripTrailing(out, ", ");
     }
 
@@ -414,16 +387,12 @@ public final class SettingsManager
      * @param tag the tag
      * @return whether the clan is unrivable
      */
-    public boolean isUnrivable(String tag)
-    {
-        for (Object t : getunRivableClans())
-        {
-            if (((String) t).equalsIgnoreCase(tag))
-            {
+    public boolean isUnrivable(String tag) {
+        for (Object t : getunRivableClans()) {
+            if (((String) t).equalsIgnoreCase(tag)) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -434,20 +403,15 @@ public final class SettingsManager
      * @return whether player is banned
      */
     @Deprecated
-    public boolean isBanned(String playerName)
-    {
-        if (SimpleClans.getInstance().hasUUID())
-        {
-            playerName = UUIDMigration.getForcedPlayerUUID(playerName).toString();
-        }
-        for (String pl : getBannedPlayers())
-        {
-            if (pl.equalsIgnoreCase(playerName))
-            {
+    public boolean isBanned(String playerName) {
+        
+        playerName = UUIDMigration.getForcedPlayerUUID(playerName).toString();
+        
+        for (String pl : getBannedPlayers()){
+            if (pl.equalsIgnoreCase(playerName)){
                 return true;
             }
         }
-
         return false;
     }
 
@@ -457,17 +421,13 @@ public final class SettingsManager
      * @param playerName the player's name
      */
     @Deprecated
-    public void addBanned(String playerName)
-    {
-        if (SimpleClans.getInstance().hasUUID())
-        {
-            playerName = UUIDMigration.getForcedPlayerUUID(playerName).toString();
-        }
-        if (!bannedPlayers.contains(playerName))
-        {
+    public void addBanned(String playerName) {
+        
+        playerName = UUIDMigration.getForcedPlayerUUID(playerName).toString();
+        
+        if (!bannedPlayers.contains(playerName)) {
             getBannedPlayers().add(playerName);
         }
-
         save();
     }
 
@@ -477,17 +437,13 @@ public final class SettingsManager
      * @param playerName the player's name
      */
     @Deprecated
-    public void removeBanned(String playerName)
-    {
-        if (SimpleClans.getInstance().hasUUID())
-        {
-            playerName = UUIDMigration.getForcedPlayerUUID(playerName).toString();
-        }
-        if (getBannedPlayers().contains(playerName))
-        {
+    public void removeBanned(String playerName) {
+        
+        playerName = UUIDMigration.getForcedPlayerUUID(playerName).toString();
+        
+        if (getBannedPlayers().contains(playerName)) {
             getBannedPlayers().remove(playerName);
         }
-
         save();
     }
 
@@ -497,16 +453,12 @@ public final class SettingsManager
      * @param playerUniqueId the player's name
      * @return whether player is banned
      */
-    public boolean isBanned(UUID playerUniqueId)
-    {
-        for (String pl : getBannedPlayers())
-        {
-            if (pl.equals(playerUniqueId.toString()))
-            {
+    public boolean isBanned(UUID playerUniqueId) {
+        for (String pl : getBannedPlayers()) {
+            if (pl.equals(playerUniqueId.toString())) {
                 return true;
             }
         }
-
         return false;
     }
 

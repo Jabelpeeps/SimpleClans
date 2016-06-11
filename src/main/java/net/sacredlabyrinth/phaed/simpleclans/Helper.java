@@ -1,34 +1,44 @@
 package net.sacredlabyrinth.phaed.simpleclans;
 
-import net.sacredlabyrinth.phaed.simpleclans.storage.DBCore;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.*;
+import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
 
 /**
  * @author phaed
  */
-public class Helper
-{
+public class Helper {
 	
+    private static SimpleClans plugin = SimpleClans.getInstance();
+    
 	private Helper() {}
 
     /**
      * Dumps stacktrace to log
      */
-    public static void dumpStackTrace()
-    {
-        for (StackTraceElement el : Thread.currentThread().getStackTrace())
-        {
+    public static void dumpStackTrace() {
+        for (StackTraceElement el : Thread.currentThread().getStackTrace()) {
             SimpleClans.debug(el.toString());
         }
     }
@@ -39,15 +49,12 @@ public class Helper
      * @param playerName
      * @return
      */
-    public static String getColorName(String playerName)
-    {
-        List<Player> players = SimpleClans.getInstance().getServer().matchPlayer(playerName);
+    public static String getColorName(String playerName) {
+        List<Player> players = Bukkit.matchPlayer(playerName);
 
-        if (players.size() == 1)
-        {
-            return SimpleClans.getInstance().getPermissionsManager().getPrefix(players.get(0)) + players.get(0).getName() + SimpleClans.getInstance().getPermissionsManager().getSuffix(players.get(0));
+        if (players.size() == 1) {
+            return plugin.getPermissionsManager().getPrefix(players.get(0)) + players.get(0).getName() + plugin.getPermissionsManager().getSuffix(players.get(0));
         }
-
         return playerName;
     }
 
@@ -57,8 +64,7 @@ public class Helper
      * @param o
      * @return
      */
-    public static boolean isInteger(Object o)
-    {
+    public static boolean isInteger(Object o) {
         return o instanceof java.lang.Integer;
     }
 
@@ -68,15 +74,12 @@ public class Helper
      * @param input
      * @return
      */
-    public static boolean isByte(String input)
-    {
-        try
-        {
+    public static boolean isByte(String input) {
+        try {
             Byte.parseByte(input);
             return true;
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             return false;
         }
     }
@@ -87,15 +90,12 @@ public class Helper
      * @param input
      * @return
      */
-    public static boolean isShort(String input)
-    {
-        try
-        {
+    public static boolean isShort(String input) {
+        try {
             Short.parseShort(input);
             return true;
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             return false;
         }
     }
@@ -106,15 +106,12 @@ public class Helper
      * @param input
      * @return
      */
-    public static boolean isInteger(String input)
-    {
-        try
-        {
+    public static boolean isInteger(String input) {
+        try {
             Integer.parseInt(input);
             return true;
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             return false;
         }
     }
@@ -125,15 +122,12 @@ public class Helper
      * @param input
      * @return
      */
-    public static boolean isFloat(String input)
-    {
-        try
-        {
+    public static boolean isFloat(String input) {
+        try {
             Float.parseFloat(input);
             return true;
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             return false;
         }
     }
@@ -144,8 +138,7 @@ public class Helper
      * @param o
      * @return
      */
-    public static boolean isString(Object o)
-    {
+    public static boolean isString(Object o) {
         return o instanceof java.lang.String;
     }
 
@@ -155,8 +148,7 @@ public class Helper
      * @param o
      * @return
      */
-    public static boolean isBoolean(Object o)
-    {
+    public static boolean isBoolean(Object o)  {
         return o instanceof java.lang.Boolean;
     }
 
@@ -167,18 +159,14 @@ public class Helper
      * @param c
      * @return
      */
-    public static String removeChar(String s, char c)
-    {
+    public static String removeChar(String s, char c) {
         String r = "";
 
-        for (int i = 0; i < s.length(); i++)
-        {
-            if (s.charAt(i) != c)
-            {
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) != c)  {
                 r += s.charAt(i);
             }
         }
-
         return r;
     }
 
@@ -189,19 +177,15 @@ public class Helper
      * @param c
      * @return
      */
-    public static String removeFirstChar(String s, char c)
-    {
+    public static String removeFirstChar(String s, char c) {
         String r = "";
 
-        for (int i = 0; i < s.length(); i++)
-        {
-            if (s.charAt(i) != c)
-            {
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) != c) {
                 r += s.charAt(i);
                 break;
             }
         }
-
         return r;
     }
 
@@ -211,13 +195,10 @@ public class Helper
      * @param content
      * @return
      */
-    public static String capitalize(String content)
-    {
-        if (content.length() < 2)
-        {
+    public static String capitalize(String content) {
+        if (content.length() < 2) {
             return content;
         }
-
         String first = content.substring(0, 1).toUpperCase();
         return first + content.substring(1);
     }
@@ -230,8 +211,7 @@ public class Helper
      * @param ending
      * @return
      */
-    public static String plural(int count, String word, String ending)
-    {
+    public static String plural(int count, String word, String ending) {
         return count == 1 ? word : word + ending;
     }
 
@@ -241,13 +221,10 @@ public class Helper
      * @param hexValue
      * @return
      */
-    public static String toColor(String hexValue)
-    {
-        if (hexValue == null)
-        {
+    public static String toColor(String hexValue) {
+        if (hexValue == null) {
             return "";
         }
-
         return ChatColor.getByChar(hexValue).toString();
     }
 
@@ -257,8 +234,7 @@ public class Helper
      * @param values
      * @return
      */
-    public static List<String> fromArray(String... values)
-    {
+    public static List<String> fromArray(String... values) {
         List<String> results = new ArrayList<>();
         Collections.addAll(results, values);
         results.remove("");
@@ -271,8 +247,7 @@ public class Helper
      * @param values
      * @return
      */
-    public static Set<String> fromArray2(String... values)
-    {
+    public static Set<String> fromArray2(String... values) {
         HashSet<String> results = new HashSet<>();
         Collections.addAll(results, values);
         results.remove("");
@@ -285,8 +260,7 @@ public class Helper
      * @param values
      * @return
      */
-    public static List<Player> fromPlayerArray(Player... values)
-    {
+    public static List<Player> fromPlayerArray(Player... values) {
         List<Player> results = new ArrayList<>();
         Collections.addAll(results, values);
         return results;
@@ -298,8 +272,7 @@ public class Helper
      * @param list
      * @return
      */
-    public static String[] toArray(List<String> list)
-    {
+    public static String[] toArray(List<String> list) {
         return list.toArray(new String[list.size()]);
     }
 
@@ -309,12 +282,10 @@ public class Helper
      * @param args
      * @return
      */
-    public static String[] removeFirst(String[] args)
-    {
+    public static String[] removeFirst(String[] args) {
         List<String> out = fromArray(args);
 
-        if (!out.isEmpty())
-        {
+        if (!out.isEmpty()) {
             out.remove(0);
         }
         return toArray(out);
@@ -326,15 +297,12 @@ public class Helper
      * @param args
      * @return
      */
-    public static String toMessage(String[] args)
-    {
+    public static String toMessage(String[] args) {
         String out = "";
 
-        for (String arg : args)
-        {
+        for (String arg : args) {
             out += arg + " ";
         }
-
         return out.trim();
     }
 
@@ -345,15 +313,12 @@ public class Helper
      * @param sep
      * @return
      */
-    public static String toMessage(String[] args, String sep)
-    {
+    public static String toMessage(String[] args, String sep) {
         String out = "";
 
-        for (String arg : args)
-        {
+        for (String arg : args) {
             out += arg + ", ";
         }
-
         return stripTrailing(out, ", ");
     }
 
@@ -642,22 +607,19 @@ public class Helper
      * @param map
      * @return Map
      */
-    public static Map sortByValue(Map map)
-    {
+    public static Map sortByValue(Map map) {
         List list = new LinkedList(map.entrySet());
-        Collections.sort(list, new Comparator()
-        {
+        
+        Collections.sort(list, new Comparator() {
 
             @Override
-            public int compare(Object o1, Object o2)
-            {
+            public int compare(Object o1, Object o2) {
                 return ((Comparable) ((Map.Entry) (o2)).getValue()).compareTo(((Map.Entry) (o1)).getValue());
             }
         });
 
         Map result = new LinkedHashMap();
-        for (Iterator it = list.iterator(); it.hasNext(); )
-        {
+        for (Iterator it = list.iterator(); it.hasNext(); )  {
             Map.Entry entry = (Map.Entry) it.next();
             result.put(entry.getKey(), entry.getValue());
         }
@@ -673,37 +635,24 @@ public class Helper
         return false;
     }
 
-    public static Collection<Player> getOnlinePlayers()
-    {
-        try
-        {
+    public static Collection<Player> getOnlinePlayers() {
+        try {
             Method method = Bukkit.class.getDeclaredMethod("getOnlinePlayers");
             Object players = method.invoke(null);
 
-            if (players instanceof Player[])
-            {
+            if (players instanceof Player[]) {
                 return new ArrayList<>(Arrays.asList((Player[]) players));
             }
-            else
-            {
-                return (Collection<Player>) players;
-            }
+            return (Collection<Player>) players;
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace();
         }
 
         return new ArrayList<>();
     }
 
-    public static Player getPlayer(String playerName)
-    {
-        if (SimpleClans.getInstance().hasUUID())
-        {
-            return SimpleClans.getInstance().getServer().getPlayer(UUIDMigration.getForcedPlayerUUID(playerName));
-        }
-
-        return SimpleClans.getInstance().getServer().getPlayer(playerName);
+    public static Player getPlayer(String playerName) {
+        return Bukkit.getPlayer(UUIDMigration.getForcedPlayerUUID(playerName));
     }
 }

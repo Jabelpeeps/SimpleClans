@@ -1,19 +1,20 @@
 package net.sacredlabyrinth.phaed.simpleclans.managers;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.plugin.RegisteredServiceProvider;
+
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
-
-import org.bukkit.entity.Player;
-import org.bukkit.permissions.PermissionAttachment;
-import org.bukkit.plugin.RegisteredServiceProvider;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author phaed
@@ -50,7 +51,7 @@ public final class PermissionsManager
         }
         catch (ClassNotFoundException e)
         {
-            SimpleClans.log("[PreciousStones] Vault not found. No economy or extended Permissions support.");
+            SimpleClans.log("[SimpleClans] Vault not found. No economy or extended Permissions support.");
         }
     }
 
@@ -69,11 +70,11 @@ public final class PermissionsManager
      */
     public void loadPermissions()
     {
-        SimpleClans.getInstance().getSettingsManager().load();
+        plugin.getSettingsManager().load();
         permissions.clear();
         for (Clan clan : plugin.getClanManager().getClans())
         {
-            permissions.put(clan.getTag(), SimpleClans.getInstance().getConfig().getStringList("permissions." + clan.getTag()));
+            permissions.put(clan.getTag(), plugin.getConfig().getStringList("permissions." + clan.getTag()));
         }
     }
 
@@ -86,10 +87,10 @@ public final class PermissionsManager
         {
             if (permissions.containsKey(clan.getTag()))
             {
-                SimpleClans.getInstance().getSettingsManager().getConfig().set("permissions." + clan.getTag(), getPermissions(clan));
+                plugin.getSettingsManager().getConfig().set("permissions." + clan.getTag(), getPermissions(clan));
             }
         }
-        SimpleClans.getInstance().getSettingsManager().save();
+        plugin.getSettingsManager().save();
     }
 
     /**
@@ -119,7 +120,7 @@ public final class PermissionsManager
             {
                 if (!permAttaches.containsKey(cp.toPlayer()))
                 {
-                    permAttaches.put(cp.toPlayer(), cp.toPlayer().addAttachment(SimpleClans.getInstance()));
+                    permAttaches.put(cp.toPlayer(), cp.toPlayer().addAttachment(plugin));
                 }
                 //Adds all permisisons from his clan
                 for (String perm : getPermissions(cp.getClan()))
@@ -352,7 +353,7 @@ public final class PermissionsManager
 
     private Boolean setupPermissions()
     {
-        RegisteredServiceProvider<Permission> permissionProvider = plugin.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+        RegisteredServiceProvider<Permission> permissionProvider = Bukkit.getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
         if (permissionProvider != null)
         {
             permission = permissionProvider.getProvider();
@@ -362,7 +363,7 @@ public final class PermissionsManager
 
     private Boolean setupChat()
     {
-        RegisteredServiceProvider<Chat> chatProvider = plugin.getServer().getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class);
+        RegisteredServiceProvider<Chat> chatProvider = Bukkit.getServicesManager().getRegistration(net.milkbowl.vault.chat.Chat.class);
         if (chatProvider != null)
         {
             chat = chatProvider.getProvider();
@@ -373,7 +374,7 @@ public final class PermissionsManager
 
     private Boolean setupEconomy()
     {
-        RegisteredServiceProvider<Economy> economyProvider = plugin.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
         if (economyProvider != null)
         {
             economy = economyProvider.getProvider();
@@ -386,7 +387,7 @@ public final class PermissionsManager
      * @param p
      * @return
      */
-    @SuppressWarnings({"deprecation", "deprecation"})
+    @SuppressWarnings({"deprecation"})
     public String getPrefix(Player p)
     {
         String out = "";
@@ -446,7 +447,7 @@ public final class PermissionsManager
      * @param p
      * @return
      */
-    @SuppressWarnings({"deprecation", "deprecation"})
+    @SuppressWarnings({"deprecation"})
     public String getSuffix(Player p)
     {
         try

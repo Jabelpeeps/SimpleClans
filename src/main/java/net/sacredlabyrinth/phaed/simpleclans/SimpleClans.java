@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,7 +30,6 @@ import net.sacredlabyrinth.phaed.simpleclans.managers.RequestManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.StorageManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.TeleportManager;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
 
 /**
  * @author Phaed
@@ -42,12 +42,11 @@ public class SimpleClans extends JavaPlugin {
     private ClanManager clanManager;
     private RequestManager requestManager;
     private StorageManager storageManager;
-//    private SpoutPluginManager spoutPluginManager;
-    private SettingsManager settingsManager;
+    private static SettingsManager settingsManager;
     private PermissionsManager permissionsManager;
     private TeleportManager teleportManager;
     private LanguageManager languageManager;
-    private boolean hasUUID;
+//    private boolean hasUUID;
 
     /**
      * @return the logger
@@ -59,9 +58,8 @@ public class SimpleClans extends JavaPlugin {
     /**
      * @param msg
      */
-    public static void debug(String msg)
-    {
-        if (getInstance().getSettingsManager().isDebugging()) {
+    public static void debug(String msg) {
+        if (settingsManager.isDebugging()) {
             logger.log(Level.INFO, msg);
         }
     }
@@ -69,13 +67,11 @@ public class SimpleClans extends JavaPlugin {
     /**
      * @return the instance
      */
-    public static SimpleClans getInstance()
-    {
+    public static SimpleClans getInstance() {
         return instance;
     }
 
-    public static void log(String msg, Object... arg)
-    {
+    public static void log(String msg, Object... arg) {
         if (arg == null || arg.length == 0) {
             logger.log(Level.INFO, msg);
         } else {
@@ -84,15 +80,13 @@ public class SimpleClans extends JavaPlugin {
     }
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         instance = this;
 
         settingsManager = new SettingsManager();
-        this.hasUUID = UUIDMigration.canReturnUUID();
+//        hasUUID = UUIDMigration.canReturnUUID();
         languageManager = new LanguageManager();
 
-//        spoutPluginManager = new SpoutPluginManager();
         permissionsManager = new PermissionsManager();
         requestManager = new RequestManager();
         clanManager = new ClanManager();
@@ -101,65 +95,58 @@ public class SimpleClans extends JavaPlugin {
 
         logger.info(MessageFormat.format(getLang("version.loaded"), getDescription().getName(), getDescription().getVersion()));
 
-        getServer().getPluginManager().registerEvents(new SCEntityListener(), this);
-        getServer().getPluginManager().registerEvents(new SCPlayerListener(), this);
+        Bukkit.getPluginManager().registerEvents(new SCEntityListener(), this);
+        Bukkit.getPluginManager().registerEvents(new SCPlayerListener(), this);
 
-//        spoutPluginManager.processAllPlayers();
         permissionsManager.loadPermissions();
 
-        CommandHelper.registerCommand(getSettingsManager().getCommandClan());
-        CommandHelper.registerCommand(getSettingsManager().getCommandAccept());
-        CommandHelper.registerCommand(getSettingsManager().getCommandDeny());
-        CommandHelper.registerCommand(getSettingsManager().getCommandMore());
-        CommandHelper.registerCommand(getSettingsManager().getCommandAlly());
-        CommandHelper.registerCommand(getSettingsManager().getCommandGlobal());
+        CommandHelper.registerCommand(settingsManager.getCommandClan());
+        CommandHelper.registerCommand(settingsManager.getCommandAccept());
+        CommandHelper.registerCommand(settingsManager.getCommandDeny());
+        CommandHelper.registerCommand(settingsManager.getCommandMore());
+        CommandHelper.registerCommand(settingsManager.getCommandAlly());
+        CommandHelper.registerCommand(settingsManager.getCommandGlobal());
 
-        getCommand(getSettingsManager().getCommandClan()).setExecutor(new ClanCommandExecutor());
-        getCommand(getSettingsManager().getCommandAccept()).setExecutor(new AcceptCommandExecutor());
-        getCommand(getSettingsManager().getCommandDeny()).setExecutor(new DenyCommandExecutor());
-        getCommand(getSettingsManager().getCommandMore()).setExecutor(new MoreCommandExecutor());
-        getCommand(getSettingsManager().getCommandAlly()).setExecutor(new AllyCommandExecutor());
-        getCommand(getSettingsManager().getCommandGlobal()).setExecutor(new GlobalCommandExecutor());
+        getCommand(settingsManager.getCommandClan()).setExecutor(new ClanCommandExecutor());
+        getCommand(settingsManager.getCommandAccept()).setExecutor(new AcceptCommandExecutor());
+        getCommand(settingsManager.getCommandDeny()).setExecutor(new DenyCommandExecutor());
+        getCommand(settingsManager.getCommandMore()).setExecutor(new MoreCommandExecutor());
+        getCommand(settingsManager.getCommandAlly()).setExecutor(new AllyCommandExecutor());
+        getCommand(settingsManager.getCommandGlobal()).setExecutor(new GlobalCommandExecutor());
 
-        getCommand(getSettingsManager().getCommandClan()).setTabCompleter(new PlayerNameTabCompleter());
+        getCommand(settingsManager.getCommandClan()).setTabCompleter(new PlayerNameTabCompleter());
 
         pullMessages();
-        logger.info("[SimpleClans] Online Mode: " + hasUUID);
-        logger.info("[SimpleClans] Modo Multithreading: " + SimpleClans.getInstance().getSettingsManager().getUseThreads());
-        logger.info("[SimpleClans] Modo BungeeCord: " + SimpleClans.getInstance().getSettingsManager().getUseBungeeCord());
+//        logger.info("[SimpleClans] Online Mode: " + hasUUID);
+        logger.info("[SimpleClans] Modo Multithreading: " + settingsManager.getUseThreads());
+        logger.info("[SimpleClans] Modo BungeeCord: " + settingsManager.getUseBungeeCord());
     }
 
     @Override
-    public void onDisable()
-    {
-        getServer().getScheduler().cancelTasks(this);
-        getStorageManager().closeConnection();
-        getPermissionsManager().savePermissions();
+    public void onDisable() {
+        Bukkit.getScheduler().cancelTasks(this);
+        storageManager.closeConnection();
+        permissionsManager.savePermissions();
     }
 
-    public void pullMessages()
-    {
-        if (getSettingsManager().isDisableMessages())
-        {
+    public void pullMessages() {
+        if (settingsManager.isDisableMessages()) {
             return;
         }
 
-        try
-        {
+        try {
             BufferedReader in = new BufferedReader(new InputStreamReader(new URL("https://minecraftcubed.net/pluginmessage/").openStream()
             		, StandardCharsets.UTF_8));
 
             String message;
-            while ((message = in.readLine()) != null)
-            {
+            while ((message = in.readLine()) != null) {
                 messages.add(message);
-                getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + message);
+                Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + message);
             }
             in.close();
 
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             // do nothing
         }
     }
@@ -167,48 +154,35 @@ public class SimpleClans extends JavaPlugin {
     /**
      * @return the clanManager
      */
-    public ClanManager getClanManager()
-    {
+    public ClanManager getClanManager() {
         return clanManager;
     }
 
     /**
      * @return the requestManager
      */
-    public RequestManager getRequestManager()
-    {
+    public RequestManager getRequestManager() {
         return requestManager;
     }
 
     /**
      * @return the storageManager
      */
-    public StorageManager getStorageManager()
-    {
+    public StorageManager getStorageManager() {
         return storageManager;
     }
-
-//    /**
-//     * @return the spoutManager
-//     */
-//    public SpoutPluginManager getSpoutPluginManager()
-//    {
-//        return spoutPluginManager;
-//    }
 
     /**
      * @return the settingsManager
      */
-    public SettingsManager getSettingsManager()
-    {
+    public SettingsManager getSettingsManager() {
         return settingsManager;
     }
 
     /**
      * @return the permissionsManager
      */
-    public PermissionsManager getPermissionsManager()
-    {
+    public PermissionsManager getPermissionsManager() {
         return permissionsManager;
     }
 
@@ -223,29 +197,25 @@ public class SimpleClans extends JavaPlugin {
         return teleportManager;
     }
 
-    public List<String> getMessages()
-    {
+    public List<String> getMessages() {
         return messages;
     }
 
     /**
-     * @return the hasUUID
-     */
-    public boolean hasUUID()
-    {
-        return this.hasUUID;
-    }
+//     * @return the hasUUID
+//     */
+//    public boolean hasUUID() {
+//        return hasUUID;
+//    }
 
-    /**
-     * @param trueOrFalse
-     */
-    public void setUUID(boolean trueOrFalse)
-    {
-        this.hasUUID = trueOrFalse;
-    }
+//    /**
+//     * @param trueOrFalse
+//     */
+//    public void setUUID(boolean trueOrFalse) {
+//        hasUUID = trueOrFalse;
+//    }
 
-    public LanguageManager getLanguageManager()
-    {
+    public LanguageManager getLanguageManager() {
         return languageManager;
     }
 }

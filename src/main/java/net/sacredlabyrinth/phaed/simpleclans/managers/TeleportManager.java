@@ -1,9 +1,10 @@
 package net.sacredlabyrinth.phaed.simpleclans.managers;
 
-import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
-import net.sacredlabyrinth.phaed.simpleclans.Helper;
-import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
-import net.sacredlabyrinth.phaed.simpleclans.TeleportState;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,21 +12,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
+import net.sacredlabyrinth.phaed.simpleclans.Helper;
+import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.TeleportState;
 
-public final class TeleportManager
-{
+public final class TeleportManager {
     private SimpleClans plugin;
     private HashMap<String, TeleportState> waitingPlayers = new HashMap<>();
 
     /**
      *
      */
-    public TeleportManager()
-    {
+    public TeleportManager() {
         plugin = SimpleClans.getInstance();
         startCounter();
     }
@@ -37,20 +36,12 @@ public final class TeleportManager
      * @param dest
      * @param clanName
      */
-    public void addPlayer(Player player, Location dest, String clanName)
-    {
+    public void addPlayer(Player player, Location dest, String clanName) {
         int secs = SimpleClans.getInstance().getSettingsManager().getWaitSecs();
 
-        if (SimpleClans.getInstance().hasUUID())
-        {
-            waitingPlayers.put(player.getUniqueId().toString(), new TeleportState(player, dest, clanName));
-        } else 
-        {
-            waitingPlayers.put(player.getName(), new TeleportState(player, dest, clanName));
-        }
-
-        if (secs > 0)
-        {
+        waitingPlayers.put(player.getUniqueId().toString(), new TeleportState(player, dest, clanName));
+        
+        if (secs > 0) {
             ChatBlock.sendMessage(player, ChatColor.AQUA + MessageFormat.format(plugin.getLang("waiting.for.teleport.stand.still.for.0.seconds"), secs));
         }
     }

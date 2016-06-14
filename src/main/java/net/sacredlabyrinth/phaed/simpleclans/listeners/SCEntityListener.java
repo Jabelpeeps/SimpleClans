@@ -90,7 +90,7 @@ public class SCEntityListener implements Listener {
                     for (ClanPlayer cp : acp.getClan().getOnlineMembers()) {
                         double money = Math.round((reward / acp.getClan().getOnlineMembers().size()) * 100D) / 100D;
                         cp.toPlayer().sendMessage(ChatColor.AQUA + MessageFormat.format(plugin.getLang("player.got.money"), money, victim.getName(), kdr));
-                        plugin.getPermissionsManager().playerGrantMoney(cp.getName(), money);
+                        plugin.getPermissionsManager().playerGrantMoney(cp.toPlayer(), money);
                     }
                 }
                 // record death for victim

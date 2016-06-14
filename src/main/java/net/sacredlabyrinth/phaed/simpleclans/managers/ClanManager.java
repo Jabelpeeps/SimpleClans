@@ -31,16 +31,9 @@ import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
  */
 public final class ClanManager {
 
-    private SimpleClans plugin;
+    private SimpleClans plugin = SimpleClans.getInstance();
     private HashMap<String, Clan> clans = new HashMap<>();
     private HashMap<String, ClanPlayer> clanPlayers = new HashMap<>();
-
-    /**
-     *
-     */
-    public ClanManager() {
-        plugin = SimpleClans.getInstance();
-    }
 
     /**
      * Deletes all clans and clan players in memory
@@ -144,21 +137,21 @@ public final class ClanManager {
         return clans.get(Helper.cleanTag(tag));
     }
 
-    /**
-     * Get a player's clan
-     *
-     * @param playerName
-     * @return null if not in a clan
-     */
-    @Deprecated
-    public Clan getClanByPlayerName(String playerName) {
-        ClanPlayer cp = getClanPlayer(playerName);
-
-        if (cp != null) {
-            return cp.getClan();
-        }
-        return null;
-    }
+//    /**
+//     * Get a player's clan
+//     *
+//     * @param playerName
+//     * @return null if not in a clan
+//     */
+//    @Deprecated
+//    public Clan getClanByPlayerName(String playerName) {
+//        ClanPlayer cp = getClanPlayer(playerName);
+//
+//        if (cp != null) {
+//            return cp.getClan();
+//        }
+//        return null;
+//    }
 
     /**
      * Get a player's clan
@@ -216,24 +209,24 @@ public final class ClanManager {
     }
 
     /**
-     * Gets the ClanPlayer data object if a player is currently in a clan, null
-     * if he's not in a clan
-     *
-     * @param playerName
-     * @return
-     */
-    @Deprecated
-    public ClanPlayer getClanPlayer(String playerName) {
-        ClanPlayer cp = getClanPlayerName(playerName);
-
-        if (cp == null){
-            return null;
-        }
-        if (cp.getClan() == null){
-            return null;
-        }
-        return cp;
-    }
+//     * Gets the ClanPlayer data object if a player is currently in a clan, null
+//     * if he's not in a clan
+//     *
+//     * @param playerName
+//     * @return
+//     */
+//    @Deprecated
+//    public ClanPlayer getClanPlayer(String playerName) {
+//        ClanPlayer cp = getClanPlayerName(playerName);
+//
+//        if (cp == null){
+//            return null;
+//        }
+//        if (cp.getClan() == null){
+//            return null;
+//        }
+//        return cp;
+//    }
 
     /**
      * Gets the ClanPlayer data object if a player is currently in a clan, null
@@ -278,19 +271,19 @@ public final class ClanManager {
         return cp;
     }
 
-    /**
-     * Gets the ClanPlayer data object for the player, will retrieve disabled
-     * clan players as well, these are players who used to be in a clan but are
-     * not currently in one, their data file persists and can be accessed. their
-     * clan will be null though.
-     *
-     * @param playerName
-     * @return
-     */
-    @Deprecated
-    public ClanPlayer getAnyClanPlayer(String playerName) {
-        return getClanPlayerName(playerName);       
-    }
+//    /**
+//     * Gets the ClanPlayer data object for the player, will retrieve disabled
+//     * clan players as well, these are players who used to be in a clan but are
+//     * not currently in one, their data file persists and can be accessed. their
+//     * clan will be null though.
+//     *
+//     * @param playerName
+//     * @return
+//     */
+//    @Deprecated
+//    public ClanPlayer getAnyClanPlayer(String playerName) {
+//        return getClanPlayerName(playerName);       
+//    }
 
     /**
      * Gets the ClanPlayer data object for the player, will retrieve disabled
@@ -305,24 +298,24 @@ public final class ClanManager {
         return clanPlayers.get(playerUniqueId.toString());
     }
 
-    /**
-     * Gets the ClanPlayer object for the player, creates one if not found
-     *
-     * @param playerName
-     * @return
-     */
-    @Deprecated
-    public ClanPlayer getCreateClanPlayer(String playerName) {
-        if (clanPlayers.containsKey(playerName.toLowerCase())) {
-            return clanPlayers.get(playerName.toLowerCase());
-        }
-        ClanPlayer cp = new ClanPlayer(playerName);
-
-        plugin.getStorageManager().insertClanPlayer(cp);
-        importClanPlayer(cp);
-
-        return cp;
-    }
+//    /**
+//     * Gets the ClanPlayer object for the player, creates one if not found
+//     *
+//     * @param playerName
+//     * @return
+//     */
+//    @Deprecated
+//    public ClanPlayer getCreateClanPlayer(String playerName) {
+//        if (clanPlayers.containsKey(playerName.toLowerCase())) {
+//            return clanPlayers.get(playerName.toLowerCase());
+//        }
+//        ClanPlayer cp = new ClanPlayer(playerName);
+//
+//        plugin.getStorageManager().insertClanPlayer(cp);
+//        importClanPlayer(cp);
+//
+//        return cp;
+//    }
 
     /**
      * Gets the ClanPlayer object for the player, creates one if not found
@@ -393,7 +386,7 @@ public final class ClanManager {
             String lastColor = plugin.getSettingsManager().isUseColorCodeFromPrefix() ? Helper.getLastColorCode(prefix) : ChatColor.WHITE + "";
             String fullName = player.getName();
 
-            ClanPlayer cp = plugin.getClanManager().getAnyClanPlayer(player.getName());
+            ClanPlayer cp = plugin.getClanManager().getAnyClanPlayer(player.getUniqueId());
 
             if (cp == null) {
                 return;
@@ -416,7 +409,7 @@ public final class ClanManager {
      * @param player
      */
     public void updateLastSeen(Player player) {
-        ClanPlayer cp = getAnyClanPlayer(player.getName());
+        ClanPlayer cp = getAnyClanPlayer(player.getUniqueId());
 
         if (cp != null) {
             cp.updateLastSeen();
@@ -434,8 +427,8 @@ public final class ClanManager {
     /**
      * @param playerName
      */
-    public void ban(String playerName) {
-        ClanPlayer cp = getClanPlayer(playerName);
+    public void ban(Player player) {
+        ClanPlayer cp = getClanPlayer(player);
         Clan clan = cp.getClan();
 
         if (clan != null) {
@@ -447,13 +440,13 @@ public final class ClanManager {
                 cp.addPastClan(clan.getColorTag() + (cp.isLeader() ? ChatColor.DARK_RED + "*" : ""));
                 cp.setLeader(false);
                 cp.setJoinDate(0);
-                clan.removeMember(playerName);
+                clan.removeMember(player.getUniqueId());
 
                 plugin.getStorageManager().updateClanPlayer(cp);
                 plugin.getStorageManager().updateClan(clan);
             }
         }
-        plugin.getSettingsManager().addBanned(playerName);
+        plugin.getSettingsManager().addBanned(player.getUniqueId());
     }
 
     /**
@@ -1046,7 +1039,7 @@ public final class ClanManager {
      * @param msg
      */
     public void processClanChat(Player player, String msg) {
-        ClanPlayer cp = plugin.getClanManager().getClanPlayer(player.getName());
+        ClanPlayer cp = plugin.getClanManager().getClanPlayer(player.getUniqueId());
 
         if (cp == null) return;
 

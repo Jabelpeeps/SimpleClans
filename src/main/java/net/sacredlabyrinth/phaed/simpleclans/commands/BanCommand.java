@@ -3,12 +3,12 @@ package net.sacredlabyrinth.phaed.simpleclans.commands;
 import java.text.MessageFormat;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
 
 /**
  *
@@ -28,9 +28,9 @@ public class BanCommand {
 
         if (plugin.getPermissionsManager().has(player, "simpleclans.mod.ban")) {
             if (arg.length == 1) {
-                String banned = arg[0];
+                Player banned = Bukkit.getPlayer( arg[0] );
                 
-                UUID PlayerUniqueId = UUIDMigration.getForcedPlayerUUID(banned);
+                UUID PlayerUniqueId = banned.getUniqueId();
                 if (!plugin.getSettingsManager().isBanned(PlayerUniqueId)) {
                     Player pl = SimpleClans.getInstance().getServer().getPlayer(PlayerUniqueId);
 

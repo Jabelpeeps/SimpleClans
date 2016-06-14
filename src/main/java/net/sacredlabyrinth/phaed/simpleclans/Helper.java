@@ -458,27 +458,27 @@ public class Helper {
         return out;
     }
 
-    /**
-     * Check whether a player is online
-     *
-     * @param playerName
-     * @return
-     */
-    @Deprecated
-    public static boolean isOnline(String playerName)
-    {
-        Collection<Player> online = getOnlinePlayers();
-
-        for (Player o : online)
-        {
-            if (o.getName().equalsIgnoreCase(playerName))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+//    /**
+//     * Check whether a player is online
+//     *
+//     * @param playerName
+//     * @return
+//     */
+//    @Deprecated
+//    public static boolean isOnline(String playerName)
+//    {
+//        Collection<Player> online = getOnlinePlayers();
+//
+//        for (Player o : online)
+//        {
+//            if (o.getName().equalsIgnoreCase(playerName))
+//            {
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
 
 
     /**
@@ -608,6 +608,7 @@ public class Helper {
      * @return Map
      */
     public static Map sortByValue(Map map) {
+        
         List list = new LinkedList(map.entrySet());
         
         Collections.sort(list, new Comparator() {

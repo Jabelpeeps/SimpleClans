@@ -2,6 +2,7 @@ package net.sacredlabyrinth.phaed.simpleclans.commands;
 
 import java.text.MessageFormat;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -10,7 +11,6 @@ import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
 
 /**
  *
@@ -35,14 +35,14 @@ public class KickCommand {
 
                 if (clan.isLeader(player)) {
                     if (arg.length == 1) {
-                        String kicked = arg[0];
-
+                        Player kicked = Bukkit.getPlayer( arg[0] );
+                        
                         if (kicked != null) {
-                            if (!kicked.equalsIgnoreCase(player.getName())) {
+                            if (!kicked.getName().equalsIgnoreCase(player.getName())) {
                                 if (clan.isMember(kicked)) {
                                     if (!clan.isLeader(kicked)) {
-                                        clan.addBb(player.getName(),  ChatColor.AQUA + MessageFormat.format(plugin.getLang("has.been.kicked.by"), Helper.capitalize(kicked), player.getName()));
-                                        clan.removePlayerFromClan(UUIDMigration.getForcedPlayerUUID(kicked));                                        
+                                        clan.addBb(player.getName(),  ChatColor.AQUA + MessageFormat.format(plugin.getLang("has.been.kicked.by"), Helper.capitalize(kicked.getName()), player.getName()));
+                                        clan.removePlayerFromClan(kicked.getUniqueId());                                        
                                     }
                                     else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("you.cannot.kick.another.leader"));
                                 }

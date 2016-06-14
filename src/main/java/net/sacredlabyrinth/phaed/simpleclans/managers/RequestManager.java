@@ -59,7 +59,7 @@ public final class RequestManager {
     public void addDemoteRequest(ClanPlayer requester, String demotedName, Clan clan) {
         String msg = MessageFormat.format(plugin.getLang("asking.for.the.demotion"), Helper.capitalize(requester.getName()), demotedName);
 
-        ClanPlayer demotedTp = plugin.getClanManager().getClanPlayer(demotedName.toLowerCase());
+        ClanPlayer demotedTp = plugin.getClanManager().getClanPlayer( Bukkit.getPlayer( demotedName ));
 
         List<ClanPlayer> acceptors = Helper.stripOffLinePlayers(clan.getLeaders());
         acceptors.remove(demotedTp);

@@ -26,18 +26,10 @@ import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
  */
 public class SCEntityListener implements Listener {
 
-    private SimpleClans plugin;
+    private SimpleClans plugin = SimpleClans.getInstance();
 
-    /**
-     *
-     */
-    public SCEntityListener() {
-        plugin = SimpleClans.getInstance();
-    }
+    public SCEntityListener() {}
 
-    /**
-     * @param event
-     */
     @EventHandler(priority = EventPriority.LOW)
     public void onEntityDeath(EntityDeathEvent event) {
         
@@ -51,7 +43,6 @@ public class SCEntityListener implements Listener {
             Player attacker = null;
 
             // find attacker
-
             EntityDamageEvent lastDamageCause = victim.getLastDamageCause();
 
             if (lastDamageCause instanceof EntityDamageByEntityEvent) {
@@ -109,17 +100,13 @@ public class SCEntityListener implements Listener {
         }
     }
 
-    /**
-     * @param event
-     */
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEntityEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
 
-        if (plugin.getSettingsManager().isTamableMobsSharing() && event.getRightClicked() instanceof Tameable) {
-        	Entity entity = event.getRightClicked();
+        Entity entity = event.getRightClicked();
+        
+        if (plugin.getSettingsManager().isTamableMobsSharing() && entity instanceof Tameable) {
+        	
             Player player = event.getPlayer();
             ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
             Tameable tamed = (Tameable) entity;
@@ -128,24 +115,23 @@ public class SCEntityListener implements Listener {
                 if(entity instanceof Wolf && !((Wolf) entity).isSitting()) {
                 	return;
                 }
-                if (cp.getClan().isMember((Player) tamed.getOwner())) {
+                if (cp != null && cp.getClan().isMember((Player) tamed.getOwner())) {
                     tamed.setOwner(player);
                 }
             }
         }
     }
 
-    /**
-     * @param event
-     */
     @EventHandler(priority = EventPriority.LOW)
     public void onEntityTarget(EntityTargetLivingEntityEvent event) {
+        
         if (plugin.getSettingsManager().isTamableMobsSharing()) {
+            
             if (event.getEntity() instanceof Tameable && event.getTarget() instanceof Player) {
                 ClanPlayer cp = plugin.getClanManager().getClanPlayer((Player) event.getTarget());
                 Tameable wolf = (Tameable) event.getEntity();
 
-                if (wolf.isTamed() && cp.getClan().isMember((Player) wolf.getOwner())) {
+                if (cp != null && wolf.isTamed() && cp.getClan().isMember((Player) wolf.getOwner())) {
                 	// cancels the event if the attacker is one out of his clan
                     event.setCancelled(true);
                 }
@@ -153,18 +139,11 @@ public class SCEntityListener implements Listener {
         }
     }
 
-    /**
-     * @param event
-     */
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
+        
         Player attacker = null;
         Player victim = null;
-
 
         if (event instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent sub = (EntityDamageByEntityEvent) event;
@@ -175,11 +154,14 @@ public class SCEntityListener implements Listener {
             }
 
             if (plugin.getSettingsManager().isTamableMobsSharing()) {
+                
                 if (sub.getEntity() instanceof Wolf && sub.getDamager() instanceof Player) {
+                    
                     attacker = (Player) sub.getDamager();
                     Wolf wolf = (Wolf) sub.getEntity();
                     ClanPlayer cp = plugin.getClanManager().getClanPlayer(attacker);
-                    if (wolf.isTamed() && cp.getClan().isMember((Player) wolf.getOwner())) {
+                    
+                    if (cp != null && wolf.isTamed() && cp.getClan().isMember((Player) wolf.getOwner())) {
                     	// Sets the wolf to friendly if the attacker is one out of his clan
                         wolf.setAngry(false);
                     }
@@ -210,63 +192,42 @@ public class SCEntityListener implements Listener {
 
 
             if (plugin.getSettingsManager().isPvpOnlywhileInWar()) {
+               
                 // if one doesn't have clan then they cant be at war
-
                 if (aclan == null || vclan == null) {
                     event.setCancelled(true);
                     return;
                 }
 
-                if (plugin.getPermissionsManager().has(victim, "simpleclans.mod.nopvpinwar")
-                        && attacker != null && victim != null) {
+                if ( plugin.getPermissionsManager().has(victim, "simpleclans.mod.nopvpinwar") ) {
                     event.setCancelled(true);
                     return;
                 }
 
                 // if not warring no pvp
-
                 if (!aclan.isWarring(vclan)) {
                     event.setCancelled(true);
                     return;
                 }
             }
 
-            if (vclan != null) {
-                if (aclan != null) {
+            if (vclan != null && aclan != null) {
                     // personal ff enabled, allow damage
-
-                    if (vcp.isFriendlyFire()) {
-                        return;
-                    }
+                    if (vcp.isFriendlyFire()) return;
 
                     // clan ff enabled, allow damage
-
-                    if (vclan.isFriendlyFire()) {
-                        return;
-                    }
+                    if (vclan.isFriendlyFire()) return;
 
                     // same clan, deny damage
-
                     if (vclan.equals(aclan)) {
                         event.setCancelled(true);
                         return;
                     }
-
                     // ally clan, deny damage
-
-                    if (vclan.isAlly(aclan.getTag())) {
-                        event.setCancelled(true);
-                    }
-                } else {
-                    // not part of a clan - check if safeCivilians is set
-
-                    if (plugin.getSettingsManager().getSafeCivilians()) {
-                        event.setCancelled(true);
-                    }
-                }
+                    if (vclan.isAlly(aclan.getTag())) event.setCancelled(true);
+                    
             } else {
                 // not part of a clan - check if safeCivilians is set
-
                 if (plugin.getSettingsManager().getSafeCivilians()) {
                     event.setCancelled(true);
                 }

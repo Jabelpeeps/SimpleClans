@@ -1,33 +1,31 @@
 package net.sacredlabyrinth.phaed.simpleclans.commands;
 
-import net.sacredlabyrinth.phaed.simpleclans.*;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
+import net.sacredlabyrinth.phaed.simpleclans.Clan;
+import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
+import net.sacredlabyrinth.phaed.simpleclans.Helper;
+import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
+
 /**
  * @author phaed
  */
-public class CoordsCommand
-{
-    public CoordsCommand()
-    {
-    }
+public class CoordsCommand implements ClanCommand  {
 
-    /**
-     * Execute the command
-     *
-     * @param player
-     * @param arg
-     */
-    public void execute(Player player, String[] arg)
-    {
+    @Override
+    public void execute(CommandSender sender, String[] arg) {
+        Player player = (Player) sender;
         SimpleClans plugin = SimpleClans.getInstance();
         String headColor = plugin.getSettingsManager().getPageHeadingsColor();
         String subColor = plugin.getSettingsManager().getPageSubTitleColor();

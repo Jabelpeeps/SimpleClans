@@ -1,12 +1,11 @@
 package net.sacredlabyrinth.phaed.simpleclans;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.text.Normalizer;
 import java.util.regex.Pattern;
 
-public class StringSimplifier
-{
+import com.google.common.collect.ImmutableMap;
+
+public class StringSimplifier {
 	
 	private StringSimplifier() {}
 	
@@ -30,17 +29,14 @@ public class StringSimplifier
             .build();
 
 
-    public static String simplifiedString(String orig)
-    {
+    public static String simplifiedString(String orig) {
         String str = orig;
-        if (str == null)
-        {
+        if (str == null) {
             return null;
         }
         str = stripDiacritics(str);
         str = stripNonDiacritics(str);
-        if (str.length() == 0)
-        {
+        if (str.length() == 0) {
             // Ugly special case to work around non-existing empty strings
             // in Oracle. Store original crapstring as simplified.
             // It would return an empty string if Oracle could store it.
@@ -49,27 +45,23 @@ public class StringSimplifier
         return str.toLowerCase();
     }
 
-    private static String stripNonDiacritics(String orig)
-    {
+    private static String stripNonDiacritics(String orig) {
         StringBuffer ret = new StringBuffer();
         String lastchar = null;
-        for (int i = 0; i < orig.length(); i++)
-        {
+        for (int i = 0; i < orig.length(); i++) {
             String source = orig.substring(i, i + 1);
             String replace = NONDIACRITICS.get(source);
             String toReplace = replace == null ? String.valueOf(source) : replace;
-            if (DEFAULT_REPLACE.equals(lastchar) && DEFAULT_REPLACE.equals(toReplace))
-            {
+            
+            if (DEFAULT_REPLACE.equals(lastchar) && DEFAULT_REPLACE.equals(toReplace)) {
                 toReplace = "";
             }
-            else
-            {
+            else {
                 lastchar = toReplace;
             }
             ret.append(toReplace);
         }
-        if (ret.length() > 0 && DEFAULT_REPLACE_CHAR == ret.charAt(ret.length() - 1))
-        {
+        if (ret.length() > 0 && DEFAULT_REPLACE_CHAR == ret.charAt(ret.length() - 1)) {
             ret.deleteCharAt(ret.length() - 1);
         }
         return ret.toString();
@@ -81,11 +73,10 @@ public class StringSimplifier
         IsSk: Symbol, Modifier see http://www.fileformat.info/info/unicode/category/Sk/list.htm
         IsLm: Letter, Modifier see http://www.fileformat.info/info/unicode/category/Lm/list.htm
      */
-    public static final Pattern DIACRITICS_AND_FRIENDS = Pattern.compile("[\\p{InCombiningDiacriticalMarks}\\p{IsLm}\\p{IsSk}]+");
+    public static final Pattern DIACRITICS_AND_FRIENDS = 
+            Pattern.compile("[\\p{InCombiningDiacriticalMarks}\\p{IsLm}\\p{IsSk}]+");
 
-
-    private static String stripDiacritics(String str)
-    {
+    private static String stripDiacritics(String str) {
         str = Normalizer.normalize(str, Normalizer.Form.NFD);
         str = DIACRITICS_AND_FRIENDS.matcher(str).replaceAll("");
         return str;

@@ -24,7 +24,6 @@ import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.events.CreateClanEvent;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
 
 /**
  * @author phaed
@@ -255,7 +254,7 @@ public final class ClanManager {
      * @return
      */
     public ClanPlayer getClanPlayerName(String playerDisplayName) {
-        UUID uuid = UUIDMigration.getForcedPlayerUUID(playerDisplayName);
+        UUID uuid = Helper.getForcedPlayerUUID(playerDisplayName);
 
         if (uuid == null){
             return null;
@@ -325,7 +324,7 @@ public final class ClanManager {
      */
     public ClanPlayer getCreateClanPlayerUUID(String playerDisplayName) {
         
-        UUID playerUniqueId = UUIDMigration.getForcedPlayerUUID(playerDisplayName);
+        UUID playerUniqueId = Helper.getForcedPlayerUUID(playerDisplayName);
         if (playerUniqueId != null) {
             return getCreateClanPlayer(playerUniqueId);
         }

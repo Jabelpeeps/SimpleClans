@@ -14,70 +14,58 @@ public class TeleportState {
     private String clanName;
     private boolean processing;
 
-    public TeleportState(Player player, Location dest, String clanName) {
-        this.destination = dest;
-        this.playerLocation = player.getLocation();
-        this.clanName = clanName;
-        this.counter = SimpleClans.getInstance().getSettingsManager().getWaitSecs();
-        this.playerUniqueId = player.getUniqueId();
+    public TeleportState(Player player, Location dest, String _clanName) {
+        destination = dest;
+        playerLocation = player.getLocation();
+        clanName = _clanName;
+        counter = SimpleClans.getInstance().getSettingsManager().getWaitSecs();
+        playerUniqueId = player.getUniqueId();
     }
-
-    /**
-     * @return
-     */
+    
     public Location getLocation()  {
-        return this.playerLocation;
+        return playerLocation;
     }
-
     /**
      * Whether its time for teleport
      * @return
      */
     public boolean isTeleportTime() {
-        if (this.counter > 1) {
-            this.counter--;
+        if (counter > 1) {
+            counter--;
             return false;
         }
         return true;
     }
-
     /**
      * The player that is waiting for teleport
      * @return
      */
     public Player getPlayer() {      
-        return Bukkit.getPlayer(this.playerUniqueId);
+        return Bukkit.getPlayer(playerUniqueId);
     }
-
     /**
      * Get seconds left before teleport
      * @return
      */
     public int getCounter() {
-        return this.counter;
+        return counter;
     }
-
-    public void setCounter(int counter) {
-        this.counter = counter;
+    public void setCounter(int _counter) {
+        counter = _counter;
     }
-
     public String getClanName() {
-        return this.clanName;
+        return clanName;
     }
-
     public Location getDestination() {
-        return this.destination;
+        return destination;
     }
-
     public boolean isProcessing() {
-        return this.processing;
+        return processing;
     }
-
-    public void setProcessing(boolean processing) {
-        this.processing = processing;
+    public void setProcessing(boolean _processing) {
+        processing = _processing;
     }
-
     public UUID getUniqueId() {
-        return this.playerUniqueId;
+        return playerUniqueId;
     }
 }

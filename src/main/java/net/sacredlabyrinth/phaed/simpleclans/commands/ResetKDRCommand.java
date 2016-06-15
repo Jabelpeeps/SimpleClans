@@ -1,26 +1,23 @@
 package net.sacredlabyrinth.phaed.simpleclans.commands;
 
-import net.sacredlabyrinth.phaed.simpleclans.*;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
+import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
+import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
 
 /**
  * @author phaed
  */
-public class ResetKDRCommand {
+public class ResetKDRCommand  implements ClanCommand {
 
-    public ResetKDRCommand() {
-    }
-
-    /**
-     * Execute the command
-     *
-     * @param player
-     * @param arg
-     */
-    public void execute(Player player, String[] arg) {
+    @Override
+    public void execute(CommandSender player, String[] arg) {
         SimpleClans plugin = SimpleClans.getInstance();
-        if (plugin.getPermissionsManager().has(player, "simpleclans.admin.resetkdr")) {
+        if (plugin.getPermissionsManager().has((Player) player, "simpleclans.admin.resetkdr")) {
             for (ClanPlayer cp : SimpleClans.getInstance().getClanManager().getAllClanPlayers()) {
                 cp.setCivilianKills(0);
                 cp.setNeutralKills(0);

@@ -1,30 +1,23 @@
 package net.sacredlabyrinth.phaed.simpleclans.commands;
 
-import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
-import net.sacredlabyrinth.phaed.simpleclans.Clan;
-import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
-import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import java.text.MessageFormat;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.text.MessageFormat;
+import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
+import net.sacredlabyrinth.phaed.simpleclans.Clan;
+import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
+import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
 
 /**
  * @author phaed
  */
-public class VerifyCommand
-{
-    public VerifyCommand()
-    {
-    }
+public class VerifyCommand implements ClanCommand {
 
-    /**
-     * Execute the command
-     *
-     * @param sender
-     * @param arg
-     */
+    @Override
     public void execute(CommandSender sender, String[] arg)
     {
         SimpleClans plugin = SimpleClans.getInstance();

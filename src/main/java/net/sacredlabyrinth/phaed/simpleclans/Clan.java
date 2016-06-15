@@ -84,7 +84,7 @@ public class Clan implements Serializable, Comparable<Clan> {
 
     @Override
     public int hashCode() {
-        return getTag().hashCode() >> 13;
+        return tag.hashCode() >> 13;
     }
 
     @Override
@@ -220,7 +220,7 @@ public class Clan implements Serializable, Comparable<Clan> {
      */
     public int getInactiveDays() {
         Timestamp now = new Timestamp((new Date()).getTime());
-        return (int) Math.floor(Dates.differenceInDays(new Timestamp(getLastUsed()), now));
+        return (int) Math.floor(Dates.differenceInDays(new Timestamp(lastUsed), now));
     }
 
     /**
@@ -259,22 +259,6 @@ public class Clan implements Serializable, Comparable<Clan> {
     public boolean isMember(Player player) {
             return this.members.contains(player.getUniqueId().toString());
     }
-
-//    /**
-//     * Check if the player is a member of this clan
-//     *
-//     * @param playerName
-//     * @return confirmation
-//     */
-//    @Deprecated
-//    public boolean isMember(String playerName) {
-//
-//        UUID PlayerUniqueId = UUIDMigration.getForcedPlayerUUID(playerName);
-//        if (PlayerUniqueId != null) {
-//            return this.members.contains(PlayerUniqueId.toString());
-//        }
-//        return false;
-//    }
 
     /**
      * Check if the player is a member of this clan
@@ -401,19 +385,6 @@ public class Clan implements Serializable, Comparable<Clan> {
             this.members.add(NameOrUUID);
         }
     }
-
-    /**
-//     * (used internally)
-//     *
-//     * @param playerName
-//     */
-//    @Deprecated
-//    public void removeMember(String playerName) {       
-//        UUID PlayerUniqueId = UUIDMigration.getForcedPlayerUUID(playerName);
-//        if (PlayerUniqueId != null) {
-//            this.members.remove(PlayerUniqueId.toString());
-//        }
-//    }
 
     /**
      * (used internally)
@@ -655,24 +626,6 @@ public class Clan implements Serializable, Comparable<Clan> {
     public boolean isLeader(Player player) {
         return isLeader(player.getUniqueId());      
     }
-
-//    /**
-//     * Check if a player is a leader of a clan
-//     *
-//     * @param playerName
-//     * @return the leaders
-//     */
-//    @Deprecated
-//    public boolean isLeader(String playerName) {
-//        if (isMember(playerName)) {
-//            ClanPlayer cp = plugin.getClanManager().getClanPlayerName(playerName.toLowerCase());
-//
-//            if (cp != null && cp.isLeader()) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 
     /**
      * Check if a player is a leader of a clan
@@ -1011,39 +964,6 @@ public class Clan implements Serializable, Comparable<Clan> {
         Bukkit.getPluginManager().callEvent(new PlayerJoinedClanEvent(this, cp));
     }
 
-//    /**
-//     * Remove a player from a clan
-//     *
-//     * @param playerName
-//     */
-//    @Deprecated
-//    public void removePlayerFromClan(String playerName) {
-//        ClanPlayer cp = plugin.getClanManager().getClanPlayer(playerName);
-//
-//        // remove clan group-permission
-//        plugin.getPermissionsManager().removeClanPermissions(cp);
-//
-//        // remove permissions
-//        plugin.getPermissionsManager().removeClanPlayerPermissions(cp);
-//
-//        cp.setClan(null);
-//        cp.addPastClan(getColorTag() + (cp.isLeader() ? ChatColor.DARK_RED + "*" : ""));
-//        cp.setLeader(false);
-//        cp.setTrusted(false);
-//        cp.setJoinDate(0);
-//        removeMember(playerName);
-//
-//        plugin.getStorageManager().updateClanPlayer(cp);
-//        plugin.getStorageManager().updateClan(this);
-//
-//        Player matched = cp.toPlayer();
-//
-//        if (matched != null) {
-//            plugin.getClanManager().updateDisplayName(matched);
-//        }
-//        Bukkit.getPluginManager().callEvent(new PlayerKickedClanEvent(this, cp));
-//    }
-
     /**
      * Remove a player from a clan
      *
@@ -1076,27 +996,6 @@ public class Clan implements Serializable, Comparable<Clan> {
         Bukkit.getPluginManager().callEvent(new PlayerKickedClanEvent(this, cp));
     }
 
-//
-//    /**
-//     * Promote a member to a leader of a clan
-//     *
-//     * @param playerName
-//     */
-//    @Deprecated
-//    public void promote(String playerName) {
-//        ClanPlayer cp = plugin.getClanManager().getClanPlayer(playerName);
-//
-//        cp.setLeader(true);
-//        cp.setTrusted(true);
-//
-//        plugin.getStorageManager().updateClanPlayer(cp);
-//        plugin.getStorageManager().updateClan(this);
-//
-//        // add clan permission
-//        plugin.getPermissionsManager().addClanPermissions(cp);
-//        Bukkit.getPluginManager().callEvent(new PlayerPromoteEvent(this, cp));
-//    }
-
     /**
      * Promote a member to a leader of a clan
      *
@@ -1115,25 +1014,6 @@ public class Clan implements Serializable, Comparable<Clan> {
         plugin.getPermissionsManager().addClanPermissions(cp);
         Bukkit.getPluginManager().callEvent(new PlayerPromoteEvent(this, cp));
     }
-
-    /**
-//     * Demote a leader back to a member of a clan
-//     *
-//     * @param playerName
-//     */
-//    @Deprecated
-//    public void demote(String playerName) {
-//        ClanPlayer cp = plugin.getClanManager().getClanPlayer(playerName);
-//
-//        cp.setLeader(false);
-//
-//        plugin.getStorageManager().updateClanPlayer(cp);
-//        plugin.getStorageManager().updateClan(this);
-//
-//        // add clan permission
-//        plugin.getPermissionsManager().addClanPermissions(cp);
-//        Bukkit.getPluginManager().callEvent(new PlayerDemoteEvent(this, cp));
-//    }
 
     /**
      * Demote a leader back to a member of a clan

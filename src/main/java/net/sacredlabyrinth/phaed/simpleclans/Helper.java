@@ -21,9 +21,10 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
+import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDFetcher;
 
 /**
  * @author phaed
@@ -35,13 +36,13 @@ public class Helper {
 	private Helper() {}
 
     /**
-     * Dumps stacktrace to log
-     */
-    public static void dumpStackTrace() {
-        for (StackTraceElement el : Thread.currentThread().getStackTrace()) {
-            SimpleClans.debug(el.toString());
-        }
-    }
+//     * Dumps stacktrace to log
+//     */
+//    public static void dumpStackTrace() {
+//        for (StackTraceElement el : Thread.currentThread().getStackTrace()) {
+//            SimpleClans.debug(el.toString());
+//        }
+//    }
 
     /**
      * Get a players full color name if he is online
@@ -53,141 +54,143 @@ public class Helper {
         List<Player> players = Bukkit.matchPlayer(playerName);
 
         if (players.size() == 1) {
-            return plugin.getPermissionsManager().getPrefix(players.get(0)) + players.get(0).getName() + plugin.getPermissionsManager().getSuffix(players.get(0));
+            return plugin.getPermissionsManager().getPrefix(players.get(0)) 
+                    + players.get(0).getName() 
+                    + plugin.getPermissionsManager().getSuffix(players.get(0));
         }
         return playerName;
     }
 
-    /**
-     * Check for integer
-     *
-     * @param o
-     * @return
-     */
-    public static boolean isInteger(Object o) {
-        return o instanceof java.lang.Integer;
-    }
+//    /**
+//     * Check for integer
+//     *
+//     * @param o
+//     * @return
+//     */
+//    public static boolean isInteger(Object o) {
+//        return o instanceof java.lang.Integer;
+//    }
+//
+//    /**
+//     * Check for byte
+//     *
+//     * @param input
+//     * @return
+//     */
+//    public static boolean isByte(String input) {
+//        try {
+//            Byte.parseByte(input);
+//            return true;
+//        }
+//        catch (Exception ex) {
+//            return false;
+//        }
+//    }
 
     /**
-     * Check for byte
-     *
-     * @param input
-     * @return
-     */
-    public static boolean isByte(String input) {
-        try {
-            Byte.parseByte(input);
-            return true;
-        }
-        catch (Exception ex) {
-            return false;
-        }
-    }
+//     * Check for short
+//     *
+//     * @param input
+//     * @return
+//     */
+//    public static boolean isShort(String input) {
+//        try {
+//            Short.parseShort(input);
+//            return true;
+//        }
+//        catch (Exception ex) {
+//            return false;
+//        }
+//    }
+//
+//    /**
+//     * Check for integer
+//     *
+//     * @param input
+//     * @return
+//     */
+//    public static boolean isInteger(String input) {
+//        try {
+//            Integer.parseInt(input);
+//            return true;
+//        }
+//        catch (Exception ex) {
+//            return false;
+//        }
+//    }
+
+//    /**
+//     * Check for float
+//     *
+//     * @param input
+//     * @return
+//     */
+//    public static boolean isFloat(String input) {
+//        try {
+//            Float.parseFloat(input);
+//            return true;
+//        }
+//        catch (Exception ex) {
+//            return false;
+//        }
+//    }
 
     /**
-     * Check for short
-     *
-     * @param input
-     * @return
-     */
-    public static boolean isShort(String input) {
-        try {
-            Short.parseShort(input);
-            return true;
-        }
-        catch (Exception ex) {
-            return false;
-        }
-    }
+//     * Check for string
+//     *
+//     * @param o
+//     * @return
+//     */
+//    public static boolean isString(Object o) {
+//        return o instanceof java.lang.String;
+//    }
+//
+//    /**
+//     * Check for boolean
+//     *
+//     * @param o
+//     * @return
+//     */
+//    public static boolean isBoolean(Object o)  {
+//        return o instanceof java.lang.Boolean;
+//    }
 
-    /**
-     * Check for integer
-     *
-     * @param input
-     * @return
-     */
-    public static boolean isInteger(String input) {
-        try {
-            Integer.parseInt(input);
-            return true;
-        }
-        catch (Exception ex) {
-            return false;
-        }
-    }
+//    /**
+//     * Remove a character from a string
+//     *
+//     * @param s
+//     * @param c
+//     * @return
+//     */
+//    public static String removeChar(String s, char c) {
+//        String r = "";
+//
+//        for (int i = 0; i < s.length(); i++) {
+//            if (s.charAt(i) != c)  {
+//                r += s.charAt(i);
+//            }
+//        }
+//        return r;
+//    }
 
-    /**
-     * Check for float
-     *
-     * @param input
-     * @return
-     */
-    public static boolean isFloat(String input) {
-        try {
-            Float.parseFloat(input);
-            return true;
-        }
-        catch (Exception ex) {
-            return false;
-        }
-    }
-
-    /**
-     * Check for string
-     *
-     * @param o
-     * @return
-     */
-    public static boolean isString(Object o) {
-        return o instanceof java.lang.String;
-    }
-
-    /**
-     * Check for boolean
-     *
-     * @param o
-     * @return
-     */
-    public static boolean isBoolean(Object o)  {
-        return o instanceof java.lang.Boolean;
-    }
-
-    /**
-     * Remove a character from a string
-     *
-     * @param s
-     * @param c
-     * @return
-     */
-    public static String removeChar(String s, char c) {
-        String r = "";
-
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) != c)  {
-                r += s.charAt(i);
-            }
-        }
-        return r;
-    }
-
-    /**
-     * Remove first character from a string
-     *
-     * @param s
-     * @param c
-     * @return
-     */
-    public static String removeFirstChar(String s, char c) {
-        String r = "";
-
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) != c) {
-                r += s.charAt(i);
-                break;
-            }
-        }
-        return r;
-    }
+//    /**
+//     * Remove first character from a string
+//     *
+//     * @param s
+//     * @param c
+//     * @return
+//     */
+//    public static String removeFirstChar(String s, char c) {
+//        String r = "";
+//
+//        for (int i = 0; i < s.length(); i++) {
+//            if (s.charAt(i) != c) {
+//                r += s.charAt(i);
+//                break;
+//            }
+//        }
+//        return r;
+//    }
 
     /**
      * Capitalize first word of sentence
@@ -203,17 +206,17 @@ public class Helper {
         return first + content.substring(1);
     }
 
-    /**
-     * Return plural word if count is bigger than one
-     *
-     * @param count
-     * @param word
-     * @param ending
-     * @return
-     */
-    public static String plural(int count, String word, String ending) {
-        return count == 1 ? word : word + ending;
-    }
+//    /**
+//     * Return plural word if count is bigger than one
+//     *
+//     * @param count
+//     * @param word
+//     * @param ending
+//     * @return
+//     */
+//    public static String plural(int count, String word, String ending) {
+//        return count == 1 ? word : word + ending;
+//    }
 
     /**
      * Hex value to ChatColor
@@ -255,22 +258,19 @@ public class Helper {
     }
 
     /**
-     * Converts a player array to ArrayList<Player>
-     *
-     * @param values
-     * @return
-     */
-    public static List<Player> fromPlayerArray(Player... values) {
-        List<Player> results = new ArrayList<>();
-        Collections.addAll(results, values);
-        return results;
-    }
+//     * Converts a player array to ArrayList<Player>
+//     *
+//     * @param values
+//     * @return
+//     */
+//    public static List<Player> fromPlayerArray(Player... values) {
+//        List<Player> results = new ArrayList<>();
+//        Collections.addAll(results, values);
+//        return results;
+//    }
 
     /**
      * Converts ArrayList<String> to string array
-     *
-     * @param list
-     * @return
      */
     public static String[] toArray(List<String> list) {
         return list.toArray(new String[list.size()]);
@@ -278,9 +278,6 @@ public class Helper {
 
     /**
      * Removes first item from a string array
-     *
-     * @param args
-     * @return
      */
     public static String[] removeFirst(String[] args) {
         List<String> out = fromArray(args);
@@ -293,17 +290,14 @@ public class Helper {
 
     /**
      * Converts a string array to a space separated string
-     *
-     * @param args
-     * @return
      */
     public static String toMessage(String[] args) {
-        String out = "";
-
-        for (String arg : args) {
-            out += arg + " ";
-        }
-        return out.trim();
+//        String out = "";
+//
+//        for (String arg : args) {
+//            out += arg + " ";
+//        }
+        return String.join( " ", args );
     }
 
     /**
@@ -314,12 +308,12 @@ public class Helper {
      * @return
      */
     public static String toMessage(String[] args, String sep) {
-        String out = "";
-
-        for (String arg : args) {
-            out += arg + ", ";
-        }
-        return stripTrailing(out, ", ");
+//        String out = "";
+//
+//        for (String arg : args) {
+//            out += arg + ", ";
+//        }
+        return String.join( sep, args );
     }
 
     /**
@@ -329,16 +323,15 @@ public class Helper {
      * @param sep
      * @return
      */
-    public static String toMessage(List<String> args, String sep)
-    {
-        String out = "";
+    public static String toMessage(List<String> args, String sep) {
+//        String out = "";
+//
+//        for (String arg : args)
+//        {
+//            out += arg + sep;
+//        }
 
-        for (String arg : args)
-        {
-            out += arg + sep;
-        }
-
-        return stripTrailing(out, sep);
+        return String.join( sep, args );
     }
 
     /**
@@ -347,8 +340,7 @@ public class Helper {
      * @param msg
      * @return
      */
-    public static String parseColors(String msg)
-    {
+    public static String parseColors(String msg) {
         return msg.replace("&", "\u00a7");
     }
 
@@ -358,69 +350,47 @@ public class Helper {
      * @param msg
      * @return
      */
-    public static String stripColors(String msg)
-    {
+    public static String stripColors(String msg) {
         String out = msg.replaceAll("[&][0-9a-f]", "");
         out = out.replaceAll(String.valueOf((char) 194), "");
         return out.replaceAll("[\u00a7][0-9a-f]", "");
     }
 
-    /*
+    /**
      * Retrieves the last color code @param msg @return
      */
-
-    /**
-     * @param msg
-     * @return
-     */
-    public static String getLastColorCode(String msg)
-    {
+    public static String getLastColorCode(String msg) {
         msg = msg.replaceAll(String.valueOf((char) 194), "").trim();
 
-        if (msg.length() < 2)
-        {
+        if (msg.length() < 2) {
             return "";
         }
 
         String one = msg.substring(msg.length() - 2, msg.length() - 1);
         String two = msg.substring(msg.length() - 1);
 
-        if (one.equals("\u00a7"))
-        {
+        if (one.equals("\u00a7")) {
             return one + two;
         }
 
-        if (one.equals("&"))
-        {
+        if (one.equals("&")) {
             return Helper.toColor(two);
         }
-
-
         return "";
     }
 
     /**
      * Cleans up the tag from color codes and makes it lowercase
-     *
-     * @param tag
-     * @return
      */
-    public static String cleanTag(String tag)
-    {
+    public static String cleanTag(String tag) {
         return stripColors(tag).toLowerCase();
     }
 
     /**
      * Removes trailing separators
-     *
-     * @param msg
-     * @param sep
-     * @return
      */
-    public static String stripTrailing(String msg, String sep)
-    {
-        if (msg.length() < sep.length())
-        {
+    public static String stripTrailing(String msg, String sep) {
+        if (msg.length() < sep.length()) {
             return msg;
         }
 
@@ -428,78 +398,41 @@ public class Helper {
         String first = msg.substring(0, sep.length());
         String last = msg.substring(msg.length() - sep.length(), msg.length());
 
-        if (first.equals(sep))
-        {
+        if (first.equals(sep)) {
             out = msg.substring(sep.length());
         }
 
-        if (last.equals(sep))
-        {
+        if (last.equals(sep)) {
             out = msg.substring(0, msg.length() - sep.length());
         }
-
         return out;
     }
 
     /**
      * Generates page separator line
-     *
-     * @param sep
-     * @return
      */
-    public static String generatePageSeparator(String sep)
-    {
+    public static String generatePageSeparator(String sep) {
         String out = "";
 
-        for (int i = 0; i < 320; i++)
-        {
+        for (int i = 0; i < 320; i++) {
             out += sep;
         }
         return out;
     }
 
-//    /**
-//     * Check whether a player is online
-//     *
-//     * @param playerName
-//     * @return
-//     */
-//    @Deprecated
-//    public static boolean isOnline(String playerName)
-//    {
+    /**
+     * Check whether a player is online
+     */
+    public static boolean isOnline(UUID playerUniqueId) {
 //        Collection<Player> online = getOnlinePlayers();
 //
-//        for (Player o : online)
-//        {
-//            if (o.getName().equalsIgnoreCase(playerName))
-//            {
+//        for (Player o : online) {
+//            if (o.getUniqueId().equals(playerUniqueId)) {
 //                return true;
 //            }
 //        }
-//
-//        return false;
-//    }
-
-
-    /**
-     * Check whether a player is online
-     *
-     * @param playerUniqueId
-     * @return
-     */
-    public static boolean isOnline(UUID playerUniqueId)
-    {
-        Collection<Player> online = getOnlinePlayers();
-
-        for (Player o : online)
-        {
-            if (o.getUniqueId().equals(playerUniqueId))
-            {
-                return true;
-            }
-        }
-
-        return false;
+//        
+        return getOnlinePlayers().parallelStream().anyMatch( p -> p.getUniqueId().equals( playerUniqueId ) );
     }
 
     /**
@@ -508,18 +441,14 @@ public class Helper {
      * @param in
      * @return
      */
-    public static List<ClanPlayer> stripOffLinePlayers(List<ClanPlayer> in)
-    {
+    public static List<ClanPlayer> stripOffLinePlayers(List<ClanPlayer> in) {
         List<ClanPlayer> out = new ArrayList<>();
 
-        for (ClanPlayer cp : in)
-        {
-            if (cp.toPlayer() != null)
-            {
+        for (ClanPlayer cp : in) {
+            if (cp.toPlayer() != null) {
                 out.add(cp);
             }
         }
-
         return out;
     }
 
@@ -529,21 +458,17 @@ public class Helper {
      * @param strUrl
      * @return
      */
-    public static boolean testURL(String strUrl)
-    {
-        try
-        {
+    public static boolean testURL(String strUrl) {
+        try {
             URL url = new URL(strUrl);
             HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
             urlConn.connect();
 
-            if (urlConn.getResponseCode() != HttpURLConnection.HTTP_OK)
-            {
+            if (urlConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 return false;
             }
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             return false;
         }
 
@@ -556,10 +481,8 @@ public class Helper {
      * @param str
      * @return
      */
-    public static String escapeQuotes(String str)
-    {
-        if (str == null)
-        {
+    public static String escapeQuotes(String str) {
+        if (str == null)  {
             return "";
         }
         return str.replace("'", "''");
@@ -571,8 +494,7 @@ public class Helper {
      * @param loc
      * @return
      */
-    public static String toLocationString(Location loc)
-    {
+    public static String toLocationString(Location loc) {
         return loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ() + " " + loc.getWorld().getName();
     }
 
@@ -583,29 +505,26 @@ public class Helper {
      * @param loc2
      * @return
      */
-    public static boolean isSameBlock(Location loc, Location loc2)
-    {
+    public static boolean isSameBlock(Location loc, Location loc2) {
         return loc.getBlockX() == loc2.getBlockX() && loc.getBlockY() == loc2.getBlockY() && loc.getBlockZ() == loc2.getBlockZ();
     }
 
-    /**
-     * Whether the two locations refer to the same location, ignoring pitch and
-     * yaw
-     *
-     * @param loc
-     * @param loc2
-     * @return
-     */
-    public static boolean isSameLocation(Location loc, Location loc2)
-    {
-        return loc.getX() == loc2.getX() && loc.getY() == loc2.getY() && loc.getZ() == loc2.getZ();
-    }
+//    /**
+//     * Whether the two locations refer to the same location, ignoring pitch and
+//     * yaw
+//     *
+//     * @param loc
+//     * @param loc2
+//     * @return
+//     */
+//    public static boolean isSameLocation(Location loc, Location loc2)
+//    {
+//        return loc.getX() == loc2.getX() && loc.getY() == loc2.getY() && loc.getZ() == loc2.getZ();
+//    }
 
     /**
      * Sort hashmap by value
-     *
-     * @param map
-     * @return Map
+
      */
     public static Map sortByValue(Map map) {
         
@@ -627,10 +546,8 @@ public class Helper {
         return result;
     }
 
-    public static boolean isVanished(Player player)
-    {
-        if (player != null && player.hasMetadata("vanished") && !player.getMetadata("vanished").isEmpty())
-        {
+    public static boolean isVanished(Player player) {
+        if (player != null && player.hasMetadata("vanished") && !player.getMetadata("vanished").isEmpty()) {
         	return player.getMetadata("vanished").get(0).asBoolean();
         }
         return false;
@@ -654,6 +571,31 @@ public class Helper {
     }
 
     public static Player getPlayer(String playerName) {
-        return Bukkit.getPlayer(UUIDMigration.getForcedPlayerUUID(playerName));
+        return Bukkit.getPlayer( getForcedPlayerUUID(playerName));
+    }
+
+    public static UUID getForcedPlayerUUID(String playerName) {
+        Player OnlinePlayer = Bukkit.getPlayerExact(playerName);
+    
+        if (OnlinePlayer != null) {
+            return OnlinePlayer.getUniqueId();
+        }
+        
+        for ( OfflinePlayer each : Bukkit.getOfflinePlayers() ) {
+            if ( each.getName().equalsIgnoreCase( playerName ) )
+                return each.getUniqueId();
+        }
+        
+        try {
+            return UUIDFetcher.getUUIDOf(playerName);
+            
+        } catch (Exception ex) {
+
+            OfflinePlayer OfflinePlayer = Bukkit.getOfflinePlayer(playerName);
+            if (OfflinePlayer != null) {
+                return OfflinePlayer.getUniqueId();
+            }
+            return null;
+        }
     }
 }

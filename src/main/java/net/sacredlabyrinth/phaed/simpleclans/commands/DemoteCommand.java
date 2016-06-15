@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
@@ -11,21 +12,17 @@ import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
+import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
 
 /**
  *
  * @author phaed
  */
-public class DemoteCommand {
-    public DemoteCommand() { }
+public class DemoteCommand  implements ClanCommand {
 
-    /**
-     * Execute the command
-     * @param player
-     * @param arg
-     */
-    public void execute(Player player, String[] arg) {
+    @Override
+    public void execute(CommandSender sender, String[] arg) {
+        Player player = (Player) sender;
         SimpleClans plugin = SimpleClans.getInstance();
 
         if (plugin.getPermissionsManager().has(player, "simpleclans.leader.demote")) {
@@ -43,7 +40,7 @@ public class DemoteCommand {
                             ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.player.matched"));
                             return;
                         }
-                        UUID PlayerUniqueId = UUIDMigration.getForcedPlayerUUID(demotedName);
+                        UUID PlayerUniqueId = Helper.getForcedPlayerUUID(demotedName);
                         if (PlayerUniqueId == null) {
                             ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.player.matched"));
                             return;

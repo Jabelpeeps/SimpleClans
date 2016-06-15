@@ -94,7 +94,7 @@ public final class TeleportManager {
             }
             catch (Exception ex)
             {
-                Helper.dumpStackTrace();
+                ex.printStackTrace();
             }
         }
     }

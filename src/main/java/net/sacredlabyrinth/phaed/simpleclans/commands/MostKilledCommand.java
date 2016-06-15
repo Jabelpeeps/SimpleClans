@@ -1,37 +1,32 @@
 package net.sacredlabyrinth.phaed.simpleclans.commands;
 
-import net.sacredlabyrinth.phaed.simpleclans.*;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class MostKilledCommand
-{
-    public MostKilledCommand()
-    {
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-    }
+import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
+import net.sacredlabyrinth.phaed.simpleclans.Clan;
+import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
+import net.sacredlabyrinth.phaed.simpleclans.Helper;
+import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
 
-    /**
-     * Execute the command
-     *
-     * @param player
-     * @param arg
-     */
-    public void execute(Player player, String[] arg)
+public class MostKilledCommand implements ClanCommand {
+
+    @Override
+    public void execute(CommandSender player, String[] arg)
     {
         SimpleClans plugin = SimpleClans.getInstance();
         String headColor = plugin.getSettingsManager().getPageHeadingsColor();
         String subColor = plugin.getSettingsManager().getPageSubTitleColor();
 
-        if (plugin.getPermissionsManager().has(player, "simpleclans.mod.mostkilled"))
+        if (plugin.getPermissionsManager().has((Player) player, "simpleclans.mod.mostkilled"))
         {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer((Player) player);
 
             if (cp != null)
             {

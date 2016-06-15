@@ -1,31 +1,25 @@
 package net.sacredlabyrinth.phaed.simpleclans.commands;
 
+import java.text.MessageFormat;
+import java.util.List;
+
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
 import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-
-import java.text.MessageFormat;
-import java.util.List;
+import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
 
 /**
  * @author phaed
  */
-public class AlliancesCommand
-{
-    public AlliancesCommand()
-    {
-    }
+public class AlliancesCommand implements ClanCommand  {
 
-    /**
-     * Execute the command
-     *
-     * @param player
-     * @param arg
-     */
-    public void execute(Player player, String[] arg)
+    @Override
+    public void execute(CommandSender player, String[] arg)
     {
         SimpleClans plugin = SimpleClans.getInstance();
         String headColor = plugin.getSettingsManager().getPageHeadingsColor();
@@ -33,7 +27,7 @@ public class AlliancesCommand
 
         if (arg.length == 0)
         {
-            if (plugin.getPermissionsManager().has(player, "simpleclans.anyone.alliances"))
+            if (plugin.getPermissionsManager().has((Player) player, "simpleclans.anyone.alliances"))
             {
                 List<Clan> clans = plugin.getClanManager().getClans();
                 plugin.getClanManager().sortClansByKDR(clans);

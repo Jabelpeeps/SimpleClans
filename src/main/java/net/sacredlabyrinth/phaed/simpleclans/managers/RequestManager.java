@@ -22,7 +22,6 @@ import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.VoteResult;
 import net.sacredlabyrinth.phaed.simpleclans.events.RequestEvent;
 import net.sacredlabyrinth.phaed.simpleclans.events.RequestFinishedEvent;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
 
 /**
  * @author phaed
@@ -356,7 +355,7 @@ public final class RequestManager {
             if (req.getType().equals(ClanRequest.DEMOTE)) {
                 Clan clan = req.getClan();
                 String demoted = req.getTarget();
-                UUID demotedUniqueId = UUIDMigration.getForcedPlayerUUID(demoted);
+                UUID demotedUniqueId = Helper.getForcedPlayerUUID(demoted);
 
                 if ( demotedUniqueId != null) return;
 
@@ -372,7 +371,7 @@ public final class RequestManager {
             else if (req.getType().equals(ClanRequest.PROMOTE)) {
                 Clan clan = req.getClan();
                 String promoted = req.getTarget();
-                UUID promotedUniqueId = UUIDMigration.getForcedPlayerUUID(promoted);
+                UUID promotedUniqueId = Helper.getForcedPlayerUUID(promoted);
 
                 if (promotedUniqueId == null) return; 
                 

@@ -46,27 +46,17 @@ public class SimpleClans extends JavaPlugin {
     private PermissionsManager permissionsManager;
     private TeleportManager teleportManager;
     private LanguageManager languageManager;
-//    private boolean hasUUID;
 
-    /**
-     * @return the logger
-     */
     public static Logger getLog() {
         return logger;
     }
 
-    /**
-     * @param msg
-     */
     public static void debug(String msg) {
         if (settingsManager.isDebugging()) {
             logger.log(Level.INFO, msg);
         }
     }
 
-    /**
-     * @return the instance
-     */
     public static SimpleClans getInstance() {
         return instance;
     }
@@ -84,7 +74,6 @@ public class SimpleClans extends JavaPlugin {
         instance = this;
 
         settingsManager = new SettingsManager();
-//        hasUUID = UUIDMigration.canReturnUUID();
         languageManager = new LanguageManager();
 
         permissionsManager = new PermissionsManager();
@@ -117,7 +106,6 @@ public class SimpleClans extends JavaPlugin {
         getCommand(settingsManager.getCommandClan()).setTabCompleter(new PlayerNameTabCompleter());
 
         pullMessages();
-//        logger.info("[SimpleClans] Online Mode: " + hasUUID);
         logger.info("[SimpleClans] Modo Multithreading: " + settingsManager.getUseThreads());
         logger.info("[SimpleClans] Modo BungeeCord: " + settingsManager.getUseBungeeCord());
     }
@@ -135,8 +123,10 @@ public class SimpleClans extends JavaPlugin {
         }
 
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(new URL("https://minecraftcubed.net/pluginmessage/").openStream()
-            		, StandardCharsets.UTF_8));
+            BufferedReader in = new BufferedReader(
+                                    new InputStreamReader(
+                                          new URL("https://minecraftcubed.net/pluginmessage/").openStream()
+                                                  , StandardCharsets.UTF_8));
 
             String message;
             while ((message = in.readLine()) != null) {
@@ -144,77 +134,34 @@ public class SimpleClans extends JavaPlugin {
                 Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + message);
             }
             in.close();
-
         }
-        catch (IOException e) {
-            // do nothing
-        }
+        catch (IOException e) { }
     }
 
-    /**
-     * @return the clanManager
-     */
     public ClanManager getClanManager() {
         return clanManager;
     }
-
-    /**
-     * @return the requestManager
-     */
     public RequestManager getRequestManager() {
         return requestManager;
     }
-
-    /**
-     * @return the storageManager
-     */
     public StorageManager getStorageManager() {
         return storageManager;
     }
-
-    /**
-     * @return the settingsManager
-     */
     public SettingsManager getSettingsManager() {
         return settingsManager;
     }
-
-    /**
-     * @return the permissionsManager
-     */
     public PermissionsManager getPermissionsManager() {
         return permissionsManager;
     }
-
-    /**
-     * @return the lang
-     */
     public String getLang(String msg) {
         return languageManager.get(msg);
     }
-
     public TeleportManager getTeleportManager() {
         return teleportManager;
     }
-
     public List<String> getMessages() {
         return messages;
     }
-
-    /**
-//     * @return the hasUUID
-//     */
-//    public boolean hasUUID() {
-//        return hasUUID;
-//    }
-
-//    /**
-//     * @param trueOrFalse
-//     */
-//    public void setUUID(boolean trueOrFalse) {
-//        hasUUID = trueOrFalse;
-//    }
-
     public LanguageManager getLanguageManager() {
         return languageManager;
     }

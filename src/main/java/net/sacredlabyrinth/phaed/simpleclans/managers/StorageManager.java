@@ -27,7 +27,6 @@ import net.sacredlabyrinth.phaed.simpleclans.storage.DBCore;
 import net.sacredlabyrinth.phaed.simpleclans.storage.MySQLCore;
 import net.sacredlabyrinth.phaed.simpleclans.storage.SQLiteCore;
 import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDFetcher;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDMigration;
 
 /**
  * @author phaed
@@ -67,7 +66,7 @@ public final class StorageManager {
      */
     public void addChatBlock(CommandSender player, ChatBlock cb) {
         
-        UUID uuid = UUIDMigration.getForcedPlayerUUID(player.getName());
+        UUID uuid = Helper.getForcedPlayerUUID(player.getName());
 
         if (uuid == null) return;
         

@@ -15,11 +15,7 @@ import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 
 public class AcceptCommandExecutor implements CommandExecutor {
-    SimpleClans plugin;
-
-    public AcceptCommandExecutor() {
-        plugin = SimpleClans.getInstance();
-    }
+    SimpleClans plugin = SimpleClans.getInstance();
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {

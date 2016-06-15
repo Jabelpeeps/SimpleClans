@@ -1,27 +1,20 @@
 package net.sacredlabyrinth.phaed.simpleclans.commands;
 
-import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
-import net.sacredlabyrinth.phaed.simpleclans.Clan;
-import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
+import net.sacredlabyrinth.phaed.simpleclans.Clan;
+import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
+
 /**
  * @author phaed
  */
-public class ReloadCommand
-{
-    public ReloadCommand()
-    {
-    }
+public class ReloadCommand implements ClanCommand {
 
-    /**
-     * Execute the command
-     *
-     * @param sender
-     * @param arg
-     */
+    @Override
     public void execute(CommandSender sender, String[] arg)
     {
         SimpleClans plugin = SimpleClans.getInstance();

@@ -3,7 +3,9 @@ package net.sacredlabyrinth.phaed.simpleclans.managers;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -34,7 +36,7 @@ public final class SettingsManager {
     private boolean requireVerification;
     private List<Integer> itemsList;
     private List<String> blacklistedWorlds;
-    private List<String> bannedPlayers;
+    private Set<UUID> bannedPlayers = new HashSet<>();
     private List<String> disallowedWords;
     private List<String> disallowedColors;
     private List<String> unRivableClans;
@@ -49,11 +51,6 @@ public final class SettingsManager {
     private double eInvitePrice;
     private double eHomeTeleportPrice;
     private double eHomeTeleportPriceSet;
-    private String alertUrl;
-    private boolean inGameTags;
-    private boolean inGameTagsColored;
-    private boolean clanCapes;
-    private String defaultCapeUrl;
     private String serverName;
     private boolean chatTags;
     private int purgeClan;
@@ -141,9 +138,6 @@ public final class SettingsManager {
     private int maxAsksPerRequest;
     private int maxMembers;
 
-    /**
-     *
-     */
     public SettingsManager() {
         plugin = SimpleClans.getInstance();
         config = plugin.getConfig();
@@ -151,14 +145,9 @@ public final class SettingsManager {
         load();
     }
 
-    /**
-     * Load the configuration
-     */
-
     public void load() {
-        boolean exists = (main).exists();
 
-        if (exists) {
+        if (main.exists()) {
             try {
                 config.options().copyDefaults(true);
                 config.load(main);
@@ -182,7 +171,12 @@ public final class SettingsManager {
         pvpOnlywhileInWar = config.getBoolean("settings.pvp-only-while-at-war");
         enableAutoGroups = config.getBoolean("settings.enable-auto-groups");
         useColorCodeFromPrefix = config.getBoolean("settings.use-colorcode-from-prefix-for-name");
-        bannedPlayers = config.getStringList("settings.banned-players");
+
+        config.getStringList("settings.banned-players")
+              .parallelStream()
+              .map( s -> UUID.fromString( s ) )
+              .forEach( u -> bannedPlayers.add( u ) );
+
         compatMode = config.getBoolean("settings.chat-compatibility-mode");
         disallowedColors = config.getStringList("settings.disallowed-tag-colors");
         blacklistedWorlds = config.getStringList("settings.blacklisted-worlds");
@@ -203,11 +197,6 @@ public final class SettingsManager {
         eInvitePrice = config.getDouble("economy.invite-price");
         eHomeTeleportPrice = config.getDouble("economy.home-teleport-price");
         eHomeTeleportPriceSet = config.getDouble("economy.home-teleport-set-price");
-        alertUrl = config.getString("spout.alert-url");
-        inGameTags = config.getBoolean("spout.in-game-tags");
-        inGameTagsColored = config.getBoolean("spout.in-game-tags-colored");
-        clanCapes = config.getBoolean("spout.enable-clan-capes");
-        defaultCapeUrl = config.getString("spout.default-cape-url");
         purgeClan = config.getInt("purge.inactive-clan-days");
         purgeUnverified = config.getInt("purge.unverified-clan-days");
         purgePlayers = config.getInt("purge.inactive-player-data-days");
@@ -294,6 +283,12 @@ public final class SettingsManager {
         useBungeeCord = config.getBoolean("performance.use-bungeecord");
         maxMembers = config.getInt("clan.max-members");
 
+        if (tagSeparator.equals(" .")) {
+            tagSeparator = ".";
+        }
+        if (tagSeparator == null) {
+            tagSeparator = "";
+        }
         // migrate from old way of adding ports
         if (database.contains(":")) {
             String[] strings = database.split(":");
@@ -313,29 +308,13 @@ public final class SettingsManager {
     }
 
     /**
-     * Check whether an item is in the list
-     *
-     * @param typeId the type
-     * @return whether the world is blacklisted
-     */
-    public boolean isItemInList(int typeId) {
-        return itemsList.contains(typeId);
-    }
-
-
-    /**
-     * Check whether a worlds is blacklisted
+     * Check whether a world is blacklisted
      *
      * @param world the world
      * @return whether the world is blacklisted
      */
     public boolean isBlacklistedWorld(String world) {
-        for (Object w : blacklistedWorlds) {
-            if (((String) w).equalsIgnoreCase(world)) {
-                return true;
-            }
-        }
-        return false;
+        return blacklistedWorlds.parallelStream().anyMatch( w -> w.equalsIgnoreCase( world ) );
     }
 
     /**
@@ -345,12 +324,11 @@ public final class SettingsManager {
      * @return whether its a disallowed word
      */
     public boolean isDisallowedWord(String word) {
-        for (Object w : disallowedWords) {
-            if (((String) w).equalsIgnoreCase(word)) {
-                return true;
-            }
-        }
-        return word.equalsIgnoreCase("clan") || word.equalsIgnoreCase(commandMore) || word.equalsIgnoreCase(commandDeny) || word.equalsIgnoreCase(commandAccept);
+        return  disallowedWords.parallelStream().allMatch( w -> w.equalsIgnoreCase( word ) )
+                || word.equalsIgnoreCase("clan") 
+                || word.equalsIgnoreCase(commandMore) 
+                || word.equalsIgnoreCase(commandDeny) 
+                || word.equalsIgnoreCase(commandAccept);
     }
 
     /**
@@ -360,24 +338,14 @@ public final class SettingsManager {
      * @return whether the string contains the color code
      */
     public boolean hasDisallowedColor(String str) {
-        for (Object c : getDisallowedColors()) {
-            if (str.contains("&" + c)) {
-                return true;
-            }
-        }
-        return false;
+        return disallowedColors.parallelStream().anyMatch( c -> str.contains( "&" + c ) );
     }
 
     /**
      * @return a comma delimited string with all disallowed colors
      */
     public String getDisallowedColorString() {
-        String out = "";
-
-        for (Object c : getDisallowedColors()) {
-            out += c + ", ";
-        }
-        return Helper.stripTrailing(out, ", ");
+        return String.join( ", ", disallowedColors );
     }
 
     /**
@@ -387,64 +355,8 @@ public final class SettingsManager {
      * @return whether the clan is unrivable
      */
     public boolean isUnrivable(String tag) {
-        for (Object t : getunRivableClans()) {
-            if (((String) t).equalsIgnoreCase(tag)) {
-                return true;
-            }
-        }
-        return false;
+        return unRivableClans.parallelStream().anyMatch( c -> c.equalsIgnoreCase( tag ) );
     }
-
-    /**
-//     * Check whether a player is banned
-//     *
-//     * @param playerName the player's name
-//     * @return whether player is banned
-//     */
-//    @Deprecated
-//    public boolean isBanned(String playerName) {
-//        
-//        playerName = UUIDMigration.getForcedPlayerUUID(playerName).toString();
-//        
-//        for (String pl : getBannedPlayers()){
-//            if (pl.equalsIgnoreCase(playerName)){
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-//    /**
-//     * Add a player to the banned list
-//     *
-//     * @param playerName the player's name
-//     */
-//    @Deprecated
-//    public void addBanned(String playerName) {
-//        
-//        playerName = UUIDMigration.getForcedPlayerUUID(playerName).toString();
-//        
-//        if (!bannedPlayers.contains(playerName)) {
-//            getBannedPlayers().add(playerName);
-//        }
-//        save();
-//    }
-
-//    /**
-//     * Remove a player from the banned list
-//     *
-//     * @param playerName the player's name
-//     */
-//    @Deprecated
-//    public void removeBanned(String playerName) {
-//        
-//        playerName = UUIDMigration.getForcedPlayerUUID(playerName).toString();
-//        
-//        if (getBannedPlayers().contains(playerName)) {
-//            getBannedPlayers().remove(playerName);
-//        }
-//        save();
-//    }
 
     /**
      * Check whether a player is banned
@@ -453,12 +365,7 @@ public final class SettingsManager {
      * @return whether player is banned
      */
     public boolean isBanned(UUID playerUniqueId) {
-        for (String pl : getBannedPlayers()) {
-            if (pl.equals(playerUniqueId.toString())) {
-                return true;
-            }
-        }
-        return false;
+        return bannedPlayers.parallelStream().anyMatch( pl -> pl.equals( playerUniqueId ) );
     }
 
     /**
@@ -466,13 +373,8 @@ public final class SettingsManager {
      *
      * @param playerUniqueId the player's name
      */
-    public void addBanned(UUID playerUniqueId)
-    {
-        if (!bannedPlayers.contains(playerUniqueId.toString()))
-        {
-            getBannedPlayers().add(playerUniqueId.toString());
-        }
-
+    public void addBanned(UUID playerUniqueId) {
+        bannedPlayers.add(playerUniqueId);
         save();
     }
 
@@ -481,906 +383,129 @@ public final class SettingsManager {
      *
      * @param playerUniqueId the player's name
      */
-    public void removeBanned(UUID playerUniqueId)
-    {
-        if (getBannedPlayers().contains(playerUniqueId.toString()))
-        {
-            getBannedPlayers().remove(playerUniqueId.toString());
-        }
-
+    public void removeBanned(UUID playerUniqueId) {
+        bannedPlayers.remove(playerUniqueId);
         save();
     }
 
-    /**
-//     * @return the plugin
-//     */
-//    public SimpleClans getPlugin()
-//    {
-//        return plugin;
-//    }
-
-    /**
-     * @return the requireVerification
-     */
-    public boolean isRequireVerification()
-    {
-        return requireVerification;
-    }
-
-    /**
-     * @return the bannedPlayers
-     */
-    public List<String> getBannedPlayers()
-    {
-        return Collections.unmodifiableList(bannedPlayers);
-    }
-
-    /**
-     * @return the disallowedColors
-     */
-    public List<String> getDisallowedColors()
-    {
-        return Collections.unmodifiableList(disallowedColors);
-    }
-
-    /**
-     * @return the unRivableClans
-     */
-    public List<String> getunRivableClans()
-    {
-        return Collections.unmodifiableList(unRivableClans);
-    }
-
-    /**
-     * @return the rivalLimitPercent
-     */
-    public int getRivalLimitPercent()
-    {
-        return rivalLimitPercent;
-    }
-
-    /**
-     * @return the alertUrl
-     */
-    public String getAlertUrl()
-    {
-        return alertUrl;
-    }
-
-    /**
-     * @return the inGameTags
-     */
-    public boolean isInGameTags()
-    {
-        return inGameTags;
-    }
-
-    /**
-     * @return the clanCapes
-     */
-    public boolean isClanCapes()
-    {
-        return clanCapes;
-    }
-
-    /**
-     * @return the defaultCapeUrl
-     */
-    public String getDefaultCapeUrl()
-    {
-        return defaultCapeUrl;
-    }
-
-    /**
-     * @return the serverName
-     */
-    public String getServerName()
-    {
-        return Helper.parseColors(serverName);
-    }
-
-    /**
-     * @return the chatTags
-     */
-    public boolean isChatTags()
-    {
-        return chatTags;
-    }
-
-    /**
-     * @return the purgeClan
-     */
-    public int getPurgeClan()
-    {
-        return purgeClan;
-    }
-
-    /**
-     * @return the purgeUnverified
-     */
-    public int getPurgeUnverified()
-    {
-        return purgeUnverified;
-    }
-
-    /**
-     * @return the purgePlayers
-     */
-    public int getPurgePlayers()
-    {
-        return purgePlayers;
-    }
-
-    /**
-     * @return the requestFreqencySecs
-     */
-    public int getRequestFreqencySecs()
-    {
-        return requestFreqencySecs;
-    }
-
-    /**
-     * @return the requestMessageColor
-     */
-    public String getRequestMessageColor()
-    {
-        return Helper.toColor(requestMessageColor);
-    }
-
-    /**
-     * @return the pageSize
-     */
-    public int getPageSize()
-    {
-        return pageSize;
-    }
-
-    /**
-     * @return the pageSep
-     */
-    public String getPageSep()
-    {
-        return pageSep;
-    }
-
-    /**
-     * @return the pageHeadingsColor
-     */
-    public String getPageHeadingsColor()
-    {
-        return Helper.toColor(pageHeadingsColor);
-    }
-
-    /**
-     * @return the pageSubTitleColor
-     */
-    public String getPageSubTitleColor()
-    {
-        return Helper.toColor(pageSubTitleColor);
-    }
-
-    /**
-     * @return the pageLeaderColor
-     */
-    public String getPageLeaderColor()
-    {
-        return Helper.toColor(pageLeaderColor);
-    }
-
-    /**
-     * @return the bbSize
-     */
-    public int getBbSize()
-    {
-        return bbSize;
-    }
-
-    /**
-     * @return the bbColor
-     */
-    public String getBbColor()
-    {
-        return Helper.toColor(bbColor);
-    }
-
-    /**
-     * @return the bbAccentColor
-     */
-    public String getBbAccentColor()
-    {
-        return Helper.toColor(bbAccentColor);
-    }
-
-    /**
-     * @return the commandClan
-     */
-    public String getCommandClan()
-    {
-        return commandClan;
-    }
-
-    /**
-     * @return the commandMore
-     */
-    public String getCommandMore()
-    {
-        return commandMore;
-    }
-
-    /**
-     * @return the commandDeny
-     */
-    public String getCommandDeny()
-    {
-        return commandDeny;
-    }
-
-    /**
-     * @return the commandAccept
-     */
-    public String getCommandAccept()
-    {
-        return commandAccept;
-    }
-
-    /**
-     * @return the clanMinSizeToAlly
-     */
-    public int getClanMinSizeToAlly()
-    {
-        return clanMinSizeToAlly;
-    }
-
-    /**
-     * @return the clanMinSizeToRival
-     */
-    public int getClanMinSizeToRival()
-    {
-        return clanMinSizeToRival;
-    }
-
-    /**
-     * @return the clanMinLength
-     */
-    public int getClanMinLength()
-    {
-        return clanMinLength;
-    }
-
-    /**
-     * @return the clanMaxLength
-     */
-    public int getClanMaxLength()
-    {
-        return clanMaxLength;
-    }
-
-    /**
-     * @return the pageClanNameColor
-     */
-    public String getPageClanNameColor()
-    {
-        return Helper.toColor(pageClanNameColor);
-    }
-
-    /**
-     * @return the tagMinLength
-     */
-    public int getTagMinLength()
-    {
-        return tagMinLength;
-    }
-
-    /**
-     * @return the tagMaxLength
-     */
-    public int getTagMaxLength()
-    {
-        return tagMaxLength;
-    }
-
-    /**
-     * @return the tagDefaultColor
-     */
-    public String getTagDefaultColor()
-    {
-        return Helper.toColor(tagDefaultColor);
-    }
-
-    /**
-     * @return the tagSeparator
-     */
-    public String getTagSeparator()
-    {
-        if (tagSeparator.equals(" ."))
-        {
-            return ".";
-        }
-
-        if (tagSeparator == null)
-        {
-            return "";
-        }
-
-        return tagSeparator;
-    }
-
-    /**
-     * @return the tagSeparatorColor
-     */
-    public String getTagSeparatorColor()
-    {
-        return Helper.toColor(tagSeparatorColor);
-    }
-
-    /**
-     * @return the clanChatAnnouncementColor
-     */
-    public String getClanChatAnnouncementColor()
-    {
-        return Helper.toColor(clanChatAnnouncementColor);
-    }
-
-    /**
-     * @return the clanChatMessageColor
-     */
-    public String getClanChatMessageColor()
-    {
-        return Helper.toColor(clanChatMessageColor);
-    }
-
-    /**
-     * @return the clanChatNameColor
-     */
-    public String getClanChatNameColor()
-    {
-        return Helper.toColor(clanChatNameColor);
-    }
-
-    /**
-     * @return the clanChatTagBracketLeft
-     */
-    public String getClanChatTagBracketLeft()
-    {
-        return clanChatTagBracketLeft;
-    }
-
-    /**
-     * @return the clanChatTagBracketRight
-     */
-    public String getClanChatTagBracketRight()
-    {
-        return clanChatTagBracketRight;
-    }
-
-    /**
-     * @return the clanChatBracketColor
-     */
-    public String getClanChatBracketColor()
-    {
-        return Helper.toColor(clanChatBracketColor);
-    }
-
-    /**
-     * @return the clanChatPlayerBracketLeft
-     */
-    public String getClanChatPlayerBracketLeft()
-    {
-        return clanChatPlayerBracketLeft;
-    }
-
-    /**
-     * @return the clanChatPlayerBracketRight
-     */
-    public String getClanChatPlayerBracketRight()
-    {
-        return clanChatPlayerBracketRight;
-    }
-
-    /**
-     * @return the kwRival
-     */
-    public double getKwRival()
-    {
-        return kwRival;
-    }
-
-    /**
-     * @return the kwNeutral
-     */
-    public double getKwNeutral()
-    {
-        return kwNeutral;
-    }
-
-    /**
-     * @return the kwCivilian
-     */
-    public double getKwCivilian()
-    {
-        return kwCivilian;
-    }
-
-    /**
-     * @return the useMysql
-     */
-    public boolean isUseMysql()
-    {
-        return useMysql;
-    }
-
-    /**
-     * @return the host
-     */
-    public String getHost()
-    {
-        return host;
-    }
-    
-    /**
-     * @return the port
-     */
-    public int getPort()
-    {
-        return port;
-    }
-
-    /**
-     * @return the database
-     */
-    public String getDatabase()
-    {
-        return database;
-    }
-
-    /**
-     * @return the username
-     */
-    public String getUsername()
-    {
-        return username;
-    }
-
-    /**
-     * @return the password
-     */
-    public String getPassword()
-    {
-        return password;
-    }
-
-    /**
-     * @return the inGameTagsColored
-     */
-    public boolean isInGameTagsColored()
-    {
-        return inGameTagsColored;
-    }
-
-    /**
-     * @return the showUnverifiedOnList
-     */
-    public boolean isShowUnverifiedOnList()
-    {
-        return showUnverifiedOnList;
-    }
-
-    /**
-     * @return the clanTrustByDefault
-     */
-    public boolean isClanTrustByDefault()
-    {
-        return clanTrustByDefault;
-    }
-
-    /**
-     * @return the pageTrustedColor
-     */
-    public String getPageTrustedColor()
-    {
-        return Helper.toColor(pageTrustedColor);
-    }
-
-    /**
-     * @return the pageUnTrustedColor
-     */
-    public String getPageUnTrustedColor()
-    {
-        return Helper.toColor(pageUnTrustedColor);
-    }
-
-    /**
-     * @return the globalff
-     */
-    public boolean isGlobalff()
-    {
-        return globalff;
-    }
-
-    /**
-     * @param globalff the globalff to set
-     */
-    public void setGlobalff(boolean globalff)
-    {
-        this.globalff = globalff;
-    }
-
-    /**
-     * @return the clanChatEnable
-     */
-    public boolean getClanChatEnable()
-    {
-        return clanChatEnable;
-    }
-
-    /**
-     * @return the tagBracketLeft
-     */
-    public String getTagBracketLeft()
-    {
-        return tagBracketLeft;
-    }
-
-    /**
-     * @return the tagBracketRight
-     */
-    public String getTagBracketRight()
-    {
-        return tagBracketRight;
-    }
-
-    /**
-     * @return the tagBracketColor
-     */
-    public String getTagBracketColor()
-    {
-        return Helper.toColor(tagBracketColor);
-    }
-
-    /**
-     * @return the ePurchaseCreation
-     */
-    public boolean isePurchaseCreation()
-    {
-        return ePurchaseCreation;
-    }
-
-    /**
-     * @return the ePurchaseVerification
-     */
-    public boolean isePurchaseVerification()
-    {
-        return ePurchaseVerification;
-    }
-
-    /**
-     * @return the ePurchaseInvite
-     */
-    public boolean isePurchaseInvite()
-    {
-        return ePurchaseInvite;
-    }
-
-    /**
-     * @return the eCreationPrice
-     */
-    public double getCreationPrice()
-    {
-        return eCreationPrice;
-    }
-
-    /**
-     * @return the eVerificationPrice
-     */
-    public double getVerificationPrice()
-    {
-        return eVerificationPrice;
-    }
-
-    /**
-     * @return the eInvitePrice
-     */
-    public double getInvitePrice()
-    {
-        return eInvitePrice;
-    }
-
-    public boolean isBbShowOnLogin()
-    {
-        return bbShowOnLogin;
-    }
-
-    public boolean getSafeCivilians()
-    {
-        return safeCivilians;
-    }
-
-    public boolean isConfirmationForPromote()
-    {
-        return confirmationForPromote;
-    }
-
-    public boolean isConfirmationForDemote()
-    {
-        return confirmationForDemote;
-    }
-
-    public boolean isUseColorCodeFromPrefix()
-    {
-        return useColorCodeFromPrefix;
-    }
-
-    public String getCommandAlly()
-    {
-        return commandAlly;
-    }
-
-    public boolean isAllyChatEnable()
-    {
-        return allyChatEnable;
-    }
-
-    public String getAllyChatMessageColor()
-    {
-        return Helper.toColor(allyChatMessageColor);
-    }
-
-    public String getAllyChatNameColor()
-    {
-        return Helper.toColor(allyChatNameColor);
-    }
-
-    public String getAllyChatTagBracketLeft()
-    {
-        return allyChatTagBracketLeft;
-    }
-
-    public String getAllyChatTagBracketRight()
-    {
-        return allyChatTagBracketRight;
-    }
-
-    public String getAllyChatBracketColor()
-    {
-        return Helper.toColor(allyChatBracketColor);
-    }
-
-    public String getAllyChatPlayerBracketLeft()
-    {
-        return allyChatPlayerBracketLeft;
-    }
-
-    public String getAllyChatPlayerBracketRight()
-    {
-        return allyChatPlayerBracketRight;
-    }
-
-    public String getCommandGlobal()
-    {
-        return commandGlobal;
-    }
-
-    public String getAllyChatTagColor()
-    {
-        return Helper.toColor(allyChatTagColor);
-    }
-
-    public boolean isClanFFOnByDefault()
-    {
-        return clanFFOnByDefault;
-    }
-
-    public boolean isCompatMode()
-    {
-        return compatMode;
-    }
-
-    public void setCompatMode(boolean compatMode)
-    {
-        this.compatMode = compatMode;
-    }
-
-    public boolean isHomebaseSetOnce()
-    {
-        return homebaseSetOnce;
-    }
-
-    public int getWaitSecs()
-    {
-        return waitSecs;
-    }
-
-    public void setWaitSecs(int waitSecs)
-    {
-        this.waitSecs = waitSecs;
-    }
-
-    public boolean isEnableAutoGroups()
-    {
-        return enableAutoGroups;
-    }
-
-    public boolean isPvpOnlywhileInWar()
-    {
-        return pvpOnlywhileInWar;
-    }
-
-    public boolean ismChatIntegration()
-    {
-        return mChatIntegration;
-    }
-
-    public boolean isDebugging()
-    {
-        return debugging;
-    }
-
-    public boolean isKeepOnHome()
-    {
-        return keepOnHome;
-    }
-
-    public boolean isDropOnHome()
-    {
-        return dropOnHome;
-    }
-
-    public List<Integer> getItemsList()
-    {
-        return Collections.unmodifiableList(itemsList);
-    }
-
-    public boolean isTeleportOnSpawn()
-    {
-        return teleportOnSpawn;
-    }
-
-    public boolean isTagBasedClanChat()
-    {
-        return tagBasedClanChat;
-    }
-
-    public String getClanChatRankColor()
-    {
-        return Helper.toColor(clanChatRankColor);
-    }
-
-    /**
-     * @return the ePurchaseHomeTeleport
-     */
-    public boolean isePurchaseHomeTeleport() {
-        return ePurchaseHomeTeleport;
-    }
-
-    /**
-     * @return the HomeTeleportPrice
-     */
-    public double getHomeTeleportPrice() {
-        return eHomeTeleportPrice;
-    }
-
-    /**
-     * @return the ePurchaseHomeTeleportSet
-     */
-    public boolean isePurchaseHomeTeleportSet() {
-        return ePurchaseHomeTeleportSet;
-    }
-
-    /**
-     * @return the HomeTeleportPriceSet
-     */
-    public double getHomeTeleportPriceSet() {
-        return eHomeTeleportPriceSet;
-    }
-
-    /**
-     * @return the config
-     */
-    public FileConfiguration getConfig() {
-        return config;
-    }
-
-    /**
-     * @return the moneyperkill
-     */
-    public boolean isMoneyPerKill() {
-        return moneyperkill;
-    }
-
-    /**
-     * @return the KDRMultipliesPerKill
-     */
-    public double getKDRMultipliesPerKill() {
-        return KDRMultipliesPerKill;
-    }
-
-    /**
-     * @return the teleportBlocks
-     */
-    public boolean isTeleportBlocks() {
-        return teleportBlocks;
-    }
-
-    /**
-     * @return the AutoGroupGroupName
-     */
-    public boolean isAutoGroupGroupName() {
-        return AutoGroupGroupName;
-    }
-
-    /**
-     * @return the tamableMobsSharing
-     */
-    public boolean isTamableMobsSharing() {
-        return tamableMobsSharing;
-    }
-
-    public boolean isOnlineMode()
-    {
-        return onlineMode;
-    }
-
-    public boolean isDisableMessages()
-    {
-        return disableMessages;
-    }
-
-    /**
-     * @return the allowReGroupCommand
-     */
-    public boolean getAllowReGroupCommand()
-    {
-        return allowReGroupCommand;
-    }
-
-    /**
-     * @return the useThreads
-     */
-    public boolean getUseThreads()
-    {
-        return useThreads;
-    }
-
-    /**
-     * @return the useBungeeCord
-     */
-    public boolean getUseBungeeCord()
-    {
-        return useBungeeCord;
-    }
-
-    public String getTagSeparatorLeaderColor()
-    {
-        return Helper.toColor(tagSeparatorLeaderColor);
-    }
-
-    public String getTagBracketLeaderColor()
-    {
-        return Helper.toColor(tagBracketLeaderColor);
-    }
-
-    public int getMaxAsksPerRequest()
-    {
-        return maxAsksPerRequest;
-    }
-
-    public void setMaxAsksPerRequest(int maxAsksPerRequest)
-    {
-        this.maxAsksPerRequest = maxAsksPerRequest;
-    }
-
-    public boolean isForceCommandPriority()
-    {
-        return forceCommandPriority;
-    }
-
-    public void setForceCommandPriority(boolean forceCommandPriority)
-    {
-        this.forceCommandPriority = forceCommandPriority;
-    }
-
-    public int getMaxMembers()
-    {
-        return this.maxMembers;
-    }
+    public boolean isRequireVerification() { return requireVerification; }
+    public Set<UUID> getBannedPlayers() { return Collections.unmodifiableSet(bannedPlayers); }
+    public List<String> getDisallowedColors() { return Collections.unmodifiableList(disallowedColors); }
+    public List<String> getunRivableClans() { return Collections.unmodifiableList(unRivableClans); }
+    public int getRivalLimitPercent() { return rivalLimitPercent; }
+    public String getServerName() { return Helper.parseColors(serverName); }
+    public boolean isChatTags() { return chatTags; }
+    public int getPurgeClan() { return purgeClan; }
+    public int getPurgeUnverified() { return purgeUnverified; }
+    public int getPurgePlayers() { return purgePlayers; }
+    public int getRequestFreqencySecs() { return requestFreqencySecs; }
+    public String getRequestMessageColor() { return Helper.toColor(requestMessageColor); }
+    public int getPageSize() { return pageSize; }
+    public String getPageSep() { return pageSep; }
+    public String getPageHeadingsColor() { return Helper.toColor(pageHeadingsColor); }
+    public String getPageSubTitleColor() { return Helper.toColor(pageSubTitleColor); }
+    public String getPageLeaderColor() { return Helper.toColor(pageLeaderColor); }
+    public int getBbSize() { return bbSize; }
+    public String getBbColor() { return Helper.toColor(bbColor); }
+    public String getBbAccentColor() { return Helper.toColor(bbAccentColor); }
+    public String getCommandClan() { return commandClan; }
+    public String getCommandMore() { return commandMore; }
+    public String getCommandDeny() { return commandDeny; }
+    public String getCommandAccept() { return commandAccept; }
+    public int getClanMinSizeToAlly() { return clanMinSizeToAlly; }
+    public int getClanMinSizeToRival() { return clanMinSizeToRival; }
+    public int getClanMinLength() { return clanMinLength; }
+    public int getClanMaxLength() { return clanMaxLength; }
+    public String getPageClanNameColor() { return Helper.toColor(pageClanNameColor); }
+    public int getTagMinLength() { return tagMinLength; }
+    public int getTagMaxLength() { return tagMaxLength; }
+    public String getTagDefaultColor() { return Helper.toColor(tagDefaultColor); }
+    public String getTagSeparator() { return tagSeparator; }
+    public String getTagSeparatorColor() { return Helper.toColor(tagSeparatorColor); }
+    public String getClanChatAnnouncementColor() { return Helper.toColor(clanChatAnnouncementColor); }
+    public String getClanChatMessageColor() { return Helper.toColor(clanChatMessageColor); }
+    public String getClanChatNameColor() { return Helper.toColor(clanChatNameColor); }
+    public String getClanChatTagBracketLeft() { return clanChatTagBracketLeft; }
+    public String getClanChatTagBracketRight() { return clanChatTagBracketRight; }
+    public String getClanChatBracketColor() { return Helper.toColor(clanChatBracketColor); }
+    public String getClanChatPlayerBracketLeft() { return clanChatPlayerBracketLeft; }
+    public String getClanChatPlayerBracketRight() { return clanChatPlayerBracketRight; }
+    public double getKwRival() { return kwRival; }
+    public double getKwNeutral() { return kwNeutral; }
+    public double getKwCivilian() { return kwCivilian; }
+    public boolean isUseMysql() { return useMysql; }
+    public String getHost() { return host; }
+    public int getPort() { return port; }
+    public String getDatabase() { return database; }
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+    public boolean isShowUnverifiedOnList() { return showUnverifiedOnList; }
+    public boolean isClanTrustByDefault() { return clanTrustByDefault; }
+    public String getPageTrustedColor() { return Helper.toColor(pageTrustedColor); }
+    public String getPageUnTrustedColor() { return Helper.toColor(pageUnTrustedColor); }
+    public boolean isGlobalff() { return globalff; }
+    public void setGlobalff(boolean _globalff) { globalff = _globalff; }
+    public boolean getClanChatEnable() { return clanChatEnable; }
+    public String getTagBracketLeft() { return tagBracketLeft; }
+    public String getTagBracketRight() { return tagBracketRight; }
+    public String getTagBracketColor() { return Helper.toColor(tagBracketColor); }
+    public boolean isePurchaseCreation() { return ePurchaseCreation; }
+    public boolean isePurchaseVerification() { return ePurchaseVerification; }
+    public boolean isePurchaseInvite() { return ePurchaseInvite; }
+    public double getCreationPrice() { return eCreationPrice; }
+    public double getVerificationPrice() { return eVerificationPrice; }
+    public double getInvitePrice() { return eInvitePrice; }
+    public boolean isBbShowOnLogin() { return bbShowOnLogin; }
+    public boolean getSafeCivilians() { return safeCivilians; }
+    public boolean isConfirmationForPromote() { return confirmationForPromote; }
+    public boolean isConfirmationForDemote() { return confirmationForDemote; }
+    public boolean isUseColorCodeFromPrefix() { return useColorCodeFromPrefix; }
+    public String getCommandAlly() { return commandAlly; }
+    public boolean isAllyChatEnable() { return allyChatEnable; }
+    public String getAllyChatMessageColor() { return Helper.toColor(allyChatMessageColor); }
+    public String getAllyChatNameColor() { return Helper.toColor(allyChatNameColor); }
+    public String getAllyChatTagBracketLeft() { return allyChatTagBracketLeft; }
+    public String getAllyChatTagBracketRight() { return allyChatTagBracketRight; }
+    public String getAllyChatBracketColor()  { return Helper.toColor(allyChatBracketColor); }
+    public String getAllyChatPlayerBracketLeft() { return allyChatPlayerBracketLeft; }
+    public String getAllyChatPlayerBracketRight() { return allyChatPlayerBracketRight; }
+    public String getCommandGlobal() { return commandGlobal; }
+    public String getAllyChatTagColor() { return Helper.toColor(allyChatTagColor); }
+    public boolean isClanFFOnByDefault() { return clanFFOnByDefault; }
+    public boolean isCompatMode() { return compatMode; }
+    public void setCompatMode(boolean _compatMode) { compatMode = _compatMode; }
+    public boolean isHomebaseSetOnce() { return homebaseSetOnce; }
+    public int getWaitSecs() { return waitSecs; }
+    public void setWaitSecs(int _waitSecs) { waitSecs = _waitSecs; }
+    public boolean isEnableAutoGroups() { return enableAutoGroups; }
+    public boolean isPvpOnlywhileInWar() { return pvpOnlywhileInWar; }
+    public boolean ismChatIntegration() { return mChatIntegration; }
+    public boolean isDebugging() { return debugging; }
+    public boolean isKeepOnHome() { return keepOnHome; }
+    public boolean isDropOnHome() { return dropOnHome; }
+    public List<Integer> getItemsList() { return Collections.unmodifiableList(itemsList); }
+    public boolean isTeleportOnSpawn() { return teleportOnSpawn; }
+    public boolean isTagBasedClanChat() { return tagBasedClanChat; }
+    public String getClanChatRankColor() { return Helper.toColor(clanChatRankColor); }
+    public boolean isePurchaseHomeTeleport() { return ePurchaseHomeTeleport; }
+    public double getHomeTeleportPrice() { return eHomeTeleportPrice; }
+    public boolean isePurchaseHomeTeleportSet() { return ePurchaseHomeTeleportSet; }
+    public double getHomeTeleportPriceSet() { return eHomeTeleportPriceSet; }
+    public boolean isMoneyPerKill() { return moneyperkill; }
+    public double getKDRMultipliesPerKill() { return KDRMultipliesPerKill; }
+    public boolean isTeleportBlocks() { return teleportBlocks; }
+    public boolean isAutoGroupGroupName() { return AutoGroupGroupName; }
+    public boolean isTamableMobsSharing() { return tamableMobsSharing; }
+    public boolean isOnlineMode() { return onlineMode; }
+    public boolean isDisableMessages() { return disableMessages; }
+    public boolean getAllowReGroupCommand() { return allowReGroupCommand; }
+    public boolean getUseThreads() { return useThreads; }
+    public boolean getUseBungeeCord() { return useBungeeCord; }
+    public String getTagSeparatorLeaderColor() { return Helper.toColor(tagSeparatorLeaderColor); }
+    public String getTagBracketLeaderColor() { return Helper.toColor(tagBracketLeaderColor); }
+    public int getMaxAsksPerRequest() { return maxAsksPerRequest; }
+    public void setMaxAsksPerRequest(int _maxAsksPerRequest) { maxAsksPerRequest = _maxAsksPerRequest; }
+    public boolean isForceCommandPriority() { return forceCommandPriority; }
+    public void setForceCommandPriority(boolean _forceCommandPriority) { forceCommandPriority = _forceCommandPriority; }
+    public int getMaxMembers() { return maxMembers; }
 }

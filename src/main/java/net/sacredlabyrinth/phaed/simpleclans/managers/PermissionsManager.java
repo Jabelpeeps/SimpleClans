@@ -71,7 +71,7 @@ public final class PermissionsManager {
     public void savePermissions() {
         for (Clan clan : plugin.getClanManager().getClans()) {
             if (permissions.containsKey(clan.getTag())) {
-                plugin.getSettingsManager().getConfig().set("permissions." + clan.getTag(), getPermissions(clan));
+                plugin.getConfig().set("permissions." + clan.getTag(), getPermissions(clan));
             }
         }
         plugin.getSettingsManager().save();

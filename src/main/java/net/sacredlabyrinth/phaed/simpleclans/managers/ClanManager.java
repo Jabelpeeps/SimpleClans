@@ -5,7 +5,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -48,7 +47,7 @@ public final class ClanManager {
      * @param clan
      */
     public void importClan(Clan clan) {
-        this.clans.put(clan.getTag(), clan);
+        clans.put(clan.getTag(), clan);
     }
 
     /**
@@ -58,7 +57,7 @@ public final class ClanManager {
      */
     public void importClanPlayer(ClanPlayer cp) {      
         if (cp.getUniqueId() != null) {
-            this.clanPlayers.put(cp.getUniqueId().toString(), cp);
+            clanPlayers.put(cp.getUniqueId().toString(), cp);
         }
     }
 
@@ -136,22 +135,6 @@ public final class ClanManager {
         return clans.get(Helper.cleanTag(tag));
     }
 
-//    /**
-//     * Get a player's clan
-//     *
-//     * @param playerName
-//     * @return null if not in a clan
-//     */
-//    @Deprecated
-//    public Clan getClanByPlayerName(String playerName) {
-//        ClanPlayer cp = getClanPlayer(playerName);
-//
-//        if (cp != null) {
-//            return cp.getClan();
-//        }
-//        return null;
-//    }
-
     /**
      * Get a player's clan
      *
@@ -208,26 +191,6 @@ public final class ClanManager {
     }
 
     /**
-//     * Gets the ClanPlayer data object if a player is currently in a clan, null
-//     * if he's not in a clan
-//     *
-//     * @param playerName
-//     * @return
-//     */
-//    @Deprecated
-//    public ClanPlayer getClanPlayer(String playerName) {
-//        ClanPlayer cp = getClanPlayerName(playerName);
-//
-//        if (cp == null){
-//            return null;
-//        }
-//        if (cp.getClan() == null){
-//            return null;
-//        }
-//        return cp;
-//    }
-
-    /**
      * Gets the ClanPlayer data object if a player is currently in a clan, null
      * if he's not in a clan
      *
@@ -270,20 +233,6 @@ public final class ClanManager {
         return cp;
     }
 
-//    /**
-//     * Gets the ClanPlayer data object for the player, will retrieve disabled
-//     * clan players as well, these are players who used to be in a clan but are
-//     * not currently in one, their data file persists and can be accessed. their
-//     * clan will be null though.
-//     *
-//     * @param playerName
-//     * @return
-//     */
-//    @Deprecated
-//    public ClanPlayer getAnyClanPlayer(String playerName) {
-//        return getClanPlayerName(playerName);       
-//    }
-
     /**
      * Gets the ClanPlayer data object for the player, will retrieve disabled
      * clan players as well, these are players who used to be in a clan but are
@@ -296,25 +245,6 @@ public final class ClanManager {
     public ClanPlayer getAnyClanPlayer(UUID playerUniqueId) {
         return clanPlayers.get(playerUniqueId.toString());
     }
-
-//    /**
-//     * Gets the ClanPlayer object for the player, creates one if not found
-//     *
-//     * @param playerName
-//     * @return
-//     */
-//    @Deprecated
-//    public ClanPlayer getCreateClanPlayer(String playerName) {
-//        if (clanPlayers.containsKey(playerName.toLowerCase())) {
-//            return clanPlayers.get(playerName.toLowerCase());
-//        }
-//        ClanPlayer cp = new ClanPlayer(playerName);
-//
-//        plugin.getStorageManager().insertClanPlayer(cp);
-//        importClanPlayer(cp);
-//
-//        return cp;
-//    }
 
     /**
      * Gets the ClanPlayer object for the player, creates one if not found
@@ -428,6 +358,7 @@ public final class ClanManager {
      */
     public void ban(Player player) {
         ClanPlayer cp = getClanPlayer(player);
+        if ( cp == null ) return;
         Clan clan = cp.getClan();
 
         if (clan != null) {
@@ -454,14 +385,10 @@ public final class ClanManager {
      * @return
      */
     public int getRivableClanCount() {
-        int clanCount = 0;
-
-        for (Clan tm : clans.values()) {
-            if (!SimpleClans.getInstance().getSettingsManager().isUnrivable(tm.getTag())) {
-                clanCount++;
-            }
-        }
-        return clanCount;
+        return (int) clans.values()
+                          .parallelStream()
+                          .filter( c -> !plugin.getSettingsManager().isUnrivable( c.getTag() ) )
+                          .count();
     }
 
     /**
@@ -476,101 +403,75 @@ public final class ClanManager {
         ItemStack h = inv.getHelmet();
 
         if (h != null) {
-            if (h.getType().equals(Material.CHAINMAIL_HELMET)) {
+            if (h.getType().equals(Material.CHAINMAIL_HELMET)) 
                 out += ChatColor.WHITE + plugin.getLang("armor.h");
-            }
-            else if (h.getType().equals(Material.DIAMOND_HELMET)) {
+            else if (h.getType().equals(Material.DIAMOND_HELMET)) 
                 out += ChatColor.AQUA + plugin.getLang("armor.h");
-            }
-            else if (h.getType().equals(Material.GOLD_HELMET)) {
+            else if (h.getType().equals(Material.GOLD_HELMET))
                 out += ChatColor.YELLOW + plugin.getLang("armor.h");
-            }
-            else if (h.getType().equals(Material.IRON_HELMET)) {
+            else if (h.getType().equals(Material.IRON_HELMET)) 
                 out += ChatColor.GRAY + plugin.getLang("armor.h");
-            }
-            else if (h.getType().equals(Material.LEATHER_HELMET)) {
+            else if (h.getType().equals(Material.LEATHER_HELMET)) 
                 out += ChatColor.GOLD + plugin.getLang("armor.h");
-            }
-            else if (h.getType().equals(Material.AIR)) {
+            else if (h.getType().equals(Material.AIR)) 
                 out += ChatColor.BLACK + plugin.getLang("armor.h");
-            }
-            else {
+            else 
                 out += ChatColor.RED + plugin.getLang("armor.h");
-            }
         }
         ItemStack c = inv.getChestplate();
 
         if (c != null) {
-            if (c.getType().equals(Material.CHAINMAIL_CHESTPLATE)) {
+            if (c.getType().equals(Material.CHAINMAIL_CHESTPLATE)) 
                 out += ChatColor.WHITE + plugin.getLang("armor.c");
-            }
-            else if (c.getType().equals(Material.DIAMOND_CHESTPLATE)) {
+            else if (c.getType().equals(Material.DIAMOND_CHESTPLATE)) 
                 out += ChatColor.AQUA + plugin.getLang("armor.c");
-            }
-            else if (c.getType().equals(Material.GOLD_CHESTPLATE)) {
+            else if (c.getType().equals(Material.GOLD_CHESTPLATE)) 
                 out += ChatColor.YELLOW + plugin.getLang("armor.c");
-            }
-            else if (c.getType().equals(Material.IRON_CHESTPLATE)) {
+            else if (c.getType().equals(Material.IRON_CHESTPLATE)) 
                 out += ChatColor.GRAY + plugin.getLang("armor.c");
-            }
-            else if (c.getType().equals(Material.LEATHER_CHESTPLATE)) {
+            else if (c.getType().equals(Material.LEATHER_CHESTPLATE)) 
                 out += ChatColor.GOLD + plugin.getLang("armor.c");
-            }
-            else if (c.getType().equals(Material.AIR)) {
+            else if (c.getType().equals(Material.AIR))
                 out += ChatColor.BLACK + plugin.getLang("armor.c");
-            }
-            else {
+            else 
                 out += ChatColor.RED + plugin.getLang("armor.c");
-            }
         }
         ItemStack l = inv.getLeggings();
 
         if (l != null) {
-            if (l.getType().equals(Material.CHAINMAIL_LEGGINGS)) {
+            if (l.getType().equals(Material.CHAINMAIL_LEGGINGS)) 
                 out += ChatColor.WHITE + plugin.getLang("armor.l");
-            }
-            else if (l.getType().equals(Material.DIAMOND_LEGGINGS)) {
+            else if (l.getType().equals(Material.DIAMOND_LEGGINGS)) 
                 out += plugin.getLang("armor.l");
-            }
-            else if (l.getType().equals(Material.GOLD_LEGGINGS)) {
+            else if (l.getType().equals(Material.GOLD_LEGGINGS)) 
                 out += plugin.getLang("armor.l");
-            }
-            else if (l.getType().equals(Material.IRON_LEGGINGS)) {
+            else if (l.getType().equals(Material.IRON_LEGGINGS)) 
                 out += plugin.getLang("armor.l");
-            }
-            else if (l.getType().equals(Material.LEATHER_LEGGINGS)) {
+            else if (l.getType().equals(Material.LEATHER_LEGGINGS)) 
                 out += plugin.getLang("armor.l");
-            }
-            else if (l.getType().equals(Material.AIR)) {
+            else if (l.getType().equals(Material.AIR)) 
                 out += plugin.getLang("armor.l");
-            }
-            else {
+            else 
                 out += plugin.getLang("armor.l");
-            }
         }
         ItemStack b = inv.getBoots();
 
         if (b != null) {
-            if (b.getType().equals(Material.CHAINMAIL_BOOTS)) {
-                out += ChatColor.WHITE + plugin.getLang("armor.B");
-            }
-            else if (b.getType().equals(Material.DIAMOND_BOOTS)) {
-                out += ChatColor.AQUA + plugin.getLang("armor.B");
-            }
-            else if (b.getType().equals(Material.GOLD_BOOTS)) {
-                out += ChatColor.YELLOW + plugin.getLang("armor.B");
-            }
-            else if (b.getType().equals(Material.IRON_BOOTS)) {
-                out += ChatColor.WHITE + plugin.getLang("armor.B");
-            }
-            else if (b.getType().equals(Material.LEATHER_BOOTS)) {
-                out += ChatColor.GOLD + plugin.getLang("armor.B");
-            }
-            else if (b.getType().equals(Material.AIR)) {
-                out += ChatColor.BLACK + plugin.getLang("armor.B");
-            }
-            else {
-                out += ChatColor.RED + plugin.getLang("armor.B");
+            switch (b.getType()) {
+                case CHAINMAIL_BOOTS:
+                    out += ChatColor.WHITE + plugin.getLang("armor.B"); break;
+                case DIAMOND_BOOTS:
+                    out += ChatColor.AQUA + plugin.getLang("armor.B"); break;
+                case GOLD_BOOTS:
+                    out += ChatColor.YELLOW + plugin.getLang("armor.B"); break;
+                case IRON_BOOTS:
+                    out += ChatColor.WHITE + plugin.getLang("armor.B"); break;
+                case LEATHER_BOOTS:
+                    out += ChatColor.GOLD + plugin.getLang("armor.B"); break;
+                case AIR:
+                    out += ChatColor.BLACK + plugin.getLang("armor.B"); break;
+                default: 
+                    out += ChatColor.RED + plugin.getLang("armor.B"); break;             
             }
         }
         if (out.length() == 0) {
@@ -646,12 +547,7 @@ public final class ClanManager {
     }
 
     private int getItemCount(HashMap<Integer, ? extends ItemStack> all) {
-        int count = 0;
-
-        for (ItemStack is : all.values()) {
-            count += is.getAmount();
-        }
-        return count;
+        return all.values().parallelStream().mapToInt( ItemStack::getAmount ).sum();
     }
 
     /**
@@ -663,7 +559,7 @@ public final class ClanManager {
     public String getFoodString(PlayerInventory inv) {
         double out = 0;
 
-        int count = getItemCount(inv.all(320)); // cooked porkchop
+        int count = getItemCount(inv.all(Material.GRILLED_PORK)); 
 
         if (count > 0) {
             out += count * 4;
@@ -723,13 +619,13 @@ public final class ClanManager {
             out += count * 2;
         }
 
-        count = getItemCount(inv.all(364));  // steak
+        count = getItemCount(inv.all(Material.COOKED_BEEF)); 
 
         if (count > 0) {
             out += count * 4;
         }
 
-        count = getItemCount(inv.all(319)); // raw porkchop
+        count = getItemCount(inv.all(Material.PORK)); 
 
         if (count > 0) {
             out += count * 2;
@@ -753,7 +649,7 @@ public final class ClanManager {
             out += count * 2;
         }
 
-        count = getItemCount(inv.all(360));  // melon slice
+        count = getItemCount(inv.all(Material.MELON)); 
 
         if (count > 0) {
             out += count * 2;
@@ -774,15 +670,12 @@ public final class ClanManager {
     public String getHealthString(double health) {
         String out = "";
 
-        if (health >= 16) {
+        if (health >= 16) 
             out += ChatColor.GREEN;
-        }
-        else if (health >= 8) {
+        else if (health >= 8) 
             out += ChatColor.GOLD;
-        }
-        else {
+        else 
             out += ChatColor.RED;
-        }
 
         for (int i = 0; i < health; i++) {
             out += '|';
@@ -799,15 +692,12 @@ public final class ClanManager {
     public String getHungerString(int health) {
         String out = "";
 
-        if (health >= 16) {
+        if (health >= 16) 
             out += ChatColor.GREEN;
-        }
-        else if (health >= 8) {
+        else if (health >= 8) 
             out += ChatColor.GOLD;
-        }
-        else {
+        else 
             out += ChatColor.RED;
-        }
 
         for (int i = 0; i < health; i++) {
             out += '|';
@@ -822,15 +712,11 @@ public final class ClanManager {
      * @return
      */
     public void sortClansByKDR(List<Clan> clans) {
-        Collections.sort(clans, new Comparator<Clan>() {
-
-            @Override
-            public int compare(Clan c1, Clan c2) {
+        Collections.sort(clans, (c1, c2) -> {
                 Float o1 = c1.getTotalKDR();
                 Float o2 = c2.getTotalKDR();
 
                 return o2.compareTo(o1);
-            }
         });
     }
 
@@ -841,15 +727,11 @@ public final class ClanManager {
      * @return
      */
     public void sortClansBySize(List<Clan> clans) {
-        Collections.sort(clans, new Comparator<Clan>() {
-
-            @Override
-            public int compare(Clan c1, Clan c2) {
+        Collections.sort(clans, (c1, c2) -> {
                 Integer o1 = c1.getAllMembers().size();
                 Integer o2 = c2.getAllMembers().size();
 
                 return o2.compareTo(o1);
-            }
         });
     }
 
@@ -860,15 +742,11 @@ public final class ClanManager {
      * @return
      */
     public void sortClanPlayersByKDR(List<ClanPlayer> cps) {
-        Collections.sort(cps, new Comparator<ClanPlayer>() {
-
-            @Override
-            public int compare(ClanPlayer c1, ClanPlayer c2) {
+        Collections.sort(cps, (c1, c2) -> {
                 Float o1 = c1.getKDR();
                 Float o2 = c2.getKDR();
 
                 return o2.compareTo(o1);
-            }
         });
     }
 
@@ -879,15 +757,11 @@ public final class ClanManager {
      * @return
      */
     public void sortClanPlayersByLastSeen(List<ClanPlayer> cps) {
-        Collections.sort(cps, new Comparator<ClanPlayer>() {
-
-            @Override
-            public int compare(ClanPlayer c1, ClanPlayer c2) {
+        Collections.sort(cps, (c1, c2) -> {
                 Double o1 = c1.getLastSeenDays();
                 Double o2 = c2.getLastSeenDays();
 
                 return o1.compareTo(o2);
-            }
         });
     }
 
@@ -898,14 +772,16 @@ public final class ClanManager {
      * @return
      */
     public boolean purchaseCreation(Player player) {
-        if (!plugin.getSettingsManager().isePurchaseCreation()) {
+        SettingsManager settings = plugin.getSettingsManager();
+        if (!settings.isePurchaseCreation()) {
             return true;
         }
-        double price = plugin.getSettingsManager().getCreationPrice();
+        double price = settings.getCreationPrice();
 
-        if (plugin.getPermissionsManager().hasEconomy()) {
-            if (plugin.getPermissionsManager().playerHasMoney(player, price)) {
-                plugin.getPermissionsManager().playerChargeMoney(player, price);
+        PermissionsManager perms = plugin.getPermissionsManager();
+        if (perms.hasEconomy()) {
+            if (perms.playerHasMoney(player, price)) {
+                perms.playerChargeMoney(player, price);
                 player.sendMessage(ChatColor.RED + MessageFormat.format(plugin.getLang("account.has.been.debited"), price));
             }
             else {
@@ -923,14 +799,16 @@ public final class ClanManager {
      * @return
      */
     public boolean purchaseInvite(Player player) {
-        if (!plugin.getSettingsManager().isePurchaseInvite()) {
+        SettingsManager settings = plugin.getSettingsManager();
+        if (!settings.isePurchaseInvite()) {
             return true;
         }
-        double price = plugin.getSettingsManager().getInvitePrice();
+        double price = settings.getInvitePrice();
 
-        if (plugin.getPermissionsManager().hasEconomy()) {
-            if (plugin.getPermissionsManager().playerHasMoney(player, price)) {
-                plugin.getPermissionsManager().playerChargeMoney(player, price);
+        PermissionsManager perms = plugin.getPermissionsManager();
+        if (perms.hasEconomy()) {
+            if (perms.playerHasMoney(player, price)) {
+                perms.playerChargeMoney(player, price);
                 player.sendMessage(ChatColor.RED + MessageFormat.format(plugin.getLang("account.has.been.debited"), price));
             }
             else {
@@ -948,14 +826,16 @@ public final class ClanManager {
      * @return
      */
     public boolean purchaseHomeTeleport(Player player) {
-        if (!plugin.getSettingsManager().isePurchaseHomeTeleport()) {
+        SettingsManager settings = plugin.getSettingsManager();
+        if (!settings.isePurchaseHomeTeleport()) {
             return true;
         }
-        double price = plugin.getSettingsManager().getHomeTeleportPrice();
+        double price = settings.getHomeTeleportPrice();
 
-        if (plugin.getPermissionsManager().hasEconomy()) {
-            if (plugin.getPermissionsManager().playerHasMoney(player, price)) {
-                plugin.getPermissionsManager().playerChargeMoney(player, price);
+        PermissionsManager perms = plugin.getPermissionsManager();
+        if (perms.hasEconomy()) {
+            if (perms.playerHasMoney(player, price)) {
+                perms.playerChargeMoney(player, price);
                 player.sendMessage(ChatColor.RED + MessageFormat.format(plugin.getLang("account.has.been.debited"), price));
             }
             else {
@@ -973,14 +853,16 @@ public final class ClanManager {
      * @return
      */
     public boolean purchaseHomeTeleportSet(Player player) {
-        if (!plugin.getSettingsManager().isePurchaseHomeTeleportSet()) {
+        SettingsManager settings = plugin.getSettingsManager();
+        if (!settings.isePurchaseHomeTeleportSet()) {
             return true;
         }
-        double price = plugin.getSettingsManager().getHomeTeleportPriceSet();
+        double price = settings.getHomeTeleportPriceSet();
 
-        if (plugin.getPermissionsManager().hasEconomy()) {
-            if (plugin.getPermissionsManager().playerHasMoney(player, price)) {
-                plugin.getPermissionsManager().playerChargeMoney(player, price);
+        PermissionsManager perms = plugin.getPermissionsManager();
+        if (perms.hasEconomy()) {
+            if (perms.playerHasMoney(player, price)) {
+                perms.playerChargeMoney(player, price);
                 player.sendMessage(ChatColor.RED + MessageFormat.format(plugin.getLang("account.has.been.debited"), price));
             }
             else {
@@ -998,14 +880,16 @@ public final class ClanManager {
      * @return
      */
     public boolean purchaseVerification(Player player) {
-        if (!plugin.getSettingsManager().isePurchaseVerification()) {
+        SettingsManager settings = plugin.getSettingsManager();
+        if (!settings.isePurchaseVerification()) {
             return true;
         }
-        double price = plugin.getSettingsManager().getVerificationPrice();
+        double price = settings.getVerificationPrice();
 
-        if (plugin.getPermissionsManager().hasEconomy()) {
-            if (plugin.getPermissionsManager().playerHasMoney(player, price)) {
-                plugin.getPermissionsManager().playerChargeMoney(player, price);
+        PermissionsManager perms = plugin.getPermissionsManager();
+        if (perms.hasEconomy()) {
+            if (perms.playerHasMoney(player, price)) {
+                perms.playerChargeMoney(player, price);
                 player.sendMessage(ChatColor.RED + MessageFormat.format(plugin.getLang("account.has.been.debited"), price));
             }
             else {
@@ -1038,6 +922,7 @@ public final class ClanManager {
      * @param msg
      */
     public void processClanChat(Player player, String msg) {
+        SettingsManager settings = plugin.getSettingsManager();
         ClanPlayer cp = plugin.getClanManager().getClanPlayer(player.getUniqueId());
 
         if (cp == null) return;
@@ -1083,16 +968,16 @@ public final class ClanManager {
             String tag;
 
             if (cp.getRank() != null && !cp.getRank().isEmpty())  {
-                tag = plugin.getSettingsManager().getClanChatBracketColor() + plugin.getSettingsManager().getClanChatTagBracketLeft() + plugin.getSettingsManager().getClanChatRankColor() + cp.getRank() + plugin.getSettingsManager().getClanChatBracketColor() + plugin.getSettingsManager().getClanChatTagBracketRight() + " ";
+                tag = settings.getClanChatBracketColor() + settings.getClanChatTagBracketLeft() + settings.getClanChatRankColor() + cp.getRank() + settings.getClanChatBracketColor() + settings.getClanChatTagBracketRight() + " ";
             }
             else {
-                tag = plugin.getSettingsManager().getClanChatBracketColor() + plugin.getSettingsManager().getClanChatTagBracketLeft() + plugin.getSettingsManager().getTagDefaultColor() + cp.getClan().getColorTag() + plugin.getSettingsManager().getClanChatBracketColor() + plugin.getSettingsManager().getClanChatTagBracketRight() + " ";
+                tag = settings.getClanChatBracketColor() + settings.getClanChatTagBracketLeft() + settings.getTagDefaultColor() + cp.getClan().getColorTag() + settings.getClanChatBracketColor() + settings.getClanChatTagBracketRight() + " ";
             }
 
-            String message = code + Helper.parseColors(tag) + plugin.getSettingsManager().getClanChatNameColor() + plugin.getSettingsManager().getClanChatPlayerBracketLeft() + player.getName() + plugin.getSettingsManager().getClanChatPlayerBracketRight() + " " + plugin.getSettingsManager().getClanChatMessageColor() + msg;
-            String eyeMessage = code + plugin.getSettingsManager().getClanChatBracketColor() + plugin.getSettingsManager().getClanChatTagBracketLeft() + plugin.getSettingsManager().getTagDefaultColor() + cp.getClan().getColorTag() + plugin.getSettingsManager().getClanChatBracketColor() + plugin.getSettingsManager().getClanChatTagBracketRight() + " " + plugin.getSettingsManager().getClanChatNameColor() + plugin.getSettingsManager().getClanChatPlayerBracketLeft() + player.getName() + plugin.getSettingsManager().getClanChatPlayerBracketRight() + " " + plugin.getSettingsManager().getClanChatMessageColor() + msg;
+            String message = code + Helper.parseColors(tag) + settings.getClanChatNameColor() + settings.getClanChatPlayerBracketLeft() + player.getName() + settings.getClanChatPlayerBracketRight() + " " + settings.getClanChatMessageColor() + msg;
+            String eyeMessage = code + settings.getClanChatBracketColor() + settings.getClanChatTagBracketLeft() + settings.getTagDefaultColor() + cp.getClan().getColorTag() + settings.getClanChatBracketColor() + settings.getClanChatTagBracketRight() + " " + settings.getClanChatNameColor() + settings.getClanChatPlayerBracketLeft() + player.getName() + settings.getClanChatPlayerBracketRight() + " " + settings.getClanChatMessageColor() + msg;
 
-            plugin.getServer().getConsoleSender().sendMessage(eyeMessage);
+            Bukkit.getConsoleSender().sendMessage(eyeMessage);
 
             List<ClanPlayer> cps = cp.getClan().getMembers();
 
@@ -1181,8 +1066,9 @@ public final class ClanManager {
             }
         }
         else {
+            SettingsManager settings = plugin.getSettingsManager();
             String code = "" + ChatColor.AQUA + ChatColor.WHITE + ChatColor.AQUA + ChatColor.BLACK;
-            String message = code + plugin.getSettingsManager().getAllyChatBracketColor() + plugin.getSettingsManager().getAllyChatTagBracketLeft() + plugin.getSettingsManager().getAllyChatTagColor() + plugin.getSettingsManager().getCommandAlly() + plugin.getSettingsManager().getAllyChatBracketColor() + plugin.getSettingsManager().getAllyChatTagBracketRight() + " " + plugin.getSettingsManager().getAllyChatNameColor() + plugin.getSettingsManager().getAllyChatPlayerBracketLeft() + player.getName() + plugin.getSettingsManager().getAllyChatPlayerBracketRight() + " " + plugin.getSettingsManager().getAllyChatMessageColor() + msg;
+            String message = code + settings.getAllyChatBracketColor() + settings.getAllyChatTagBracketLeft() + settings.getAllyChatTagColor() + settings.getCommandAlly() + settings.getAllyChatBracketColor() + settings.getAllyChatTagBracketRight() + " " + settings.getAllyChatNameColor() + settings.getAllyChatPlayerBracketLeft() + player.getName() + settings.getAllyChatPlayerBracketRight() + " " + settings.getAllyChatMessageColor() + msg;
             SimpleClans.log(message);
 
             Player self = cp.toPlayer();

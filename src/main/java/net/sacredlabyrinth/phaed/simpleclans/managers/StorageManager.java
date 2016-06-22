@@ -15,8 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import com.google.common.base.Charsets;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
 import net.sacredlabyrinth.phaed.simpleclans.Clan;
@@ -26,7 +25,6 @@ import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.storage.DBCore;
 import net.sacredlabyrinth.phaed.simpleclans.storage.MySQLCore;
 import net.sacredlabyrinth.phaed.simpleclans.storage.SQLiteCore;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDFetcher;
 
 /**
  * @author phaed
@@ -37,9 +35,6 @@ public final class StorageManager {
     private DBCore core;
     private HashMap<String, ChatBlock> chatBlocks = new HashMap<>();
 
-    /**
-     *
-     */
     public StorageManager() {
         plugin = SimpleClans.getInstance();
         initiateDB();
@@ -73,12 +68,10 @@ public final class StorageManager {
         chatBlocks.put(uuid.toString(), cb);
     }
 
-    /**
-     * Initiates the db
-     */
     public void initiateDB() {
-        if (plugin.getSettingsManager().isUseMysql()) {
-            core = new MySQLCore(plugin.getSettingsManager().getHost(), plugin.getSettingsManager().getDatabase(), plugin.getSettingsManager().getPort(), plugin.getSettingsManager().getUsername(), plugin.getSettingsManager().getPassword());
+        SettingsManager settings = plugin.getSettingsManager();
+        if (settings.isUseMysql()) {
+            core = new MySQLCore(settings.getHost(), settings.getDatabase(), settings.getPort(), settings.getUsername(), settings.getPassword());
 
             if (core.checkConnection()) {
                 SimpleClans.log("[SimpleClans] " + plugin.getLang("mysql.connection.successful"));
@@ -139,9 +132,6 @@ public final class StorageManager {
         }
     }
 
-    /**
-     * Closes DB connection
-     */
     public void closeConnection() {
         core.close();
     }
@@ -150,13 +140,14 @@ public final class StorageManager {
      * Import all data from database to memory
      */
     public void importFromDatabase() {
-        plugin.getClanManager().cleanData();
+        ClanManager clanManager = plugin.getClanManager();
+        clanManager.cleanData();
 
         List<Clan> clans = retrieveClans();
         purgeClans(clans);
 
         for (Clan clan : clans) {
-            plugin.getClanManager().importClan(clan);
+            clanManager.importClan(clan);
         }
 
         for (Clan clan : clans) {
@@ -176,7 +167,7 @@ public final class StorageManager {
             if (tm != null) {
                 tm.importMember(cp);
             }
-            plugin.getClanManager().importClanPlayer(cp);
+            clanManager.importClanPlayer(cp);
         }
 
         if (!cps.isEmpty()) {
@@ -216,13 +207,10 @@ public final class StorageManager {
                     purge.add(clan);
                 }
             }
-            else {
-                if (clan.getInactiveDays() > plugin.getSettingsManager().getPurgeUnverified()) {
-                    purge.add(clan);
-                }
+            else if (clan.getInactiveDays() > plugin.getSettingsManager().getPurgeUnverified()) {
+                purge.add(clan);              
             }
         }
-
         for (Clan clan : purge) {
             SimpleClans.log("[SimpleClans] " + MessageFormat.format(plugin.getLang("purging.clan"), clan.getName()));
             deleteClan(clan);
@@ -238,7 +226,6 @@ public final class StorageManager {
             	purge.add(cp);
             }
         }
-
         for (ClanPlayer cp : purge) {
             SimpleClans.log("[SimpleClans] " + MessageFormat.format(plugin.getLang("purging.player.data"), cp.getName()));
             deleteClanPlayer(cp);
@@ -549,14 +536,13 @@ public final class StorageManager {
      *
      * @param clan
      */
-    @SuppressWarnings("deprecation")
 	public void updateClanAsync(final Clan clan) {
-        Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
-                updateClan(clan);
-            }
-        });
+                updateClan(clan);           
+            }           
+        }.runTaskAsynchronously( plugin );
     }
 
     /**
@@ -564,14 +550,13 @@ public final class StorageManager {
      * 
      * @param Player to update
      */
-    @SuppressWarnings("deprecation")
 	public void updatePlayerNameAsync(final Player p) {
-        Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
-            	updatePlayerName(p);
-            }
-        });
+                updatePlayerName(p);             
+            }           
+        }.runTaskAsynchronously( plugin );
     }
     
     /**
@@ -621,14 +606,13 @@ public final class StorageManager {
      *
      * @param cp
      */
-    @SuppressWarnings("deprecation")
 	public void updateClanPlayerAsync(final ClanPlayer cp) {
-        Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
+        new BukkitRunnable() {
             @Override
             public void run() {
-                updateClanPlayer(cp);
+                updateClanPlayer(cp);               
             }
-        });
+        }.runTaskAsynchronously( plugin );
     }
 
     /**
@@ -667,17 +651,6 @@ public final class StorageManager {
         String query = "INSERT INTO `sc_kills` (  `attacker_uuid`, `attacker`, `attacker_tag`, `victim_uuid`, `victim`, `victim_tag`, `kill_type`) ";
         String values = "VALUES ( '" + attacker.getUniqueId() + "','" + attacker.getName() + "','" + attackerTag + "','" + victim.getUniqueId() + "','" + victim.getName() + "','" + victimTag + "','" + type + "');";
         core.insert(query + values);       
-    }
-
-    /**
-     * Delete a player's kill record form the database
-     *
-     * @param playerName
-     */
-    @Deprecated
-    public void deleteKills(String playerName) {
-        String query = "DELETE FROM `sc_kills` WHERE `attacker` = '" + playerName + "'";
-        core.delete(query);
     }
 
     /**
@@ -779,7 +752,7 @@ public final class StorageManager {
                 query = "ALTER TABLE `sc_players` ADD UNIQUE `uq_player_uuid` (`uuid`);";
                 core.execute(query);
             }
-            updatePlayersToUUID();
+//            updatePlayersToUUID();
 
             query = "ALTER TABLE sc_players DROP INDEX uq_sc_players_1;";
             core.execute(query);
@@ -791,50 +764,50 @@ public final class StorageManager {
         }
     }
 
-    /**
-     * Updates the database to the latest version
-     *
-     * @param
-     */
-    private void updatePlayersToUUID() {
-        SimpleClans.log("[SimpleClans] Starting Migration to UUID Players !");
-        SimpleClans.log("[SimpleClans] ==================== ATTENTION DONT STOP BUKKIT ! ==================== ");
-        SimpleClans.log("[SimpleClans] ==================== ATTENTION DONT STOP BUKKIT ! ==================== ");
-        SimpleClans.log("[SimpleClans] ==================== ATTENTION DONT STOP BUKKIT ! ==================== ");
-        List<ClanPlayer> cps = retrieveClanPlayers();
-
-        int i = 1;
-        for (ClanPlayer cp : cps) {
-            try {
-                UUID uuidPlayer;
-                if (SimpleClans.getInstance().getServer().getOnlineMode()) {
-                    uuidPlayer = UUIDFetcher.getUUIDOfThrottled(cp.getName());
-                }
-                else {
-                    uuidPlayer = UUID.nameUUIDFromBytes(("OfflinePlayer:" + cp.getName()).getBytes(Charsets.UTF_8));
-                }
-                String query = "UPDATE `sc_players` SET uuid = '" + uuidPlayer.toString() + "' WHERE name = '" + cp.getName() + "';";
-                core.update(query);
-
-                String query2 = "UPDATE `sc_kills` SET attacker_uuid = '" + uuidPlayer.toString() + "' WHERE attacker = '" + cp.getName() + "';";
-                core.update(query2);
-
-                String query3 = "UPDATE `sc_kills` SET victim_uuid = '" + uuidPlayer.toString() + "' WHERE victim = '" + cp.getName() + "';";
-                core.update(query3);
-                SimpleClans.log("[" + i + " / " + cps.size() + "] Success: " + cp.getName() + "; UUID: " + uuidPlayer.toString());
-            }
-            catch (Exception ex) {
-                SimpleClans.log("[" + i + " / " + cps.size() + "] Failed [ERRO]: " + cp.getName() + "; UUID: ???");
-            }
-            i++;
-        }
-        SimpleClans.log("[SimpleClans] ==================== END OF MIGRATION ====================");
-        SimpleClans.log("[SimpleClans] ==================== END OF MIGRATION ====================");
-        SimpleClans.log("[SimpleClans] ==================== END OF MIGRATION ====================");
-
-
-        if (!cps.isEmpty()) {
-            SimpleClans.log(MessageFormat.format("[SimpleClans] " + plugin.getLang("clan.players"), cps.size()));
-        }
-    }
+//    /**
+//     * Updates the database to the latest version
+//     *
+//     * @param
+//     */
+//    private void updatePlayersToUUID() {
+//        SimpleClans.log("[SimpleClans] Starting Migration to UUID Players !");
+//        SimpleClans.log("[SimpleClans] ==================== ATTENTION DONT STOP BUKKIT ! ==================== ");
+//        SimpleClans.log("[SimpleClans] ==================== ATTENTION DONT STOP BUKKIT ! ==================== ");
+//        SimpleClans.log("[SimpleClans] ==================== ATTENTION DONT STOP BUKKIT ! ==================== ");
+//        List<ClanPlayer> cps = retrieveClanPlayers();
+//
+//        int i = 1;
+//        for (ClanPlayer cp : cps) {
+//            try {
+//                UUID uuidPlayer;
+//                if (SimpleClans.getInstance().getServer().getOnlineMode()) {
+//                    uuidPlayer = UUIDFetcher.getUUIDOfThrottled(cp.getName());
+//                }
+//                else {
+//                    uuidPlayer = UUID.nameUUIDFromBytes(("OfflinePlayer:" + cp.getName()).getBytes(Charsets.UTF_8));
+//                }
+//                String query = "UPDATE `sc_players` SET uuid = '" + uuidPlayer.toString() + "' WHERE name = '" + cp.getName() + "';";
+//                core.update(query);
+//
+//                String query2 = "UPDATE `sc_kills` SET attacker_uuid = '" + uuidPlayer.toString() + "' WHERE attacker = '" + cp.getName() + "';";
+//                core.update(query2);
+//
+//                String query3 = "UPDATE `sc_kills` SET victim_uuid = '" + uuidPlayer.toString() + "' WHERE victim = '" + cp.getName() + "';";
+//                core.update(query3);
+//                SimpleClans.log("[" + i + " / " + cps.size() + "] Success: " + cp.getName() + "; UUID: " + uuidPlayer.toString());
+//            }
+//            catch (Exception ex) {
+//                SimpleClans.log("[" + i + " / " + cps.size() + "] Failed [ERRO]: " + cp.getName() + "; UUID: ???");
+//            }
+//            i++;
+//        }
+//        SimpleClans.log("[SimpleClans] ==================== END OF MIGRATION ====================");
+//        SimpleClans.log("[SimpleClans] ==================== END OF MIGRATION ====================");
+//        SimpleClans.log("[SimpleClans] ==================== END OF MIGRATION ====================");
+//
+//
+//        if (!cps.isEmpty()) {
+//            SimpleClans.log(MessageFormat.format("[SimpleClans] " + plugin.getLang("clan.players"), cps.size()));
+//        }
+//    }
 }

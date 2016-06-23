@@ -324,7 +324,7 @@ public final class SettingsManager {
      * @return whether its a disallowed word
      */
     public boolean isDisallowedWord(String word) {
-        return  disallowedWords.parallelStream().allMatch( w -> w.equalsIgnoreCase( word ) )
+        return  disallowedWords.parallelStream().anyMatch( w -> w.equalsIgnoreCase( word ) )
                 || word.equalsIgnoreCase("clan") 
                 || word.equalsIgnoreCase(commandMore) 
                 || word.equalsIgnoreCase(commandDeny) 

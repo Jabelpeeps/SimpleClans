@@ -40,11 +40,12 @@ public class DemoteCommand  implements ClanCommand {
                             ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.player.matched"));
                             return;
                         }
-                        UUID PlayerUniqueId = Helper.getForcedPlayerUUID(demotedName);
+                        UUID PlayerUniqueId = Helper.getCachedPlayerUUID(demotedName);
                         if (PlayerUniqueId == null) {
                             ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.player.matched"));
                             return;
                         }
+                        
                         allOtherLeadersOnline = clan.allOtherLeadersOnline(PlayerUniqueId);
                         
                         if (allOtherLeadersOnline) {

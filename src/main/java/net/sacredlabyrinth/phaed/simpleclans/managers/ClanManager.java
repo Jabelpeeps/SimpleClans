@@ -217,7 +217,7 @@ public final class ClanManager {
      * @return
      */
     public ClanPlayer getClanPlayerName(String playerDisplayName) {
-        UUID uuid = Helper.getForcedPlayerUUID(playerDisplayName);
+        UUID uuid = Helper.getCachedPlayerUUID(playerDisplayName);
 
         if (uuid == null){
             return null;
@@ -254,7 +254,7 @@ public final class ClanManager {
      */
     public ClanPlayer getCreateClanPlayerUUID(String playerDisplayName) {
         
-        UUID playerUniqueId = Helper.getForcedPlayerUUID(playerDisplayName);
+        UUID playerUniqueId = Helper.getCachedPlayerUUID(playerDisplayName);
         if (playerUniqueId != null) {
             return getCreateClanPlayer(playerUniqueId);
         }
@@ -285,7 +285,7 @@ public final class ClanManager {
      * @param msg
      */
     public void serverAnnounce(String msg) {
-        Collection<Player> players = Helper.getOnlinePlayers();
+        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 
         for (Player player : players) {
             ChatBlock.sendMessage(player, ChatColor.DARK_GRAY + "* " + ChatColor.AQUA + msg);
@@ -439,39 +439,39 @@ public final class ClanManager {
         ItemStack l = inv.getLeggings();
 
         if (l != null) {
-            if (l.getType().equals(Material.CHAINMAIL_LEGGINGS)) 
-                out += ChatColor.WHITE + plugin.getLang("armor.l");
-            else if (l.getType().equals(Material.DIAMOND_LEGGINGS)) 
-                out += plugin.getLang("armor.l");
-            else if (l.getType().equals(Material.GOLD_LEGGINGS)) 
-                out += plugin.getLang("armor.l");
-            else if (l.getType().equals(Material.IRON_LEGGINGS)) 
-                out += plugin.getLang("armor.l");
-            else if (l.getType().equals(Material.LEATHER_LEGGINGS)) 
-                out += plugin.getLang("armor.l");
-            else if (l.getType().equals(Material.AIR)) 
-                out += plugin.getLang("armor.l");
-            else 
-                out += plugin.getLang("armor.l");
+            String leggings = plugin.getLang("armor.l");
+            switch (l.getType()) {
+                case CHAINMAIL_LEGGINGS:
+                    out += ChatColor.WHITE + leggings; break;
+                case DIAMOND_LEGGINGS:
+                    out += ChatColor.AQUA + leggings; break;
+                case GOLD_LEGGINGS:
+                    out += ChatColor.YELLOW + leggings; break;
+                case IRON_LEGGINGS:
+                    out += ChatColor.WHITE + leggings; break;
+                case LEATHER_LEGGINGS:
+                    out += ChatColor.GOLD + leggings; break;
+                default:
+                    out += ChatColor.BLACK + leggings; break;
+            }
         }
         ItemStack b = inv.getBoots();
 
         if (b != null) {
+            String boots = plugin.getLang("armor.B");
             switch (b.getType()) {
                 case CHAINMAIL_BOOTS:
-                    out += ChatColor.WHITE + plugin.getLang("armor.B"); break;
+                    out += ChatColor.WHITE + boots; break;
                 case DIAMOND_BOOTS:
-                    out += ChatColor.AQUA + plugin.getLang("armor.B"); break;
+                    out += ChatColor.AQUA + boots; break;
                 case GOLD_BOOTS:
-                    out += ChatColor.YELLOW + plugin.getLang("armor.B"); break;
+                    out += ChatColor.YELLOW + boots; break;
                 case IRON_BOOTS:
-                    out += ChatColor.WHITE + plugin.getLang("armor.B"); break;
+                    out += ChatColor.WHITE + boots; break;
                 case LEATHER_BOOTS:
-                    out += ChatColor.GOLD + plugin.getLang("armor.B"); break;
-                case AIR:
-                    out += ChatColor.BLACK + plugin.getLang("armor.B"); break;
+                    out += ChatColor.GOLD + boots; break;
                 default: 
-                    out += ChatColor.RED + plugin.getLang("armor.B"); break;             
+                    out += ChatColor.BLACK + boots; break;          
             }
         }
         if (out.length() == 0) {
@@ -993,7 +993,7 @@ public final class ClanManager {
     }
 
     public void sendToAllSeeing(String msg, List<ClanPlayer> cps) {
-        Collection<Player> players = Helper.getOnlinePlayers();
+        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 
         for (Player player : players) {
             if (plugin.getPermissionsManager().has(player, "simpleclans.admin.all-seeing-eye")) {

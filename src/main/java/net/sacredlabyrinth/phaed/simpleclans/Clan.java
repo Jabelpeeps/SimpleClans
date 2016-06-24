@@ -3,6 +3,7 @@ package net.sacredlabyrinth.phaed.simpleclans;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,11 +50,11 @@ public class Clan implements Serializable, Comparable<Clan> {
     private boolean friendlyFire;
     private long founded;
     private long lastUsed;
-    private String capeUrl;
+    private String capeUrl = "";
     private List<String> allies = new ArrayList<>();
     private List<String> rivals = new ArrayList<>();
     private List<String> bb = new ArrayList<>();
-    private List<String> members = new ArrayList<>();
+    private Set<UUID> members = new HashSet<>();
     private HashMap<String, Clan> warringClans = new HashMap<>();
     private int homeX = 0;
     private int homeY = 0;
@@ -61,25 +62,20 @@ public class Clan implements Serializable, Comparable<Clan> {
     private String homeWorld = "";
     private boolean allowWithdraw = false;
     private boolean allowDeposit = true;
-    private SimpleClans plugin = SimpleClans.getInstance();
+    SimpleClans plugin = SimpleClans.getInstance();
 
     public Clan() {
-        this.capeUrl = "";
-        this.tag = "";
+        tag = "";
     }
 
-    public Clan(String tag, String name, boolean verified) {
-        this.tag = Helper.cleanTag(tag);
-        this.colorTag = Helper.parseColors(tag);
-        this.name = name;
-        this.founded = (new Date()).getTime();
-        this.lastUsed = (new Date()).getTime();
-        this.verified = verified;
-        this.capeUrl = "";
-
-        if (plugin.getSettingsManager().isClanFFOnByDefault()) {
-            friendlyFire = true;
-        }
+    public Clan(String _tag, String _name, boolean _verified) {
+        tag = Helper.cleanTag(_tag);
+        colorTag = Helper.parseColors(_tag);
+        name = _name;
+        founded = (new Date()).getTime();
+        lastUsed = (new Date()).getTime();
+        verified = _verified;
+        friendlyFire = plugin.getSettingsManager().isClanFFOnByDefault();
     }
 
     @Override
@@ -89,11 +85,7 @@ public class Clan implements Serializable, Comparable<Clan> {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Clan)) {
-            return false;
-        }
-        Clan other = (Clan) obj;
-        return other.tag.equals(tag);
+        return obj instanceof Clan && ((Clan) obj).tag.equals(tag);
     }
 
     @Override
@@ -157,8 +149,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      *
      * @param name the name to set
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String _name) {
+        name = _name;
     }
 
     /**
@@ -175,8 +167,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      *
      * @param balance the balance to set
      */
-    public void setBalance(double balance) {
-        this.balance = balance;
+    public void setBalance(double _balance) {
+        balance = _balance;
     }
 
     /**
@@ -193,8 +185,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      *
      * @param tag the tag to set
      */
-    public void setTag(String tag) {
-        this.tag = tag;
+    public void setTag(String _tag) {
+        tag = _tag;
     }
 
     /**
@@ -228,8 +220,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      *
      * @param lastUsed the lastUsed to set
      */
-    public void setLastUsed(long lastUsed) {
-        this.lastUsed = lastUsed;
+    public void setLastUsed(long _lastUsed) {
+        lastUsed = _lastUsed;
     }
 
     /**
@@ -246,8 +238,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      *
      * @param friendlyFire the friendlyFire to set
      */
-    public void setFriendlyFire(boolean friendlyFire) {
-        this.friendlyFire = friendlyFire;
+    public void setFriendlyFire(boolean _friendlyFire) {
+        friendlyFire = _friendlyFire;
     }
 
     /**
@@ -257,7 +249,7 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @return confirmation
      */
     public boolean isMember(Player player) {
-            return this.members.contains(player.getUniqueId().toString());
+            return members.contains(player.getUniqueId().toString());
     }
 
     /**
@@ -289,8 +281,8 @@ public class Clan implements Serializable, Comparable<Clan> {
         return Collections.unmodifiableList(allies);
     }
 
-    private void addAlly(String tag) {
-        allies.add(tag);
+    private void addAlly(String _tag) {
+        allies.add(_tag);
     }
 
     private boolean removeAlly(String ally) {
@@ -316,7 +308,7 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @return
      */
     public String getFoundedString() {
-        return new java.text.SimpleDateFormat("MMM dd, ''yy h:mm a").format(new Date(this.founded));
+        return new SimpleDateFormat("MMM dd, ''yy h:mm a").format(new Date(this.founded));
     }
 
     /**
@@ -324,8 +316,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      *
      * @param founded the founded to set
      */
-    public void setFounded(long founded) {
-        this.founded = founded;
+    public void setFounded(long _founded) {
+        founded = _founded;
     }
 
     /**
@@ -342,8 +334,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      *
      * @param colorTag the colorTag to set
      */
-    public void setColorTag(String colorTag) {
-        this.colorTag = Helper.parseColors(colorTag);
+    public void setColorTag(String _colorTag) {
+        colorTag = Helper.parseColors(_colorTag);
     }
 
     /**
@@ -373,17 +365,11 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @param cp
      */
     public void importMember(ClanPlayer cp) {
-        String NameOrUUID;
-        if (cp.getUniqueId() != null) {
-            NameOrUUID = cp.getUniqueId().toString();
-        }
-        else {
-            return;
-        }
-        
-        if (!this.members.contains(NameOrUUID)) {
-            this.members.add(NameOrUUID);
-        }
+        UUID uuid = cp.getUniqueId();
+    
+        if ( uuid == null ) return;
+    
+        members.add(uuid);
     }
 
     /**
@@ -413,8 +399,8 @@ public class Clan implements Serializable, Comparable<Clan> {
         return Collections.unmodifiableList(rivals);
     }
 
-    private void addRival(String tag) {
-        rivals.add(tag);
+    private void addRival(String _tag) {
+        rivals.add(_tag);
     }
 
     private boolean removeRival(String rival) {
@@ -431,8 +417,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @param tag
      * @return
      */
-    public boolean isRival(String tag) {
-        return rivals.contains(tag);
+    public boolean isRival(String _tag) {
+        return rivals.contains(_tag);
     }
 
     /**
@@ -441,8 +427,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @param tag
      * @return
      */
-    public boolean isAlly(String tag) {
-        return allies.contains(tag);
+    public boolean isAlly(String _tag) {
+        return allies.contains(_tag);
     }
 
     /**
@@ -461,8 +447,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      *
      * @param verified the verified to set
      */
-    public void setVerified(boolean verified) {
-        this.verified = verified;
+    public void setVerified(boolean _verified) {
+        verified = _verified;
     }
 
     /**
@@ -479,8 +465,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      *
      * @param capeUrl the capeUrl to set
      */
-    public void setCapeUrl(String capeUrl) {
-        this.capeUrl = capeUrl;
+    public void setCapeUrl(String _capeUrl) {
+        capeUrl = _capeUrl;
     }
 
     /**
@@ -577,7 +563,7 @@ public class Clan implements Serializable, Comparable<Clan> {
             Clan rival = plugin.getClanManager().getClan(rivalTag);
 
             if (rival != null) {
-                if (isWarring(rivalTag)) {
+                if (isWarring(rival)) {
                     out += ChatColor.DARK_RED + "[" + Helper.stripColors(rival.getColorTag()) + "]" + sep;
                 }
                 else {
@@ -604,12 +590,11 @@ public class Clan implements Serializable, Comparable<Clan> {
     public String getLeadersString(String prefix, String sep) {
         String out = "";
 
-        for (String member : members) {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(UUID.fromString(member));
+        for (UUID member : members) {
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer(member);
         
-            if (cp == null) {
-                continue;
-            }
+            if (cp == null)  continue;
+
             if (cp.isLeader()) {
                 out += prefix + cp.getName() + sep;
             }
@@ -652,12 +637,11 @@ public class Clan implements Serializable, Comparable<Clan> {
     public List<ClanPlayer> getMembers() {
         List<ClanPlayer> out = new ArrayList<>();
 
-        for (String member : members) {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(UUID.fromString(member));
+        for (UUID member : members) {
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer(member);
             
-            if (cp == null) {
-                continue;
-            }
+            if (cp == null) continue;
+
             out.add(cp);
         }
         return out;
@@ -671,12 +655,11 @@ public class Clan implements Serializable, Comparable<Clan> {
     public List<ClanPlayer> getOnlineMembers() {
         List<ClanPlayer> out = new ArrayList<>();
 
-        for (String member : members) {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(UUID.fromString(member));
+        for (UUID member : members) {
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer(member);
             
-            if (cp == null) {
-                continue;
-            }
+            if (cp == null) continue;
+
             if (cp.toPlayer() != null && cp.toPlayer().isOnline()) {
             	out.add(cp);
             }
@@ -692,12 +675,10 @@ public class Clan implements Serializable, Comparable<Clan> {
     public List<ClanPlayer> getLeaders() {
         List<ClanPlayer> out = new ArrayList<>();
 
-        for (String member : members) {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(UUID.fromString(member));
+        for (UUID member : members) {
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer(member);
        
-            if (cp == null) {
-                continue;
-            }
+            if (cp == null) continue;
 
             if (cp.isLeader()) {
                 out.add(cp);
@@ -714,8 +695,8 @@ public class Clan implements Serializable, Comparable<Clan> {
     public List<ClanPlayer> getNonLeaders() {
         List<ClanPlayer> out = new ArrayList<>();
 
-        for (String member : members) {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(UUID.fromString(member));
+        for (UUID member : members) {
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer(member);
             
             if (cp == null) {
                 continue;
@@ -737,12 +718,11 @@ public class Clan implements Serializable, Comparable<Clan> {
     public List<ClanPlayer> getAllMembers() {
         List<ClanPlayer> out = new ArrayList<>();
 
-        for (String member : members) {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(UUID.fromString(member));
+        for (UUID member : members) {
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer(member);
             
-            if (cp == null) {
-                continue;
-            }
+            if (cp == null) continue;
+
             out.add(cp);
         }
         Collections.sort(out);
@@ -758,8 +738,8 @@ public class Clan implements Serializable, Comparable<Clan> {
     public Set<ClanPlayer> getAllAllyMembers() {
         Set<ClanPlayer> out = new HashSet<>();
 
-        for (String tag : allies) {
-            Clan ally = plugin.getClanManager().getClan(tag);
+        for (String each : allies) {
+            Clan ally = plugin.getClanManager().getClan(each);
 
             if (ally != null) {
                 out.addAll(ally.getMembers());
@@ -781,8 +761,8 @@ public class Clan implements Serializable, Comparable<Clan> {
         double totalWeightedKills = 0;
         int totalDeaths = 0;
 
-        for (String member : members) {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(UUID.fromString(member));
+        for (UUID member : members) {
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer(member);
             
             if (cp == null) {
                 continue;
@@ -808,8 +788,8 @@ public class Clan implements Serializable, Comparable<Clan> {
             return totalDeaths;
         }
 
-        for (String member : members) {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(UUID.fromString(member));
+        for (UUID member : members) {
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer(member);
             
             if (cp == null) {
                 continue;
@@ -831,8 +811,8 @@ public class Clan implements Serializable, Comparable<Clan> {
             return total;
         }
 
-        for (String member : members) {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(UUID.fromString(member));
+        for (UUID member : members) {
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer(member);
             
             if (cp == null) {
                 continue;
@@ -854,8 +834,8 @@ public class Clan implements Serializable, Comparable<Clan> {
             return total;
         }
 
-        for (String member : members) {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(UUID.fromString(member));
+        for (UUID member : members) {
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer(member);
             
             if (cp == null) {
                 continue;
@@ -877,8 +857,8 @@ public class Clan implements Serializable, Comparable<Clan> {
             return total;
         }
 
-        for (String member : members) {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(UUID.fromString(member));
+        for (UUID member : members) {
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer(member);
             
             if (cp == null) {
                 continue;
@@ -900,8 +880,8 @@ public class Clan implements Serializable, Comparable<Clan> {
             return total;
         }
 
-        for (String member : members) {
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(UUID.fromString(member));
+        for (UUID member : members) {
+            ClanPlayer cp = plugin.getClanManager().getClanPlayer(member);
             
             if (cp == null) {
                 continue;
@@ -1109,8 +1089,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @return
      */
     public boolean isAnyOnline() {
-        for (String member : members) {           
-            if (Helper.isOnline(UUID.fromString(member))) {
+        for (UUID member : members) {           
+            if (Helper.isOnline(member)) {
                 return true;
             }        
         }
@@ -1158,8 +1138,8 @@ public class Clan implements Serializable, Comparable<Clan> {
      *
      * @param tag
      */
-    public void changeClanTag(String tag) {
-        setColorTag(tag);
+    public void changeClanTag(String _tag) {
+        setColorTag(_tag);
         plugin.getStorageManager().updateClan(this);
     }
 
@@ -1297,31 +1277,10 @@ public class Clan implements Serializable, Comparable<Clan> {
         return plugin.getSettingsManager().isUnrivable(tag);
     }
 
-    /**
-     * Returns whether this clan is warring with another clan
-     *
-     * @param tag the tag of the clan we are at war with
-     * @return
-     */
-    public boolean isWarring(String tag) {
-        return warringClans.containsKey(tag);
-    }
-
-    /**
-     * Returns whether this clan is warring with another clan
-     *
-     * @param clan the clan we are testing against
-     * @return
-     */
     public boolean isWarring(Clan clan) {
-        return warringClans.containsKey(clan.tag);
+        return warringClans.containsValue(clan);
     }
 
-    /**
-     * Add a clan to be at war with
-     *
-     * @param clan
-     */
     public void addWarringClan(Clan clan) {
         if (!warringClans.containsKey(clan.tag)) {
             warringClans.put(clan.tag, clan);
@@ -1329,12 +1288,6 @@ public class Clan implements Serializable, Comparable<Clan> {
         plugin.getStorageManager().updateClan(this);
     }
 
-    /**
-     * Remove a warring clan
-     *
-     * @param clan
-     * @return
-     */
     public boolean removeWarringClan(Clan clan) {
         Clan warring = warringClans.remove(clan.tag);
 
@@ -1345,11 +1298,6 @@ public class Clan implements Serializable, Comparable<Clan> {
         return false;
     }
 
-    /**
-     * Return a collection of all the warring clans
-     *
-     * @return the clan list
-     */
     public List<Clan> getWarringClans() {
         return new ArrayList<>(warringClans.values());
     }
@@ -1488,31 +1436,19 @@ public class Clan implements Serializable, Comparable<Clan> {
                 setMan.getTagSeparatorColor() + setMan.getTagSeparator();
     }
 
-    /**
-     * @return the allowWithdraw
-     */
     public boolean isAllowWithdraw() {
         return allowWithdraw;
     }
 
-    /**
-     * @param allowWithdraw the allowWithdraw to set
-     */
-    public void setAllowWithdraw(boolean allowWithdraw) {
-        this.allowWithdraw = allowWithdraw;
+    public void setAllowWithdraw(boolean _allowWithdraw) {
+        allowWithdraw = _allowWithdraw;
     }
 
-    /**
-     * @return the allowDeposit
-     */
     public boolean isAllowDeposit() {
         return allowDeposit;
     }
 
-    /**
-     * @param allowDeposit the allowDeposit to set
-     */
-    public void setAllowDeposit(boolean allowDeposit) {
-        this.allowDeposit = allowDeposit;
+    public void setAllowDeposit(boolean _allowDeposit) {
+        allowDeposit = _allowDeposit;
     }
 }

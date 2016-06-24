@@ -28,11 +28,8 @@ import net.sacredlabyrinth.phaed.simpleclans.events.RequestFinishedEvent;
  */
 public final class RequestManager {
     private SimpleClans plugin;
-    private HashMap<String, Request> requests = new HashMap<>();
+    HashMap<String, Request> requests = new HashMap<>();
 
-    /**
-     *
-     */
     public RequestManager() {
         plugin = SimpleClans.getInstance();
         askerTask();
@@ -355,7 +352,7 @@ public final class RequestManager {
             if (req.getType().equals(ClanRequest.DEMOTE)) {
                 Clan clan = req.getClan();
                 String demoted = req.getTarget();
-                UUID demotedUniqueId = Helper.getForcedPlayerUUID(demoted);
+                UUID demotedUniqueId = Helper.getCachedPlayerUUID(demoted);
 
                 if ( demotedUniqueId != null) return;
 
@@ -371,7 +368,7 @@ public final class RequestManager {
             else if (req.getType().equals(ClanRequest.PROMOTE)) {
                 Clan clan = req.getClan();
                 String promoted = req.getTarget();
-                UUID promotedUniqueId = Helper.getForcedPlayerUUID(promoted);
+                UUID promotedUniqueId = Helper.getCachedPlayerUUID(promoted);
 
                 if (promotedUniqueId == null) return; 
                 

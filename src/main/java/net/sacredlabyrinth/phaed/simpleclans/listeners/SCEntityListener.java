@@ -115,7 +115,8 @@ public class SCEntityListener implements Listener {
                 if(entity instanceof Wolf && !((Wolf) entity).isSitting()) {
                 	return;
                 }
-                if (cp != null && cp.getClan().isMember((Player) tamed.getOwner())) {
+                Player owner = (Player) tamed.getOwner();
+                if ( cp != null && owner != null && cp.getClan().isMember(owner) ) {
                     tamed.setOwner(player);
                 }
             }

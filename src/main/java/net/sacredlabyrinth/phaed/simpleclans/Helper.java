@@ -1,14 +1,10 @@
 package net.sacredlabyrinth.phaed.simpleclans;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -17,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -36,15 +33,6 @@ public class Helper {
 	private Helper() {}
 
     /**
-//     * Dumps stacktrace to log
-//     */
-//    public static void dumpStackTrace() {
-//        for (StackTraceElement el : Thread.currentThread().getStackTrace()) {
-//            SimpleClans.debug(el.toString());
-//        }
-//    }
-
-    /**
      * Get a players full color name if he is online
      *
      * @param playerName
@@ -61,137 +49,6 @@ public class Helper {
         return playerName;
     }
 
-//    /**
-//     * Check for integer
-//     *
-//     * @param o
-//     * @return
-//     */
-//    public static boolean isInteger(Object o) {
-//        return o instanceof java.lang.Integer;
-//    }
-//
-//    /**
-//     * Check for byte
-//     *
-//     * @param input
-//     * @return
-//     */
-//    public static boolean isByte(String input) {
-//        try {
-//            Byte.parseByte(input);
-//            return true;
-//        }
-//        catch (Exception ex) {
-//            return false;
-//        }
-//    }
-
-    /**
-//     * Check for short
-//     *
-//     * @param input
-//     * @return
-//     */
-//    public static boolean isShort(String input) {
-//        try {
-//            Short.parseShort(input);
-//            return true;
-//        }
-//        catch (Exception ex) {
-//            return false;
-//        }
-//    }
-//
-//    /**
-//     * Check for integer
-//     *
-//     * @param input
-//     * @return
-//     */
-//    public static boolean isInteger(String input) {
-//        try {
-//            Integer.parseInt(input);
-//            return true;
-//        }
-//        catch (Exception ex) {
-//            return false;
-//        }
-//    }
-
-//    /**
-//     * Check for float
-//     *
-//     * @param input
-//     * @return
-//     */
-//    public static boolean isFloat(String input) {
-//        try {
-//            Float.parseFloat(input);
-//            return true;
-//        }
-//        catch (Exception ex) {
-//            return false;
-//        }
-//    }
-
-    /**
-//     * Check for string
-//     *
-//     * @param o
-//     * @return
-//     */
-//    public static boolean isString(Object o) {
-//        return o instanceof java.lang.String;
-//    }
-//
-//    /**
-//     * Check for boolean
-//     *
-//     * @param o
-//     * @return
-//     */
-//    public static boolean isBoolean(Object o)  {
-//        return o instanceof java.lang.Boolean;
-//    }
-
-//    /**
-//     * Remove a character from a string
-//     *
-//     * @param s
-//     * @param c
-//     * @return
-//     */
-//    public static String removeChar(String s, char c) {
-//        String r = "";
-//
-//        for (int i = 0; i < s.length(); i++) {
-//            if (s.charAt(i) != c)  {
-//                r += s.charAt(i);
-//            }
-//        }
-//        return r;
-//    }
-
-//    /**
-//     * Remove first character from a string
-//     *
-//     * @param s
-//     * @param c
-//     * @return
-//     */
-//    public static String removeFirstChar(String s, char c) {
-//        String r = "";
-//
-//        for (int i = 0; i < s.length(); i++) {
-//            if (s.charAt(i) != c) {
-//                r += s.charAt(i);
-//                break;
-//            }
-//        }
-//        return r;
-//    }
-
     /**
      * Capitalize first word of sentence
      *
@@ -205,18 +62,6 @@ public class Helper {
         String first = content.substring(0, 1).toUpperCase();
         return first + content.substring(1);
     }
-
-//    /**
-//     * Return plural word if count is bigger than one
-//     *
-//     * @param count
-//     * @param word
-//     * @param ending
-//     * @return
-//     */
-//    public static String plural(int count, String word, String ending) {
-//        return count == 1 ? word : word + ending;
-//    }
 
     /**
      * Hex value to ChatColor
@@ -258,18 +103,6 @@ public class Helper {
     }
 
     /**
-//     * Converts a player array to ArrayList<Player>
-//     *
-//     * @param values
-//     * @return
-//     */
-//    public static List<Player> fromPlayerArray(Player... values) {
-//        List<Player> results = new ArrayList<>();
-//        Collections.addAll(results, values);
-//        return results;
-//    }
-
-    /**
      * Converts ArrayList<String> to string array
      */
     public static String[] toArray(List<String> list) {
@@ -292,11 +125,6 @@ public class Helper {
      * Converts a string array to a space separated string
      */
     public static String toMessage(String[] args) {
-//        String out = "";
-//
-//        for (String arg : args) {
-//            out += arg + " ";
-//        }
         return String.join( " ", args );
     }
 
@@ -308,11 +136,6 @@ public class Helper {
      * @return
      */
     public static String toMessage(String[] args, String sep) {
-//        String out = "";
-//
-//        for (String arg : args) {
-//            out += arg + ", ";
-//        }
         return String.join( sep, args );
     }
 
@@ -324,13 +147,6 @@ public class Helper {
      * @return
      */
     public static String toMessage(List<String> args, String sep) {
-//        String out = "";
-//
-//        for (String arg : args)
-//        {
-//            out += arg + sep;
-//        }
-
         return String.join( sep, args );
     }
 
@@ -423,16 +239,8 @@ public class Helper {
     /**
      * Check whether a player is online
      */
-    public static boolean isOnline(UUID playerUniqueId) {
-//        Collection<Player> online = getOnlinePlayers();
-//
-//        for (Player o : online) {
-//            if (o.getUniqueId().equals(playerUniqueId)) {
-//                return true;
-//            }
-//        }
-//        
-        return getOnlinePlayers().parallelStream().anyMatch( p -> p.getUniqueId().equals( playerUniqueId ) );
+    public static boolean isOnline(UUID playerUniqueId) { 
+        return Bukkit.getPlayer( playerUniqueId ) != null;
     }
 
     /**
@@ -442,14 +250,7 @@ public class Helper {
      * @return
      */
     public static List<ClanPlayer> stripOffLinePlayers(List<ClanPlayer> in) {
-        List<ClanPlayer> out = new ArrayList<>();
-
-        for (ClanPlayer cp : in) {
-            if (cp.toPlayer() != null) {
-                out.add(cp);
-            }
-        }
-        return out;
+        return in.parallelStream().filter( cp -> { return cp.toPlayer() != null; } ).collect(Collectors.toList());
     }
 
     /**
@@ -509,19 +310,6 @@ public class Helper {
         return loc.getBlockX() == loc2.getBlockX() && loc.getBlockY() == loc2.getBlockY() && loc.getBlockZ() == loc2.getBlockZ();
     }
 
-//    /**
-//     * Whether the two locations refer to the same location, ignoring pitch and
-//     * yaw
-//     *
-//     * @param loc
-//     * @param loc2
-//     * @return
-//     */
-//    public static boolean isSameLocation(Location loc, Location loc2)
-//    {
-//        return loc.getX() == loc2.getX() && loc.getY() == loc2.getY() && loc.getZ() == loc2.getZ();
-//    }
-
     /**
      * Sort hashmap by value
 
@@ -530,12 +318,8 @@ public class Helper {
         
         List list = new LinkedList(map.entrySet());
         
-        Collections.sort(list, new Comparator() {
-
-            @Override
-            public int compare(Object o1, Object o2) {
-                return ((Comparable) ((Map.Entry) (o2)).getValue()).compareTo(((Map.Entry) (o1)).getValue());
-            }
+        Collections.sort(list, (o1, o2) -> {
+            return ((Comparable) ((Map.Entry) (o2)).getValue()).compareTo(((Map.Entry) (o1)).getValue());     
         });
 
         Map result = new LinkedHashMap();
@@ -553,28 +337,11 @@ public class Helper {
         return false;
     }
 
-    public static Collection<Player> getOnlinePlayers() {
-        try {
-            Method method = Bukkit.class.getDeclaredMethod("getOnlinePlayers");
-            Object players = method.invoke(null);
-
-            if (players instanceof Player[]) {
-                return new ArrayList<>(Arrays.asList((Player[]) players));
-            }
-            return (Collection<Player>) players;
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return new ArrayList<>();
-    }
-
     public static Player getPlayer(String playerName) {
-        return Bukkit.getPlayer( getForcedPlayerUUID(playerName));
+        return Bukkit.getPlayer( getCachedPlayerUUID(playerName));
     }
 
-    public static UUID getForcedPlayerUUID(String playerName) {
+    public static UUID getCachedPlayerUUID(String playerName) {
         Player OnlinePlayer = Bukkit.getPlayerExact(playerName);
     
         if (OnlinePlayer != null) {

@@ -382,7 +382,7 @@ public final class StorageManager {
      */
     public Clan retrieveOneClan(String tagClan) {
         if (getOneClan == null || !checkStatement(getOneClan)) {
-            getOneClan = prepareStatement("SELECT * FROM  `sc_clans` WHERE `tag` = '" + tagClan + "';");
+            getOneClan = prepareStatement("SELECT * FROM  `sc_clans` WHERE `tag` = '?';");
         }
         Clan clan = new Clan();
 
@@ -550,7 +550,7 @@ public final class StorageManager {
             insertClan = prepareStatement(
                     "INSERT INTO `sc_clans` (  `verified`, `tag`, `color_tag`, `name`, `friendly_fire`, `founded`, "
                     + "`last_used`, `packed_allies`, `packed_rivals`, `packed_bb`, `cape_url`, `flags`, `balance`) "
-                    + "VALUES ( ?,'?','?','?',?,'?','?','?','?,'?','?','?','?');" );
+                    + "VALUES ( '?','?','?','?','?','?','?','?','?','?','?','?','?');" );
         }
         core.executeUpdate( insertClan, String.valueOf( clan.isVerified() ? 1 : 0 ),
                                         Helper.escapeQuotes(clan.getTag()),
@@ -615,7 +615,7 @@ public final class StorageManager {
     public void updateClan(Clan clan) {
         if ( updateClan == null || !checkStatement(updateClan)) {
             updateClan = prepareStatement( 
-                    "UPDATE `sc_clans` SET verified = ?, tag = '?', color_tag = '?', name = '?', friendly_fire = ?, "
+                    "UPDATE `sc_clans` SET verified = '?', tag = '?', color_tag = '?', name = '?', friendly_fire = '?', "
                     + "founded = '?', last_used = '?', packed_allies = '?', packed_rivals = '?', packed_bb = '?', "
                     + "cape_url = '?', balance = '?', flags = '?' WHERE tag = '?';" );
         }
@@ -658,7 +658,7 @@ public final class StorageManager {
             insertCP = prepareStatement(
                     "INSERT INTO `sc_players` ( `uuid`, `name`, `leader`, `tag`, `friendly_fire`, `neutral_kills`, "
                     + "`rival_kills`, `civilian_kills`, `deaths`, `last_seen`, `join_date`, `packed_past_clans`, "
-                    + "`flags`) VALUES ('?','?',?,'?',?,?,?,?,?,'?','?','?','?');" );
+                    + "`flags`) VALUES ('?','?','?','?','?','?','?','?','?','?','?','?','?');" );
         }
         core.executeUpdate( insertCP, cp.getUniqueId().toString(),
                                       cp.getName(),
@@ -698,9 +698,9 @@ public final class StorageManager {
         cp.updateLastSeen();
         if ( updateCP == null || !checkStatement(updateCP)) {
             updateCP = prepareStatement(
-                    "UPDATE `sc_players` SET leader = ?, tag = '?' , friendly_fire = ?, neutral_kills = ?, "
-                    + "rival_kills = ?, civilian_kills = ?, deaths = ?, last_seen = '?', packed_past_clans = '?', "
-                    + "trusted = ?, flags = '?', name = '?' WHERE `uuid` = '?';");
+                    "UPDATE `sc_players` SET leader = '?', tag = '?' , friendly_fire = '?', neutral_kills = '?', "
+                    + "rival_kills = '?', civilian_kills = '?', deaths = '?', last_seen = '?', packed_past_clans = '?', "
+                    + "trusted = '?', flags = '?', name = '?' WHERE `uuid` = '?';");
         }
         core.executeUpdate( updateCP, String.valueOf( cp.isLeader() ? 1 : 0), 
                                       Helper.escapeQuotes( cp.getTag() ),

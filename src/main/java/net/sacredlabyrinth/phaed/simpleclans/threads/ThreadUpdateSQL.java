@@ -2,6 +2,8 @@ package net.sacredlabyrinth.phaed.simpleclans.threads;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 
@@ -32,7 +34,12 @@ public class ThreadUpdateSQL extends Thread {
         }
         catch (SQLException ex) {
             if (!ex.toString().contains("not return ResultSet")) {
-                SimpleClans.getLog().severe("[Thread] Error at SQL " + params.toString() );
+                SimpleClans.getLog()
+                           .severe("[Thread] Error at SQL " + Arrays.asList( params )
+                                                                    .stream()
+                                                                    .collect( Collectors.joining( "]" + 
+                                                                                  System.lineSeparator() + 
+                                                                                  "[", "[", "]" ) ) );
                 ex.printStackTrace();
             }
         }

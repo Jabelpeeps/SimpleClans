@@ -22,15 +22,19 @@ public class ThreadUpdateSQL extends Thread {
     @Override
     public void run() {
         try {
-            for ( int i = 0; i < params.length; i++ ) {
-                statement.setString( i + 1, params[i] );
+            int j = 1;
+            for ( String each : params ) {
+                statement.setString( j++, each );
             }
+//            for ( int i = 0; i < params.length; i++ ) {
+//                statement.setString( i + 1, params[i] );
+//            }
             statement.executeUpdate(); 
         }
         catch (SQLException ex) {
             if (!ex.toString().contains("not return ResultSet")) {
                 try {
-                    SimpleClans.getLog().severe("[Thread] Error at SQL " + statement.getWarnings() );
+                    SimpleClans.getLog().severe("[Thread] Error at SQL " + statement.getParameterMetaData() );
                 } catch ( SQLException e ) {
                     e.printStackTrace();
                 }

@@ -21,15 +21,17 @@ public class MySQLCore implements DBCore {
     private String username;
     private String password;
     private String database;
+    private boolean usingThreads;
     private int port;
 
-    public MySQLCore(String host, String database, int port, String username, String password) {
-        this.database = database;
-        this.port = port;
-        this.host = host;
-        this.username = username;
-        this.password = password;
-        this.log = SimpleClans.getLog();
+    public MySQLCore(String _host, String _database, int _port, String _username, String _password) {
+        database = _database;
+        port = _port;
+        host = _host;
+        username = _username;
+        password = _password;
+        log = SimpleClans.getLog();
+        usingThreads = SimpleClans.getInstance().getSettingsManager().getUseThreads();
         initialize();
     }
 
@@ -83,114 +85,6 @@ public class MySQLCore implements DBCore {
     }
 
     /**
-     * Execute a select statement
-     *
-     * @param query
-     * @return
-     */
-    @Override
-    public ResultSet select(String query) {
-        try {
-            return getConnection().createStatement().executeQuery(query);
-        }
-        catch (SQLException ex) {
-            log.severe("Error at SQL Query: " + ex.getMessage());
-            log.severe("Query: " + query);
-        }
-        return null;
-    }
-
-    /**
-     * Execute an insert statement
-     *
-     * @param query
-     */
-    @Override
-    public void insert(String query) {
-        if (SimpleClans.getInstance().getSettingsManager().getUseThreads()) {
-            Thread th = new Thread(new ThreadUpdateSQL(getConnection(), query, "INSERT"));
-            th.start();
-        }
-        else {
-            try {
-                getConnection().createStatement().executeUpdate(query);
-            }
-            catch (SQLException ex) {
-                if (!ex.toString().contains("not return ResultSet")) {
-                    log.severe("Error at SQL INSERT Query: " + ex);
-                    log.severe("Query: " + query);
-                }
-            }
-        }
-    }
-
-    /**
-     * Execute an update statement
-     *
-     * @param query
-     */
-    @Override
-    public void update(String query) {
-        if (SimpleClans.getInstance().getSettingsManager().getUseThreads()) {
-            Thread th = new Thread(new ThreadUpdateSQL(getConnection(), query, "UPDATE"));
-            th.start();
-        }
-        else {
-            try {
-                getConnection().createStatement().executeUpdate(query);
-            }
-            catch (SQLException ex) {
-                if (!ex.toString().contains("not return ResultSet")) {
-                    log.severe("Error at SQL UPDATE Query: " + ex);
-                    log.severe("Query: " + query);
-                }
-            }
-        }
-    }
-
-    /**
-     * Execute a delete statement
-     *
-     * @param query
-     */
-    @Override
-    public void delete(String query) {
-        if (SimpleClans.getInstance().getSettingsManager().getUseThreads()) {
-            Thread th = new Thread(new ThreadUpdateSQL(getConnection(), query, "DELETE"));
-            th.start();
-        }
-        else {
-            try {
-                getConnection().createStatement().executeUpdate(query);
-            }
-            catch (SQLException ex) {
-                if (!ex.toString().contains("not return ResultSet")) {
-                    log.severe("Error at SQL DELETE Query: " + ex);
-                    log.severe("Query: " + query);
-                }
-            }
-        }
-    }
-    /**
-     * Execute a statement
-     *
-     * @param query
-     * @return
-     */
-    @Override
-    public ResultSet getResultSet(PreparedStatement query) {
-        try {
-            if (query.execute())
-                return query.getResultSet();
-        }
-        catch (SQLException ex) {
-            log.severe(ex.getMessage());
-            log.severe("Query: " + query);
-        }
-        return null;
-    }
-
-    /**
      * Execute a statement
      *
      * @param query
@@ -204,7 +98,7 @@ public class MySQLCore implements DBCore {
         }
         catch (SQLException ex) {
             log.severe(ex.getMessage());
-            log.severe("Query: " + query);
+            log.severe("query: " + query);
             return false;
         }
     }
@@ -241,6 +135,47 @@ public class MySQLCore implements DBCore {
         catch (Exception e) {
             log.severe("Failed to check if column " + column + " exists in table " + table + " : " + e.getMessage());
             return false;
+        }
+    }
+    
+    /**
+     * Execute a statement
+     *
+     * @param query
+     * @return the results of the query or null
+     */
+    @Override
+    public ResultSet getResultSet(PreparedStatement query, String...params ) {
+        try {
+            for ( int i = 0; i < params.length; i++ ) {
+                query.setString( i + 1, params[i] );
+            }
+            if (query.execute())
+                return query.getResultSet();
+        }
+        catch (SQLException ex) {
+            log.severe(ex.getMessage());
+            log.severe("query: " + query);
+        }
+        return null;
+    }
+    
+    @Override
+    public void executeUpdate(PreparedStatement query, String...params ) {
+        if ( usingThreads ) {
+            new ThreadUpdateSQL(query, params).start();
+        }
+        else {
+            try {
+                for ( int i = 0; i < params.length; i++ ) {
+                    query.setString( i + 1, params[i] );
+                }
+                query.executeUpdate();
+            }
+            catch (SQLException ex) {
+                log.severe(ex.getMessage());
+                log.severe("query: " + query);
+            }
         }
     }
 }

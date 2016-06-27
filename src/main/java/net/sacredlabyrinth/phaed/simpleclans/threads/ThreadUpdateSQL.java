@@ -1,7 +1,8 @@
 package net.sacredlabyrinth.phaed.simpleclans.threads;
 
-import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 
 /**
@@ -10,30 +11,30 @@ import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
  */
 public class ThreadUpdateSQL extends Thread {
 
-    Connection Connection;
-    String Query;
-    String TypeSQL;
+    PreparedStatement statement;
+    String[] params;
 
-    public ThreadUpdateSQL(Connection Connection, String Query, String TypeSQL)
-    {
-        this.Query = Query;
-        this.Connection = Connection;
-        this.TypeSQL = TypeSQL;
+    public ThreadUpdateSQL(PreparedStatement _statement, String... _params) {
+        statement = _statement;
+        params = _params;
     }
-
+    
     @Override
-    public void run()
-    {
-        try
-        {
-            this.Connection.createStatement().executeUpdate(this.Query);
+    public void run() {
+        try {
+            for ( int i = 0; i < params.length; i++ ) {
+                statement.setString( i + 1, params[i] );
+            }
+            statement.executeUpdate(); 
         }
-        catch (SQLException ex)
-        {
-            if (!ex.toString().contains("not return ResultSet"))
-            {
-                SimpleClans.getLog().severe("[Thread] Error at SQL " + this.TypeSQL + " Query: " + ex);
-                SimpleClans.getLog().severe("[Thread] Query: " + this.Query);
+        catch (SQLException ex) {
+            if (!ex.toString().contains("not return ResultSet")) {
+                try {
+                    SimpleClans.getLog().severe("[Thread] Error at SQL " + statement.getWarnings() );
+                } catch ( SQLException e ) {
+                    e.printStackTrace();
+                }
+                ex.printStackTrace();
             }
         }
     }

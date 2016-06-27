@@ -13,6 +13,7 @@ import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.managers.RequestManager;
 
 public class DenyCommandExecutor implements CommandExecutor {
     SimpleClans plugin = SimpleClans.getInstance();
@@ -27,14 +28,15 @@ public class DenyCommandExecutor implements CommandExecutor {
         }
 
         ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
+        RequestManager reqMan = plugin.getRequestManager();
 
         if (cp != null) {
             Clan clan = cp.getClan();
 
             if (clan.isLeader(player)) {
-                if (plugin.getRequestManager().hasRequest(clan.getTag())) {
-                    if (cp.getVote() == null) {
-                        plugin.getRequestManager().deny(cp);
+                if (reqMan.hasRequest(clan.getTag())) {
+                    if (!cp.hasVote(reqMan.getRequest( clan.getTag() ))) {
+                        reqMan.deny(cp);
                         clan.leaderAnnounce(ChatColor.RED + MessageFormat.format(plugin.getLang("has.voted.to.deny"), Helper.capitalize(player.getName())));
                     }
                     else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("you.have.already.voted"));
@@ -43,10 +45,10 @@ public class DenyCommandExecutor implements CommandExecutor {
             }
             else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.leader.permissions"));
         }
-        else if (plugin.getRequestManager().hasRequest(player.getName().toLowerCase())) {
+        else if (plugin.getRequestManager().hasRequest(player.getUniqueId().toString())) {
          
             cp = plugin.getClanManager().getCreateClanPlayer(player.getUniqueId());
-            plugin.getRequestManager().deny(cp);
+            reqMan.deny(cp);
         }
         else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("nothing.to.deny"));
 

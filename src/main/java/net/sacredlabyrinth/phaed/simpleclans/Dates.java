@@ -106,59 +106,41 @@ public class Dates {
 //	return  days / 365.2425;
 //    } 
 
-    /**
-     *
-     * @param date1
-     * @param date2
-     * @return
-     */
-    public static double differenceInDays(Date date1, Date date2)
-    {
-	return differenceInHours(date1, date2) / 24.0;
+	public static double differenceInDays(long date1, long date2) {
+	    return differenceInHours( date1, date2 ) / 24;
+	}
+    public static double differenceInHours(long date1, long date2) {
+        return differenceInMinutes(date1, date2) / 60.0;
+    }
+    public static double differenceInMinutes(long date1, long date2) {
+        return differenceInSeconds(date1, date2) / 60.0;
+    }
+    public static double differenceInSeconds(long date1, long date2) {
+        return differenceInMilliseconds(date1, date2) / 1000.0;
+    }
+    private static double differenceInMilliseconds(long date1, long date2) {
+        return Math.abs(date1 - date2);
+    }
+    
+    public static double differenceInDays(Date date1, Date date2) {
+        return differenceInHours(date1, date2) / 24.0;
+    }
+    public static double differenceInHours(Date date1, Date date2) {
+        return differenceInMinutes(date1, date2) / 60.0;
+    }
+    public static double differenceInMinutes(Date date1, Date date2) {
+        return differenceInSeconds(date1, date2) / 60.0;
+    }
+    public static double differenceInSeconds(Date date1, Date date2) {
+        return differenceInMilliseconds(date1, date2) / 1000.0;
+    }
+    private static double differenceInMilliseconds(Date date1, Date date2) {
+        return Math.abs(getTimeInMilliseconds(date1) - getTimeInMilliseconds(date2));
     }
 
-    /**
-     *
-     * @param date1
-     * @param date2
-     * @return
-     */
-    public static double differenceInHours(Date date1, Date date2)
-    {
-	return differenceInMinutes(date1, date2) / 60.0;
-    }
-
-    /**
-     *
-     * @param date1
-     * @param date2
-     * @return
-     */
-    public static double differenceInMinutes(Date date1, Date date2)
-    {
-	return differenceInSeconds(date1, date2) / 60.0;
-    }
-
-    /**
-     *
-     * @param date1
-     * @param date2
-     * @return
-     */
-    public static double differenceInSeconds(Date date1, Date date2)
-    {
-	return differenceInMilliseconds(date1, date2) / 1000.0;
-    }
-
-    private static double differenceInMilliseconds(Date date1, Date date2)
-    {
-	return Math.abs(getTimeInMilliseconds(date1) - getTimeInMilliseconds(date2));
-    }
-
-    private static long getTimeInMilliseconds(Date date)
-    {
-	Calendar cal = Calendar.getInstance();
-	cal.setTime(date);
-	return cal.getTimeInMillis() + cal.getTimeZone().getOffset(cal.getTimeInMillis());
+    private static long getTimeInMilliseconds(Date date) {
+    	Calendar cal = Calendar.getInstance();
+    	cal.setTime(date);
+    	return cal.getTimeInMillis() + cal.getTimeZone().getOffset(cal.getTimeInMillis());
     }
 }

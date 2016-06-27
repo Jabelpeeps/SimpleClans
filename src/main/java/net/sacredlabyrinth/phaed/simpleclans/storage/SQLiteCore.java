@@ -94,74 +94,6 @@ public class SQLiteCore implements DBCore {
     }
 
     /**
-     * Execute a select statement
-     * @param query
-     * @return
-     */
-    @Override
-    public ResultSet select(String query) {
-        try {
-            return getConnection().createStatement().executeQuery(query);
-        }
-        catch (SQLException ex) {
-            log.severe("Error at SQL Query: " + ex.getMessage());
-            log.severe("Query: " + query);
-        }
-        return null;
-    }
-
-    /**
-     * Execute an insert statement
-     * @param query
-     */
-    @Override
-    public void insert(String query) {
-        try {
-            getConnection().createStatement().executeQuery(query);
-        }
-        catch (SQLException ex) {
-            if (!ex.toString().contains("not return ResultSet")) {
-                log.severe("Error at SQL INSERT Query: " + ex);
-                log.severe("Query: " + query);
-            }
-        }
-    }
-
-    /**
-     * Execute an update statement
-     * @param query
-     */
-    @Override
-    public void update(String query) {
-        try {
-            getConnection().createStatement().executeQuery(query);
-        }
-        catch (SQLException ex) {
-            if (!ex.toString().contains("not return ResultSet")) {
-                log.severe("Error at SQL UPDATE Query: " + ex);
-                log.severe("Query: " + query);
-            }
-        }
-    }
-
-    /**
-     * Execute a delete statement
-     * @param query
-     */
-    @Override
-    public void delete(String query) {
-        try {
-            getConnection().createStatement().executeQuery(query);
-        }
-        catch (SQLException ex) {
-            if (!ex.toString().contains("not return ResultSet")) {
-                log.severe("Error at SQL DELETE Query: " + ex);
-                log.severe("Query: " + query);
-            }
-        }
-    }
-
-    /**
      * Execute a statement
      * @param query
      * @return
@@ -174,7 +106,7 @@ public class SQLiteCore implements DBCore {
         }
         catch (SQLException ex) {
             log.severe(ex.getMessage());
-            log.severe("Query: " + query);
+            log.severe("query: " + query);
             return false;
         }
     }
@@ -215,15 +147,32 @@ public class SQLiteCore implements DBCore {
     }
 
     @Override
-    public ResultSet getResultSet( PreparedStatement query ) {
+    public ResultSet getResultSet( PreparedStatement query, String...params  ) {
         try {
+            for ( int i = 0; i < params.length; i++ ) {
+                query.setString( i + 1, params[i] );
+            }
             if (query.execute())
                 return query.getResultSet();
         }
         catch (SQLException ex) {
             log.severe(ex.getMessage());
-            log.severe("Query: " + query);
+            log.severe("query: " + query);
         }
         return null;
+    }
+
+    @Override
+    public void executeUpdate( PreparedStatement query, String...params ) {
+        try {
+            for ( int i = 0; i < params.length; i++ ) {
+                query.setString( i + 1, params[i] );
+            }
+            query.executeUpdate();
+        }
+        catch (SQLException ex) {
+            log.severe(ex.getMessage());
+            log.severe("query: " + query);
+        }
     }
 }

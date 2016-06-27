@@ -26,31 +26,6 @@ public interface DBCore
     void close();
 
     /**
-     * Execute a select statement
-     * @param query
-     * @return
-     */
-    ResultSet select(String query);
-
-    /**
-     * Execute an insert statement
-     * @param query
-     */
-    void insert(String query);
-
-    /**
-     * Execute an update statement
-     * @param query
-     */
-    void update(String query);
-
-    /**
-     * Execute a delete statement
-     * @param query
-     */
-    void delete(String query);
-
-    /**
      * Execute a statement
      * @param query
      * @return
@@ -73,5 +48,7 @@ public interface DBCore
      */
     Boolean existsColumn(String tabell, String colum);
 
-    ResultSet getResultSet( PreparedStatement query );
+    ResultSet getResultSet( PreparedStatement query, String...params );
+
+    void executeUpdate( PreparedStatement query, String...params );
 }

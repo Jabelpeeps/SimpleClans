@@ -38,13 +38,13 @@ public class InviteCommand  implements ClanCommand {
                         if (invited != null) {
                             if (plugin.getPermissionsManager().has(invited, "simpleclans.member.can-join")) {
                                 if (!invited.getName().equals(player.getName())) {
-                                    if (!plugin.getSettingsManager().isBanned(player.getUniqueId())) {
+                                    if (!plugin.getSettingsManager().isBanned(invited.getUniqueId())) {
                                         ClanPlayer cpInv = plugin.getClanManager().getClanPlayer(invited);
 
                                         if (cpInv == null) {
                                             if (plugin.getClanManager().purchaseInvite(player)) {
                                                 if(clan.getSize() < plugin.getSettingsManager().getMaxMembers()) {
-                                                    plugin.getRequestManager().addInviteRequest(cp, invited.getName(), clan);
+                                                    plugin.getRequestManager().addInviteRequest(cp, invited.getUniqueId(), clan);
                                                     ChatBlock.sendMessage(player, ChatColor.AQUA + MessageFormat.format(plugin.getLang("has.been.asked.to.join"), Helper.capitalize(invited.getName()), clan.getName()));
                                                 } 
                                                 else  ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("the.clan.members.reached.limit"));

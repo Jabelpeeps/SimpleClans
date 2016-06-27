@@ -39,7 +39,7 @@ public class TrustCommand  implements ClanCommand {
                             if (!trusted.equals(player.getName())) {
                                 if (clan.isMember(trusted)) {
                                     if (!clan.isLeader(trusted)) {
-                                        ClanPlayer tcp = plugin.getClanManager().getClanPlayerName(trusted.getName());
+                                        ClanPlayer tcp = plugin.getClanManager().getAnyClanPlayer(trusted.getUniqueId());
                                         if (tcp == null)  {
                                             ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.player.matched"));
                                             return;

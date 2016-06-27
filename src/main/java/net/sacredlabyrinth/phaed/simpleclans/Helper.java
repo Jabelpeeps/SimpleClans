@@ -149,7 +149,18 @@ public class Helper {
     public static String toMessage(List<String> args, String sep) {
         return String.join( sep, args );
     }
-
+    
+    /**
+     * Converts a string array to a string with custom separators
+     *
+     * @param args
+     * @param sep
+     * @return
+     */
+    public static String toMessage(Set<String> args, String sep) {
+        return String.join( sep, args );
+    }
+    
     /**
      * Convert color hex values with ampersand to special character
      *
@@ -249,8 +260,8 @@ public class Helper {
      * @param in
      * @return
      */
-    public static List<ClanPlayer> stripOffLinePlayers(List<ClanPlayer> in) {
-        return in.parallelStream().filter( cp -> { return cp.toPlayer() != null; } ).collect(Collectors.toList());
+    public static Set<ClanPlayer> stripOffLinePlayers(List<ClanPlayer> in) {
+        return in.parallelStream().filter( cp -> { return cp.toPlayer() != null; } ).collect(Collectors.toSet());
     }
 
     /**

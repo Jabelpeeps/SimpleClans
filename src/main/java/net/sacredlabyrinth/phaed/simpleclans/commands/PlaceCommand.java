@@ -50,7 +50,7 @@ public class PlaceCommand  implements ClanCommand {
                         }
                     }
 
-                    ClanPlayer cp = plugin.getClanManager().getCreateClanPlayerUUID(player.getName());
+                    ClanPlayer cp = plugin.getClanManager().getCreateClanPlayer(player.getUniqueId());
 
                     if (cp == null)  return;
 

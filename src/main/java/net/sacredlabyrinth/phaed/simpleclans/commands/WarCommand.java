@@ -1,7 +1,7 @@
 package net.sacredlabyrinth.phaed.simpleclans.commands;
 
 import java.text.MessageFormat;
-import java.util.List;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -40,7 +40,7 @@ public class WarCommand implements ClanCommand {
                                 if (clan.isRival(war.getTag())) {
                                     if (action.equals(plugin.getLang("start"))) {
                                         if (!clan.isWarring(war)) {
-                                            List<ClanPlayer> onlineLeaders = Helper.stripOffLinePlayers(clan.getLeaders());
+                                            Set<ClanPlayer> onlineLeaders = Helper.stripOffLinePlayers(clan.getLeaders());
 
                                             if (!onlineLeaders.isEmpty()) {
                                                 plugin.getRequestManager().addWarStartRequest(cp, war, clan);

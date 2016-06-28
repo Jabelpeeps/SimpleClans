@@ -4,12 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-/**
- *
- * @author phaed
- */
-public interface DBCore
-{
+public interface DBCore {
+    
     /**
      * @return connection
      */
@@ -48,7 +44,7 @@ public interface DBCore
      */
     Boolean existsColumn(String tabell, String colum);
 
-    ResultSet getResultSet( PreparedStatement query, String...params );
+    ResultSet getResultSet( PreparedStatement query, Class<?>[] types, Object...params  );
 
-    void executeUpdate( PreparedStatement query, String...params );
+    void executeUpdate( PreparedStatement query, Class<?>[] types, Object...params );
 }

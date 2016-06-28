@@ -3,7 +3,6 @@ package net.sacredlabyrinth.phaed.simpleclans.threads;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 
@@ -14,10 +13,12 @@ import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 public class ThreadUpdateSQL extends Thread {
 
     PreparedStatement statement;
-    String[] params;
+    Class<?>[] types;
+    Object[] params;
 
-    public ThreadUpdateSQL(PreparedStatement _statement, String... _params) {
+    public ThreadUpdateSQL(PreparedStatement _statement, Class<?>[] _types, Object[]_params ) {
         statement = _statement;
+        types = _types;
         params = _params;
     }
     
@@ -25,21 +26,28 @@ public class ThreadUpdateSQL extends Thread {
     public void run() {
         try {
             if ( params.length > 0 ) {
-                int j = 1;
-                for ( String each : params ) {
-                    statement.setString( j++, each );
+                
+                for ( int i = 0; i < params.length; i++ ) {
+                    
+                    if ( types[i].equals( String.class ) ) {
+                        statement.setString( i + 1, (String) params[i] );
+                    }
+                    else if ( types[i].equals( int.class ) ) {
+                        statement.setInt( i + 1, (int) params[i] );
+                    }
+                    else if ( types[i].equals( long.class ) ) {
+                        statement.setLong( i + 1, (long) params[i] );
+                    }
+                    else if ( types[i].equals( double.class ) ) {
+                        statement.setDouble( i + 1, (double) params[i] );
+                    }
                 }
             }
             statement.executeUpdate(); 
         }
         catch (SQLException ex) {
             if (!ex.toString().contains("not return ResultSet")) {
-                SimpleClans.getLog()
-                           .severe("[Thread] Error at SQL " + Arrays.asList( params )
-                                                                    .stream()
-                                                                    .collect( Collectors.joining( "]" + 
-                                                                                  System.lineSeparator() + 
-                                                                                  "[", "[", "]" ) ) );
+                SimpleClans.getLog().severe("[Thread] Error at SQL " + Arrays.asList( params ));
                 ex.printStackTrace();
             }
         }

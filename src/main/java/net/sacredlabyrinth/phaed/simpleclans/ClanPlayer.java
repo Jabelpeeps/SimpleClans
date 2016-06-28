@@ -14,7 +14,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -67,13 +66,6 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer> {
 
     public ClanPlayer(UUID playerUniqueId) {
         uniqueId = playerUniqueId;
-        Player OnlinePlayer = Bukkit.getPlayer(playerUniqueId);
-        if (OnlinePlayer != null) {
-            displayName = OnlinePlayer.getName();
-        } else {
-            OfflinePlayer OfflinePlayer = Bukkit.getOfflinePlayer(playerUniqueId);
-            displayName = OfflinePlayer.getName();
-        }
         lastSeen = System.currentTimeMillis();
         joinDate = System.currentTimeMillis();
         neutralKills = 0;
@@ -81,6 +73,14 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer> {
         civilianKills = 0;
         tag = "";
         channel = Channel.NONE;
+
+        Player player = Bukkit.getPlayer(playerUniqueId);
+        
+        if (player != null) {
+            displayName = player.getName();
+        } else {
+            displayName = Bukkit.getOfflinePlayer(playerUniqueId).getName();
+        }
     }
 
     @Override

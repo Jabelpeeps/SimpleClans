@@ -33,6 +33,7 @@ import net.sacredlabyrinth.phaed.simpleclans.events.PlayerPromoteEvent;
 import net.sacredlabyrinth.phaed.simpleclans.events.RivalClanAddEvent;
 import net.sacredlabyrinth.phaed.simpleclans.events.RivalClanRemoveEvent;
 import net.sacredlabyrinth.phaed.simpleclans.managers.ClanManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.PermissionsManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 /**
@@ -101,11 +102,13 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @param player
      */
     public void deposit(double amount, Player player) {
-        if (plugin.getPermissionsManager().playerHasMoney(player, amount)) {
-            if (plugin.getPermissionsManager().playerChargeMoney(player, amount)) {
+        PermissionsManager perms = plugin.getPermissionsManager();
+        if (perms.playerHasMoney(player, amount)) {
+            if (perms.playerChargeMoney(player, amount)) {
+                
                 player.sendMessage(ChatColor.AQUA + MessageFormat.format(plugin.getLang("player.clan.deposit"), amount));
                 addBb(player.getName(), ChatColor.AQUA + MessageFormat.format(plugin.getLang("bb.clan.deposit"), amount));
-                setBalance(balance + amount);
+                balance += amount;
                 plugin.getStorageManager().updateClan(this);
             }
             else player.sendMessage(ChatColor.AQUA + plugin.getLang("not.sufficient.money"));
@@ -120,103 +123,61 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @param player
      */
     public void withdraw(double amount, Player player) {
-        if (getBalance() >= amount) {
+        if (balance >= amount) {
             if (plugin.getPermissionsManager().playerGrantMoney(player, amount)) {
+                
                 player.sendMessage(ChatColor.AQUA + MessageFormat.format(plugin.getLang("player.clan.withdraw"), amount));
                 addBb(player.getName(), ChatColor.AQUA + MessageFormat.format(plugin.getLang("bb.clan.withdraw"), amount));
-                setBalance(balance - amount);
+                balance -= amount;
                 plugin.getStorageManager().updateClan(this);
             }
         }
         else player.sendMessage(ChatColor.AQUA + plugin.getLang("clan.bank.not.enough.money"));
     }
 
-    public String getName() {
-        return name;
-    }
-    public void setName(String _name) {
-        name = _name;
-    }
-    public double getBalance() {
-        return balance;
-    }
-    public void setBalance(double _balance) {
-        balance = _balance;
-    }
+    public String getName() { return name; }
+    public void setName(String _name) { name = _name; }
+    public double getBalance() { return balance; }
+    public void setBalance(double _balance) { balance = _balance; }
     /**
      * Returns the clan's tag clean (no colors)
      *
      * @return the tag
      */
-    public String getTag() {
-        return tag;
-    }
-    public void setTag(String _tag) {
-        tag = _tag;
-    }
-    public long getLastUsed() {
-        return lastUsed;
-    }
+    public String getTag() { return tag; }
+    public void setTag(String _tag) { tag = _tag; }
+    public long getLastUsed() { return lastUsed; }
     /**
      * Updates last used date to today (does not update clan on db)
      */
-    public void updateLastUsed() {
-        lastUsed = System.currentTimeMillis();
-    }
-
+    public void updateLastUsed() { lastUsed = System.currentTimeMillis(); }
     public int getInactiveDays() {
         return (int) Math.floor(Dates.differenceInDays(lastUsed, System.currentTimeMillis()));
     }
-    public void setLastUsed(long _lastUsed) {
-        lastUsed = _lastUsed;
-    }
-
-    public boolean isFriendlyFire() {
-        return friendlyFire;
-    }
+    public void setLastUsed(long _lastUsed) { lastUsed = _lastUsed; }
+    public boolean isFriendlyFire() { return friendlyFire; }
     /**
      * Sets the friendly fire status of this clan (does not update clan on db)
      *
      * @param friendlyFire the friendlyFire to set
      */
-    public void setFriendlyFire(boolean _friendlyFire) {
-        friendlyFire = _friendlyFire;
-    }
-
-    public boolean isMember(Player player) {
-        return members.contains(player.getUniqueId());
-    }
-
-    public boolean isMember(UUID playerUniqueId) {
-        return members.contains(playerUniqueId);
-    }
-
+    public void setFriendlyFire(boolean _friendlyFire) { friendlyFire = _friendlyFire; }
+    public boolean isMember(Player player) { return members.contains(player.getUniqueId()); }
+    public boolean isMember(UUID playerUniqueId) { return members.contains(playerUniqueId); }
     /**
      * Returns a list with the contents of the bulletin board
      *
      * @return the bb
      */
-    public List<String> getBb() {
-        return Collections.unmodifiableList(bb);
-    }
-
-    private void addAlly(String _tag) {
-        allies.add(_tag);
-    }
-
-    private boolean removeAlly(String ally) {
-        return allies.remove(ally);
-    }
-
+    public List<String> getBb() { return Collections.unmodifiableList(bb); }
+    private void addAlly(String _tag) { allies.add(_tag); }
+    private boolean removeAlly(String ally) { return allies.remove(ally); }
     /**
      * The founded date in milliseconds
      *
      * @return the founded
      */
-    public long getFounded() {
-        return founded;
-    }
-
+    public long getFounded() { return founded; }
     /**
      * The string representation of the founded date
      *
@@ -225,18 +186,9 @@ public class Clan implements Serializable, Comparable<Clan> {
     public String getFoundedString() {
         return new SimpleDateFormat("MMM dd, ''yy h:mm a").format(new Date(founded));
     }
-
-    public void setFounded(long _founded) {
-        founded = _founded;
-    }
-
-    public String getColorTag() {
-        return colorTag;
-    }
-
-    public void setColorTag(String _colorTag) {
-        colorTag = Helper.parseColors(_colorTag);
-    }
+    public void setFounded(long _founded) { founded = _founded; }
+    public String getColorTag() { return colorTag; }
+    public void setColorTag(String _colorTag) { colorTag = Helper.parseColors(_colorTag); }
 
     /**
      * Adds a bulletin board message without announcer
@@ -264,42 +216,18 @@ public class Clan implements Serializable, Comparable<Clan> {
         members.add(uuid);
     }
 
-    public void removeMember(UUID playerUniqueId) {
-        members.remove(playerUniqueId);
-    }
-
-    public int getSize() {
-        return members.size();
-    }
-
+    public void removeMember(UUID playerUniqueId) { members.remove(playerUniqueId); }
+    public int getSize() { return members.size(); }
     /**
      * Returns a list of all rival tags clean (no colors)
      *
      * @return the rivals
      */
-    public Set<String> getRivals() {
-        return Collections.unmodifiableSet(rivals);
-    }
-
-    private void addRival(String _tag) {
-        rivals.add(_tag);
-    }
-
-    private boolean removeRival(String rival) {
-        if (!rivals.contains(rival)) {
-            return false;
-        }
-        rivals.remove(rival);
-        return true;
-    }
-
-    public boolean isRival(String _tag) {
-        return rivals.contains(_tag);
-    }
-
-    public boolean isAlly(String _tag) {
-        return allies.contains(_tag);
-    }
+    public Set<String> getRivals() { return Collections.unmodifiableSet(rivals); }
+    private void addRival(String _tag) { rivals.add(_tag); }
+    private boolean removeRival(String rival) { return rivals.remove(rival); }
+    public boolean isRival(String _tag) { return rivals.contains(_tag); }
+    public boolean isAlly(String _tag) { return allies.contains(_tag); }
 
     /**
      * Tells you if the clan is verified, always returns true if no verification
@@ -308,45 +236,18 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @return
      */
     public boolean isVerified() {
-        return !plugin.getSettingsManager().isRequireVerification() || verified;
-
+        return verified || !plugin.getSettingsManager().isRequireVerification();
     }
 
-    public void setVerified(boolean _verified) {
-        verified = _verified;
-    }
-
-    public String getCapeUrl() {
-        return capeUrl;
-    }
-
-    public void setCapeUrl(String _capeUrl) {
-        capeUrl = _capeUrl;
-    }
-
-    public String getPackedBb() {
-        return Helper.toMessage(bb, "|");
-    }
-
-    public void setPackedBb(String packedBb) {
-        bb = Helper.fromArray(packedBb.split("[|]"));
-    }
-
-    public String getPackedAllies() {
-        return Helper.toMessage(allies, "|");
-    }
-
-    public void setPackedAllies(String packedAllies) {
-        allies = Helper.fromArray2(packedAllies.split("[|]"));
-    }
-
-    public String getPackedRivals() {
-        return Helper.toMessage(rivals, "|");
-    }
-
-    public void setPackedRivals(String packedRivals) {
-        rivals = Helper.fromArray2(packedRivals.split("[|]"));
-    }
+    public void setVerified(boolean _verified) { verified = _verified; }
+    public String getCapeUrl() { return capeUrl; }
+    public void setCapeUrl(String _capeUrl) { capeUrl = _capeUrl; }
+    public String getPackedBb() { return Helper.toMessage(bb, "|"); }
+    public void setPackedBb(String packedBb) { bb = Helper.fromArray(packedBb.split("[|]")); }
+    public String getPackedAllies() { return Helper.toMessage(allies, "|"); }
+    public void setPackedAllies(String packedAllies) { allies = Helper.fromArray2(packedAllies.split("[|]")); }
+    public String getPackedRivals() { return Helper.toMessage(rivals, "|"); }
+    public void setPackedRivals(String packedRivals) { rivals = Helper.fromArray2(packedRivals.split("[|]")); }
 
     /**
      * Returns a separator delimited string with all the ally clan's colored
@@ -430,15 +331,7 @@ public class Clan implements Serializable, Comparable<Clan> {
         return Helper.stripTrailing(out, sep);
     }
 
-    /**
-     * Check if a player is a leader of a clan
-     *
-     * @param player
-     * @return the leaders
-     */
-    public boolean isLeader(Player player) {
-        return isLeader(player.getUniqueId());      
-    }
+    public boolean isLeader(Player player) { return isLeader(player.getUniqueId()); }
 
     /**
      * Check if a player is a leader of a clan
@@ -695,8 +588,9 @@ public class Clan implements Serializable, Comparable<Clan> {
         ClanManager clanManager = plugin.getClanManager();
         
         return members.parallelStream()
-                      .filter( m -> clanManager.getClanPlayer( m ) != null )
-                      .collect( Collectors.summingInt( m -> clanManager.getClanPlayer( m ).getCivilianKills() ) );
+                      .map( m -> clanManager.getClanPlayer( m ) )
+                      .filter( cp -> cp != null )
+                      .collect( Collectors.summingInt( cp -> cp.getCivilianKills() ) );
     }
 
     /**
@@ -715,13 +609,10 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @return
      */
     public boolean reachedRivalLimit() {
-        int rivalCount = rivals.size();
         int clanCount = plugin.getClanManager().getRivableClanCount() - 1;
         int rivalPercent = plugin.getSettingsManager().getRivalLimitPercent();
 
-        double limit = (clanCount) * (((double) rivalPercent) / ((double) 100));
-
-        return rivalCount > limit;
+        return rivals.size() > clanCount * rivalPercent / 100;
     }
 
     /**
@@ -907,8 +798,9 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @return
      */
     public boolean allOtherLeadersOnline(UUID playerUniqueId) {
-        return getLeaders().parallelStream().filter( l -> l.getUniqueId().equals( playerUniqueId ) )
-                                            .allMatch( l -> Helper.isOnline( l.getUniqueId() ) );
+        return getLeaders().parallelStream().map( l -> l.getUniqueId() )
+                                            .filter( u -> u.equals( playerUniqueId ) )
+                                            .allMatch( u -> Helper.isOnline( u ) );
     }
 
     /**

@@ -75,7 +75,6 @@ public class SimpleClans extends JavaPlugin {
 
         settingsManager = new SettingsManager();
         languageManager = new LanguageManager();
-
         permissionsManager = new PermissionsManager();
         requestManager = new RequestManager();
         clanManager = new ClanManager();

@@ -27,9 +27,6 @@ import net.sacredlabyrinth.phaed.simpleclans.storage.DBCore;
 import net.sacredlabyrinth.phaed.simpleclans.storage.MySQLCore;
 import net.sacredlabyrinth.phaed.simpleclans.storage.SQLiteCore;
 
-/**
- * @author phaed
- */
 public final class StorageManager {
 
     private SimpleClans plugin;
@@ -384,7 +381,7 @@ public final class StorageManager {
      */
     public Clan retrieveOneClan(String tagClan) {
         if (getOneClan == null || !checkStatement(getOneClan)) {
-            getOneClan = prepareStatement("SELECT * FROM  `sc_clans` WHERE `tag` = '?';");
+            getOneClan = prepareStatement("SELECT * FROM  `sc_clans` WHERE `tag` = ?;");
         }
         Clan clan = new Clan();
 
@@ -494,7 +491,7 @@ public final class StorageManager {
      */
     public ClanPlayer retrieveOneClanPlayer(UUID playerUniqueId) {
         if (getOneCP == null || !checkStatement(getOneCP)) {
-            getOneCP = prepareStatement("SELECT * FROM `sc_players` WHERE `uuid` = '?';" );
+            getOneCP = prepareStatement("SELECT * FROM `sc_players` WHERE `uuid` = ?;" );
         }
 
         try ( ResultSet res = core.getResultSet( getOneCP, oneStringArg, playerUniqueId.toString() ) ) {
@@ -555,7 +552,7 @@ public final class StorageManager {
             insertClan = prepareStatement(
                     "INSERT INTO `sc_clans` (  `verified`, `tag`, `color_tag`, `name`, `friendly_fire`, `founded`, "
                     + "`last_used`, `packed_allies`, `packed_rivals`, `packed_bb`, `cape_url`, `flags`, `balance`) "
-                    + "VALUES ( ?,'?','?','?',?,?,?,'?','?','?','?','?',?);" );
+                    + "VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,? );" );
         }
         core.executeUpdate( insertClan, insertClanTypes, clan.isVerified() ? 1 : 0,
                                                          Helper.escapeQuotes(clan.getTag()),
@@ -608,7 +605,7 @@ public final class StorageManager {
      */
     public void updatePlayerName(final Player p) {
         if ( updatePlayerName == null || !checkStatement(updatePlayerName)) {
-            updatePlayerName = prepareStatement("UPDATE `sc_players` SET `name` = '?' WHERE uuid = '?';");
+            updatePlayerName = prepareStatement("UPDATE `sc_players` SET `name` = ? WHERE uuid = ?;");
         }
         core.executeUpdate( updatePlayerName, updatePlayerNameTypes, p.getName(), p.getUniqueId().toString());
     }
@@ -623,9 +620,9 @@ public final class StorageManager {
     public void updateClan(Clan clan) {
         if ( updateClan == null || !checkStatement(updateClan)) {
             updateClan = prepareStatement( 
-                    "UPDATE `sc_clans` SET verified = ?, tag = '?', color_tag = '?', name = '?', friendly_fire = ?, "
-                    + "founded = ?, last_used = ?, packed_allies = '?', packed_rivals = '?', packed_bb = '?', "
-                    + "cape_url = '?', balance = ?, flags = '?' WHERE tag = '?';" );
+                    "UPDATE `sc_clans` SET verified = ?, tag = ?, color_tag = ?, name = ?, friendly_fire = ?, "
+                    + "founded = ?, last_used = ?, packed_allies = ?, packed_rivals = ?, packed_bb = ?, "
+                    + "cape_url = ?, balance = ?, flags = ? WHERE tag = ?;" );
         }
         clan.updateLastUsed();
         core.executeUpdate( updateClan, updateClanTypes, clan.isVerified() ? 1 : 0,
@@ -651,7 +648,7 @@ public final class StorageManager {
      */
     public void deleteClan(Clan clan) {
         if ( deleteClan == null || !checkStatement(deleteClan)) {
-            deleteClan =  prepareStatement( "DELETE FROM `sc_clans` WHERE tag = '?';" );
+            deleteClan =  prepareStatement( "DELETE FROM `sc_clans` WHERE tag = ?;" );
         }
         core.executeUpdate( deleteClan, oneStringArg, clan.getTag() );
     }
@@ -668,7 +665,7 @@ public final class StorageManager {
             insertCP = prepareStatement(
                     "INSERT INTO `sc_players` ( `uuid`, `name`, `leader`, `tag`, `friendly_fire`, `neutral_kills`, "
                     + "`rival_kills`, `civilian_kills`, `deaths`, `last_seen`, `join_date`, `packed_past_clans`, "
-                    + "`flags`) VALUES ('?','?',?,'?',?,?,?,?,?,?,?,'?','?');" );
+                    + "`flags`) VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,? );" );
         }
         core.executeUpdate( insertCP, insertClanPlayerTypes, cp.getUniqueId().toString(),
                                                              cp.getName(),
@@ -710,9 +707,9 @@ public final class StorageManager {
         cp.updateLastSeen();
         if ( updateCP == null || !checkStatement(updateCP)) {
             updateCP = prepareStatement(
-                    "UPDATE `sc_players` SET leader = ?, tag = '?' , friendly_fire = ?, neutral_kills = ?, "
-                    + "rival_kills = ?, civilian_kills = ?, deaths = ?, last_seen = ?, packed_past_clans = '?', "
-                    + "trusted = ?, flags = '?', name = '?' WHERE `uuid` = '?';");
+                    "UPDATE `sc_players` SET leader = ?, tag = ?, friendly_fire = ?, neutral_kills = ?, "
+                    + "rival_kills = ?, civilian_kills = ?, deaths = ?, last_seen = ?, packed_past_clans = ?, "
+                    + "trusted = ?, flags = ?, name = ? WHERE `uuid` = ?;");
         }
         core.executeUpdate( updateCP, updateClanPlayerTypes, cp.isLeader() ? 1 : 0, 
                                                              Helper.escapeQuotes( cp.getTag() ),
@@ -736,7 +733,7 @@ public final class StorageManager {
      */
     public void deleteClanPlayer(ClanPlayer cp) {
         if ( deleteCP == null || !checkStatement(deleteCP)) {
-            deleteCP = prepareStatement("DELETE FROM `sc_players` WHERE uuid = '?';");
+            deleteCP = prepareStatement("DELETE FROM `sc_players` WHERE uuid = ?;");
         }
         core.executeUpdate( deleteCP, oneStringArg, cp.getUniqueId().toString() );;
         deleteKills(cp.getUniqueId());
@@ -756,7 +753,7 @@ public final class StorageManager {
         if ( insertKill == null || !checkStatement(insertKill)) {
             insertKill = prepareStatement(
                     "INSERT INTO `sc_kills` (  `attacker_uuid`, `attacker`, `attacker_tag`, `victim_uuid`,"
-                    + " `victim`, `victim_tag`, `kill_type`) VALUES ( '?','?','?','?','?','?','?');" );
+                    + " `victim`, `victim_tag`, `kill_type`) VALUES ( ?,?,?,?,?,?,? );" );
         }
         core.executeUpdate( insertKill, insertKillTypes, attacker.getUniqueId().toString(), attacker.getName(), 
                             attackerTag, victim.getUniqueId().toString(), victim.getName(), victimTag, type ); 
@@ -769,7 +766,7 @@ public final class StorageManager {
      */
     public void deleteKills(UUID playerUniqueId) {
         if ( deleteKills == null || !checkStatement(deleteKills) ) {
-            deleteKills = prepareStatement("DELETE FROM `sc_kills` WHERE `attacker_uuid` = '?';");
+            deleteKills = prepareStatement("DELETE FROM `sc_kills` WHERE `attacker_uuid` = ?;");
         }
         core.executeUpdate( deleteKills, oneStringArg, playerUniqueId.toString() );
     }
@@ -784,7 +781,7 @@ public final class StorageManager {
         HashMap<String, Integer> out = new HashMap<>();
 
         if ( getKills == null || !checkStatement(getKills) ) {
-            getKills = prepareStatement( "SELECT victim, count(victim) AS kills FROM `sc_kills` WHERE attacker_uuid = '?' GROUP BY victim ORDER BY count(victim) DESC;" );
+            getKills = prepareStatement( "SELECT victim, count(victim) AS kills FROM `sc_kills` WHERE attacker_uuid = ? GROUP BY victim ORDER BY count(victim) DESC;" );
         }
 
         try ( ResultSet res = core.getResultSet( getKills, oneStringArg, player.toString() ) ) {

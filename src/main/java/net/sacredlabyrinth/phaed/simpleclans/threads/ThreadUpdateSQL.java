@@ -16,7 +16,7 @@ public class ThreadUpdateSQL extends Thread {
     Class<?>[] types;
     Object[] params;
 
-    public ThreadUpdateSQL(PreparedStatement _statement, Class<?>[] _types, Object[]_params ) {
+    public ThreadUpdateSQL(PreparedStatement _statement, Class<?>[] _types, Object..._params ) {
         statement = _statement;
         types = _types;
         params = _params;
@@ -25,7 +25,7 @@ public class ThreadUpdateSQL extends Thread {
     @Override
     public void run() {
         try {
-            if ( params.length > 0 ) {
+            if ( types != null ) {
                 
                 for ( int i = 0; i < params.length; i++ ) {
                     

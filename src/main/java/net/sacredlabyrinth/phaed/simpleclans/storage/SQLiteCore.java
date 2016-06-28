@@ -149,19 +149,21 @@ public class SQLiteCore implements DBCore {
     @Override
     public ResultSet getResultSet( PreparedStatement query, Class<?>[] types, Object...params ) {
         try {
-            for ( int i = 0; i < params.length; i++ ) {
-                
-                if ( types[i].equals( String.class ) ) {
-                    query.setString( i + 1, (String) params[i] );
-                }
-                else if ( types[i].equals( int.class ) ) {
-                    query.setInt( i + 1, (int) params[i] );
-                }
-                else if ( types[i].equals( long.class ) ) {
-                    query.setLong( i + 1, (long) params[i] );
-                }
-                else if ( types[i].equals( double.class ) ) {
-                    query.setDouble( i + 1, (double) params[i] );
+            if (types != null) {
+                for ( int i = 0; i < params.length; i++ ) {
+                    
+                    if ( types[i].equals( String.class ) ) {
+                        query.setString( i + 1, (String) params[i] );
+                    }
+                    else if ( types[i].equals( int.class ) ) {
+                        query.setInt( i + 1, (int) params[i] );
+                    }
+                    else if ( types[i].equals( long.class ) ) {
+                        query.setLong( i + 1, (long) params[i] );
+                    }
+                    else if ( types[i].equals( double.class ) ) {
+                        query.setDouble( i + 1, (double) params[i] );
+                    }
                 }
             }
             if (query.execute())
@@ -177,19 +179,21 @@ public class SQLiteCore implements DBCore {
     @Override
     public void executeUpdate( PreparedStatement query, Class<?>[] types, Object...params ) {
         try {
-            for ( int i = 0; i < params.length; i++ ) {
-                
-                if ( types[i].equals( String.class ) ) {
-                    query.setString( i + 1, (String) params[i] );
-                }
-                else if ( types[i].equals( int.class ) ) {
-                    query.setInt( i + 1, (int) params[i] );
-                }
-                else if ( types[i].equals( long.class ) ) {
-                    query.setLong( i + 1, (long) params[i] );
-                }
-                else if ( types[i].equals( double.class ) ) {
-                    query.setDouble( i + 1, (double) params[i] );
+            if (types != null) {
+                for ( int i = 0; i < params.length; i++ ) {
+                    
+                    if ( types[i].equals( String.class ) ) {
+                        query.setString( i + 1, (String) params[i] );
+                    }
+                    else if ( types[i].equals( int.class ) ) {
+                        query.setInt( i + 1, (int) params[i] );
+                    }
+                    else if ( types[i].equals( long.class ) ) {
+                        query.setLong( i + 1, (long) params[i] );
+                    }
+                    else if ( types[i].equals( double.class ) ) {
+                        query.setDouble( i + 1, (double) params[i] );
+                    }
                 }
             }
             query.executeUpdate();

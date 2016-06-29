@@ -3,6 +3,7 @@ package net.sacredlabyrinth.phaed.simpleclans.listeners;
 import java.text.MessageFormat;
 
 import org.bukkit.ChatColor;
+import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -108,15 +109,15 @@ public class SCEntityListener implements Listener {
         if (plugin.getSettingsManager().isTamableMobsSharing() && entity instanceof Tameable) {
         	
             Player player = event.getPlayer();
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
             Tameable tamed = (Tameable) entity;
 
             if (tamed.isTamed()) {
                 if(entity instanceof Wolf && !((Wolf) entity).isSitting()) {
                 	return;
                 }
-                Player owner = (Player) tamed.getOwner();
-                if ( cp != null && owner != null && cp.getClan().isMember(owner) ) {
+                ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
+                AnimalTamer owner = tamed.getOwner();
+                if ( cp != null && owner instanceof Player && cp.getClan().isMember((Player) owner) ) {
                     tamed.setOwner(player);
                 }
             }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,6 +22,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import net.sacredlabyrinth.phaed.simpleclans.managers.ClanManager;
 import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDFetcher;
 
 /**
@@ -101,7 +103,21 @@ public class Helper {
         results.remove("");
         return results;
     }
-
+    /**
+     * Converts string array to HashSet<String>, remove empty strings
+     *
+     * @param values
+     * @return
+     */
+    public static Set<Clan> fromArray3(String... values) {
+        Set<Clan> results = new HashSet<>();
+        ClanManager clanMan = plugin.getClanManager();
+        Arrays.asList( values ).parallelStream()
+                               .map( v -> clanMan.getClan( v ) )
+                               .forEach( c -> results.add( c ) );
+        return results;
+    }
+    
     /**
      * Converts ArrayList<String> to string array
      */
@@ -151,14 +167,14 @@ public class Helper {
     }
     
     /**
-     * Converts a string array to a string with custom separators
+     * Converts a Set<Clan> to a string of tags with custom separators
      *
      * @param args
      * @param sep
      * @return
      */
-    public static String toMessage(Set<String> args, String sep) {
-        return String.join( sep, args );
+    public static String toMessage(Set<Clan> args, String sep) {
+        return String.join( sep, args.parallelStream().map( c -> c.getTag() ).collect( Collectors.toList() ) );
     }
     
     /**

@@ -1,6 +1,7 @@
 package net.sacredlabyrinth.phaed.simpleclans.listeners;
 
 import java.text.MessageFormat;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.AnimalTamer;
@@ -21,6 +22,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 /**
  * @author phaed
@@ -33,11 +35,12 @@ public class SCEntityListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onEntityDeath(EntityDeathEvent event) {
+        SettingsManager settings = plugin.getSettingsManager();
         
         if (event.getEntity() instanceof Player) {
             Player victim = (Player) event.getEntity();
 
-            if (plugin.getSettingsManager().isBlacklistedWorld(victim.getLocation().getWorld().getName())) {
+            if (settings.isBlacklistedWorld(victim.getLocation().getWorld().getName())) {
                 return;
             }
 
@@ -65,31 +68,35 @@ public class SCEntityListener implements Listener {
                 ClanPlayer vcp = plugin.getClanManager().getCreateClanPlayer(victim.getUniqueId());
                 
                 double reward = 0;
-                double multipier = plugin.getSettingsManager().getKDRMultipliesPerKill();
+                double multipier = settings.getKDRMultipliesPerKill();
                 float kdr = acp.getKDR();
 
-                if (vcp.getClan() == null || acp.getClan() == null || !vcp.getClan().isVerified() || !acp.getClan().isVerified()) {
+                Clan vClan = vcp.getClan();
+                Clan aClan = acp.getClan();
+                
+                if (vClan == null || aClan == null || !vClan.isVerified() || !aClan.isVerified()) {
                     acp.addCivilianKill();
                     plugin.getStorageManager().insertKill(attacker, acp.getTag(), victim, "", "c");
-                } else if (acp.getClan().isRival(vcp.getTag())) {
-                    if (acp.getClan().isWarring(vcp.getClan())) {
+                } else if (aClan.isRival(vClan)) {
+                    if (aClan.isWarring(vClan)) {
                         reward = kdr * multipier * 4;
                     } else {
                         reward = kdr * multipier * 2;
                     }
                     acp.addRivalKill();
                     plugin.getStorageManager().insertKill(attacker, acp.getTag(), victim, vcp.getTag(), "r");
-                } else if (acp.getClan().isAlly(vcp.getTag())) {
-                    reward = kdr * multipier * -1;
+                } else if (aClan.isAlly(vClan)) {
+                    reward = kdr * multipier * - 1;
                 } else {
                     reward = kdr * multipier;
                     acp.addNeutralKill();
                     plugin.getStorageManager().insertKill(attacker, acp.getTag(), victim, vcp.getTag(), "n");
                 }
 
-                if (reward != 0 && plugin.getSettingsManager().isMoneyPerKill()) {
-                    for (ClanPlayer cp : acp.getClan().getOnlineMembers()) {
-                        double money = Math.round((reward / acp.getClan().getOnlineMembers().size()) * 100D) / 100D;
+                if (aClan != null && reward != 0 && settings.isMoneyPerKill()) {
+                    List<ClanPlayer> list = aClan.getOnlineMembers();
+                    for (ClanPlayer cp : list) {
+                        double money = Math.round((reward / list.size()) * 100D) / 100D;
                         cp.toPlayer().sendMessage(ChatColor.AQUA + MessageFormat.format(plugin.getLang("player.got.money"), money, victim.getName(), kdr));
                         plugin.getPermissionsManager().playerGrantMoney(cp.toPlayer(), money);
                     }
@@ -141,8 +148,10 @@ public class SCEntityListener implements Listener {
         }
     }
 
+    @SuppressWarnings( "null" )
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
+        SettingsManager settings = plugin.getSettingsManager();
         
         Player attacker = null;
         Player victim = null;
@@ -155,7 +164,7 @@ public class SCEntityListener implements Listener {
                 victim = (Player) sub.getEntity();
             }
 
-            if (plugin.getSettingsManager().isTamableMobsSharing()) {
+            if (settings.isTamableMobsSharing()) {
                 
                 if (sub.getEntity() instanceof Wolf && sub.getDamager() instanceof Player) {
                     
@@ -180,7 +189,7 @@ public class SCEntityListener implements Listener {
             }
         }
 
-        if (victim != null && plugin.getSettingsManager().isBlacklistedWorld(victim.getLocation().getWorld().getName())) {
+        if (victim != null && settings.isBlacklistedWorld(victim.getLocation().getWorld().getName())) {
         	return;
         }
 
@@ -193,7 +202,7 @@ public class SCEntityListener implements Listener {
             Clan aclan = acp == null ? null : acp.getClan();
 
 
-            if (plugin.getSettingsManager().isPvpOnlywhileInWar()) {
+            if (settings.isPvpOnlywhileInWar()) {
                
                 // if one doesn't have clan then they cant be at war
                 if (aclan == null || vclan == null) {
@@ -226,11 +235,11 @@ public class SCEntityListener implements Listener {
                         return;
                     }
                     // ally clan, deny damage
-                    if (vclan.isAlly(aclan.getTag())) event.setCancelled(true);
+                    if (vclan.isAlly(aclan)) event.setCancelled(true);
                     
             } else {
                 // not part of a clan - check if safeCivilians is set
-                if (plugin.getSettingsManager().getSafeCivilians()) {
+                if (settings.getSafeCivilians()) {
                     event.setCancelled(true);
                 }
             }

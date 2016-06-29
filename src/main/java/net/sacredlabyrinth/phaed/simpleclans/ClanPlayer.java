@@ -93,7 +93,7 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer> {
     }
     @Override
     public int compareTo(ClanPlayer other) {        
-        return uniqueId.compareTo(other.uniqueId);
+        return displayName.toLowerCase().compareTo(other.displayName.toLowerCase());
     }
     @Override
     public String toString() { return displayName; }
@@ -128,9 +128,9 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer> {
      * @return
      */
     public boolean isAlly(Player player) {
-        ClanPlayer allycp = plugin.getClanManager().getClanPlayer(player);
+        ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
 
-        return allycp != null && allycp.clan.isAlly(tag);
+        return cp != null && cp.clan.isAlly(clan);
     }
 
     /**
@@ -140,9 +140,9 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer> {
      * @return
      */
     public boolean isRival(Player player) {
-        ClanPlayer allycp = plugin.getClanManager().getClanPlayer(player);
+        ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
 
-        return allycp != null && allycp.clan.isRival(tag);
+        return cp != null && cp.clan.isRival(clan);
     }
 
     /**
@@ -163,7 +163,7 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer> {
      * @return
      */
     public String getLastSeenDaysString() {
-        double days = getLastSeenDays();
+        double days = Dates.differenceInDays(lastSeen, System.currentTimeMillis());
 
         if (days < 1) 
             return plugin.getLang("today");
@@ -171,10 +171,6 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer> {
             return MessageFormat.format(plugin.getLang("1.color.day"), ChatColor.GRAY);
         else 
             return MessageFormat.format(plugin.getLang("many.color.days"), Math.round(days), ChatColor.GRAY);
-    }
-
-    public double getLastSeenDays() {
-        return Dates.differenceInDays(lastSeen, System.currentTimeMillis());
     }
 
     public int getRivalKills() { return rivalKills; }

@@ -258,16 +258,17 @@ public final class ClanManager {
      * @param player
      */
     public void updateDisplayName(Player player) {
+        SettingsManager settings = plugin.getSettingsManager();
         // do not update displayname if in compat mode
 
-        if (player == null || plugin.getSettingsManager().isCompatMode()) {
+        if (player == null || settings.isCompatMode()) {
             return;
         }
         
-        if (plugin.getSettingsManager().isChatTags()) {
+        if (settings.isChatTags()) {
             String prefix = plugin.getPermissionsManager().getPrefix(player);
 //            String suffix = plugin.getPermissionsManager().getSuffix(player);
-            String lastColor = plugin.getSettingsManager().isUseColorCodeFromPrefix() ? Helper.getLastColorCode(prefix) : ChatColor.WHITE + "";
+            String lastColor = settings.isUseColorCodeFromPrefix() ? Helper.getLastColorCode(prefix) : ChatColor.WHITE + "";
             String fullName = player.getName();
 
             ClanPlayer cp = plugin.getClanManager().getAnyClanPlayer(player.getUniqueId());
@@ -607,34 +608,12 @@ public final class ClanManager {
     }
 
     /**
-     * Returns a formatted string detailing the players health
+     * Returns a formatted string representing the number supplied
      *
      * @param health
      * @return
      */
-    public String getHealthString(double health) {
-        String out = "";
-
-        if (health >= 16) 
-            out += ChatColor.GREEN;
-        else if (health >= 8) 
-            out += ChatColor.GOLD;
-        else 
-            out += ChatColor.RED;
-
-        for (int i = 0; i < health; i++) {
-            out += '|';
-        }
-        return out;
-    }
-
-    /**
-     * Returns a formatted string detailing the players hunger
-     *
-     * @param health
-     * @return
-     */
-    public String getHungerString(int health) {
+    public String getBarString(int health) {
         String out = "";
 
         if (health >= 16) 
@@ -658,10 +637,7 @@ public final class ClanManager {
      */
     public void sortClansByKDR(List<Clan> _clans) {
         Collections.sort(_clans, (c1, c2) -> {
-                Float o1 = c1.getTotalKDR();
-                Float o2 = c2.getTotalKDR();
-
-                return o2.compareTo(o1);
+                return (int)(c2.getTotalKDR() - c1.getTotalKDR());
         });
     }
 
@@ -673,10 +649,7 @@ public final class ClanManager {
      */
     public void sortClansBySize(List<Clan> _clans) {
         Collections.sort(_clans, (c1, c2) -> {
-                Integer o1 = c1.getAllMembers().size();
-                Integer o2 = c2.getAllMembers().size();
-
-                return o2.compareTo(o1);
+                return c2.getSize() - c1.getSize();
         });
     }
 
@@ -688,10 +661,7 @@ public final class ClanManager {
      */
     public void sortClanPlayersByKDR(List<ClanPlayer> cps) {
         Collections.sort(cps, (c1, c2) -> {
-                Float o1 = c1.getKDR();
-                Float o2 = c2.getKDR();
-
-                return o2.compareTo(o1);
+                return (int)(c2.getKDR() - c1.getKDR()); 
         });
     }
 
@@ -703,10 +673,7 @@ public final class ClanManager {
      */
     public void sortClanPlayersByLastSeen(List<ClanPlayer> cps) {
         Collections.sort(cps, (c1, c2) -> {
-                Double o1 = c1.getLastSeenDays();
-                Double o2 = c2.getLastSeenDays();
-
-                return o1.compareTo(o2);
+                return (int)(c1.getLastSeen() - c2.getLastSeen());
         });
     }
 

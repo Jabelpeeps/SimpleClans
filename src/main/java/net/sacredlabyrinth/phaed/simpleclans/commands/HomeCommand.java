@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,6 +18,9 @@ import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.events.PlayerHomeSetEvent;
 import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
+import net.sacredlabyrinth.phaed.simpleclans.managers.ClanManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.PermissionsManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 /**
  * @author phaed
@@ -24,32 +28,28 @@ import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanC
 public class HomeCommand  implements ClanCommand {
 
     @Override
-    public void execute(CommandSender sender, String[] arg)
-    {
+    public void execute(CommandSender sender, String[] arg) {
         SimpleClans plugin = SimpleClans.getInstance();
+        PermissionsManager perms = plugin.getPermissionsManager();
+        ClanManager clanMan = plugin.getClanManager();
         Player player = (Player) sender;
-        if (arg.length == 2 && arg[0].equalsIgnoreCase("set") && plugin.getPermissionsManager().has(player, "simpleclans.mod.home"))
-        {
-            if (!plugin.getClanManager().purchaseHomeTeleportSet(player))
-            {
+        
+        if (arg.length == 2 && arg[0].equalsIgnoreCase("set") && perms.has(player, "simpleclans.mod.home")) {
+            if (!clanMan.purchaseHomeTeleportSet(player)) {
                 return;
             }
             Location loc = player.getLocation();
-            Clan clan = plugin.getClanManager().getClan(arg[1]);
-            if (clan != null)
-            {
+            Clan clan = clanMan.getClan(arg[1]);
+            if (clan != null) {
                 clan.setHomeLocation(loc);
                 ChatBlock.sendMessage(player, ChatColor.AQUA + MessageFormat.format(plugin.getLang("hombase.mod.set"), clan.getName()) + " " + ChatColor.YELLOW + Helper.toLocationString(loc));
             }
         }
-        if (arg.length == 2 && arg[0].equalsIgnoreCase("tp") && plugin.getPermissionsManager().has(player, "simpleclans.mod.hometp"))
-        {
-            Clan clan = plugin.getClanManager().getClan(arg[1]);
-            if (clan != null)
-            {
+        if (arg.length == 2 && arg[0].equalsIgnoreCase("tp") && perms.has(player, "simpleclans.mod.hometp")) {
+            Clan clan = clanMan.getClan(arg[1]);
+            if (clan != null) {
                 Location loc = clan.getHomeLocation();
-                if (loc == null)
-                {
+                if (loc == null) {
                     ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("hombase.not.set"));
                     return;
                 }
@@ -60,109 +60,94 @@ public class HomeCommand  implements ClanCommand {
             ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("the.clan.does.not.exist"));
             return;
         }
-        ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
-        if (cp == null)
-        {
+        ClanPlayer cp = clanMan.getClanPlayer(player);
+        if (cp == null) {
             ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("not.a.member.of.any.clan"));
             return;
         }
         Clan clan = cp.getClan();
-        if (!clan.isVerified())
-        {
+        if (!clan.isVerified()) {
             ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("clan.is.not.verified"));
             return;
         }
-        if (!cp.isTrusted())
-        {
+        if (!cp.isTrusted()) {
             ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("only.trusted.players.can.access.clan.vitals"));
             return;
         }
-        if (arg.length == 0)
-        {
-            if (!plugin.getPermissionsManager().has(player, "simpleclans.member.home"))
-            {
+        if (arg.length == 0) {
+            if (!perms.has(player, "simpleclans.member.home")) {
                 ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
                 return;
             }
                 Location loc = clan.getHomeLocation();
-                if (loc == null)
-                {
+                if (loc == null) {
                     ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("hombase.not.set"));
                     return;
                 }
-            if (plugin.getClanManager().purchaseHomeTeleport(player))
-            {
+            if (clanMan.purchaseHomeTeleport(player)) {
                 plugin.getTeleportManager().addPlayer(player, clan.getHomeLocation(), clan.getName());
             }
         }
-        else
-        {
+        else {
+            SettingsManager settings = plugin.getSettingsManager();
             String ttag = arg[0];
-            if (ttag.equalsIgnoreCase("set"))
-            {
-                if (!cp.isLeader())
-                {
+            if (ttag.equalsIgnoreCase("set")) {
+                if (!cp.isLeader()) {
                     ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.leader.permissions"));
                     return;
                 }
-                if (!plugin.getPermissionsManager().has(player, "simpleclans.leader.home-set"))
-                {
+                if (!perms.has(player, "simpleclans.leader.home-set")) {
                     ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
                     return;
                 }
-                if (plugin.getSettingsManager().isHomebaseSetOnce() && clan.getHomeLocation() != null && !plugin.getPermissionsManager().has(player, "simpleclans.mod.home"))
-                {
+                if (    settings.isHomebaseSetOnce() 
+                        && clan.getHomeLocation() != null 
+                        && !perms.has(player, "simpleclans.mod.home")) {
                     ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("home.base.only.once"));
                     return;
                 }
                 PlayerHomeSetEvent homeSetEvent = new PlayerHomeSetEvent(clan, cp, player.getLocation());
-                SimpleClans.getInstance().getServer().getPluginManager().callEvent(homeSetEvent);
-                if (homeSetEvent.isCancelled() || !plugin.getClanManager().purchaseHomeTeleportSet(player))
-                {
+                Bukkit.getPluginManager().callEvent(homeSetEvent);
+                
+                if (homeSetEvent.isCancelled() || !clanMan.purchaseHomeTeleportSet(player)) {
                     return;
                 }
                 clan.setHomeLocation(player.getLocation());
                 ChatBlock.sendMessage(player, ChatColor.AQUA + MessageFormat.format(plugin.getLang("hombase.set"), ChatColor.YELLOW + Helper.toLocationString(player.getLocation())));
             }
-            else if (ttag.equalsIgnoreCase("clear"))
-            {
-                if (!cp.isLeader())
-                {
+            else if (ttag.equalsIgnoreCase("clear")) {
+                if (!cp.isLeader()) {
                     ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.leader.permissions"));
                     return;
                 }
-                if (!plugin.getPermissionsManager().has(player, "simpleclans.leader.home-set"))
-                {
+                if (!perms.has(player, "simpleclans.leader.home-set")) {
                     ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
                     return;
                 }
-                if (plugin.getSettingsManager().isHomebaseSetOnce() && clan.getHomeLocation() != null && !plugin.getPermissionsManager().has(player, "simpleclans.mod.home"))
-                {
+                if (    settings.isHomebaseSetOnce() 
+                        && clan.getHomeLocation() != null 
+                        && !perms.has(player, "simpleclans.mod.home")) {
                     ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("home.base.only.once"));
                     return;
                 }
                 clan.setHomeLocation(null);
                 ChatBlock.sendMessage(player, ChatColor.AQUA + plugin.getLang("hombase.cleared"));
             }
-            else if (ttag.equalsIgnoreCase("regroup"))
-            {
-                if (SimpleClans.getInstance().getSettingsManager().getAllowReGroupCommand())
-                {
+            else if (ttag.equalsIgnoreCase("regroup")) {
+                if (settings.getAllowReGroupCommand()) {
                     Location loc = player.getLocation();
-                    if (!cp.isLeader())
-                    {
+                    if (!cp.isLeader()) {
                         ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.leader.permissions"));
+                        return;
                     }
-                    if (!plugin.getPermissionsManager().has(player, "simpleclans.leader.regroup"))
-                    {
+                    if (!perms.has(player, "simpleclans.leader.regroup")) {
                         ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
+                        return;
                     }
                     List<ClanPlayer> members = clan.getAllMembers();
-                    for (ClanPlayer ccp : members)
-                    {
+                    for (ClanPlayer ccp : members) {
                         Player pl = ccp.toPlayer();
-                        if (pl == null || pl.equals(player))
-                        {
+                        if (pl == null || pl.equals(player)) {
                             continue;
                         }
                         int x = loc.getBlockX();
@@ -174,8 +159,7 @@ public class HomeCommand  implements ClanCommand {
                         Random r = new Random();
                         int xx = r.nextInt(2) - 1;
                         int zz = r.nextInt(2) - 1;
-                        if (xx == 0 && zz == 0)
-                        {
+                        if (xx == 0 && zz == 0) {
                             xx = 1;
                         }
                         x = x + xx;
@@ -184,15 +168,9 @@ public class HomeCommand  implements ClanCommand {
                     }
                     ChatBlock.sendMessage(player, ChatColor.AQUA + plugin.getLang("hombase.set") + ChatColor.YELLOW + Helper.toLocationString(loc));
                 }
-                else
-                {
-                    ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
-                }
+                else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
             }
-            else
-            {
-                ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
-            }
+            else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
         }
     }
 }

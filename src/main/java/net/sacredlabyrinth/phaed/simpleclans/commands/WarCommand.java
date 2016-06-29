@@ -37,7 +37,7 @@ public class WarCommand implements ClanCommand {
                             Clan war = plugin.getClanManager().getClan(arg[1]);
 
                             if (war != null) {
-                                if (clan.isRival(war.getTag())) {
+                                if (clan.isRival(war)) {
                                     if (action.equals(plugin.getLang("start"))) {
                                         if (!clan.isWarring(war)) {
                                             Set<ClanPlayer> onlineLeaders = Helper.stripOffLinePlayers(clan.getLeaders());

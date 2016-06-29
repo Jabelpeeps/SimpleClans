@@ -13,6 +13,7 @@ import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
+import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 /**
  * @author phaed
@@ -22,6 +23,7 @@ public class AllyCommand implements ClanCommand {
     @Override
     public void execute(CommandSender sender, String[] arg) {
         SimpleClans plugin = SimpleClans.getInstance();
+        SettingsManager settings = plugin.getSettingsManager();
         Player player = (Player) sender;
 
         if (!plugin.getPermissionsManager().has(player, "simpleclans.leader.ally")) {
@@ -49,12 +51,12 @@ public class AllyCommand implements ClanCommand {
         }
 
         if (arg.length != 2) {
-            ChatBlock.sendMessage(player, ChatColor.RED + MessageFormat.format(plugin.getLang("usage.ally"), plugin.getSettingsManager().getCommandClan()));
+            ChatBlock.sendMessage(player, ChatColor.RED + MessageFormat.format(plugin.getLang("usage.ally"), settings.getCommandClan()));
             return;
         }
 
-        if (clan.getSize() < plugin.getSettingsManager().getClanMinSizeToAlly()) {
-            ChatBlock.sendMessage(player, ChatColor.RED + MessageFormat.format(plugin.getLang("minimum.to.make.alliance"), plugin.getSettingsManager().getClanMinSizeToAlly()));
+        if (clan.getSize() < settings.getClanMinSizeToAlly()) {
+            ChatBlock.sendMessage(player, ChatColor.RED + MessageFormat.format(plugin.getLang("minimum.to.make.alliance"), settings.getClanMinSizeToAlly()));
             return;
         }
 
@@ -72,7 +74,8 @@ public class AllyCommand implements ClanCommand {
         }
 
         if (action.equals(plugin.getLang("add"))) {
-            if (!clan.isAlly(ally.getTag())) {
+            
+            if (!clan.isAlly(ally)) {
                 Set<ClanPlayer> onlineLeaders = Helper.stripOffLinePlayers(clan.getLeaders());
 
                 if (!onlineLeaders.isEmpty()) {
@@ -84,13 +87,14 @@ public class AllyCommand implements ClanCommand {
             else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("your.clans.are.already.allies"));
         }
         else if (action.equals(plugin.getLang("remove"))) {
-            if (clan.isAlly(ally.getTag())) {
+            
+            if (clan.isAlly(ally)) {
                 clan.removeAlly(ally);
                 ally.addBb(cp.getName(), ChatColor.AQUA + MessageFormat.format(plugin.getLang("has.broken.the.alliance"), Helper.capitalize(clan.getName()), ally.getName()));
                 clan.addBb(cp.getName(), ChatColor.AQUA + MessageFormat.format(plugin.getLang("has.broken.the.alliance"), Helper.capitalize(cp.getName()), Helper.capitalize(ally.getName())));
             }
             else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("your.clans.are.not.allies"));
         }
-        else ChatBlock.sendMessage(player, ChatColor.RED + MessageFormat.format(plugin.getLang("usage.ally"), plugin.getSettingsManager().getCommandClan()));
+        else ChatBlock.sendMessage(player, ChatColor.RED + MessageFormat.format(plugin.getLang("usage.ally"), settings.getCommandClan()));
     }
 }

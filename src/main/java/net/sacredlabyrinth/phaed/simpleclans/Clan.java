@@ -18,7 +18,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.eclipse.jdt.annotation.NonNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -206,7 +205,7 @@ public class Clan implements Serializable, Comparable<Clan> {
         plugin.getStorageManager().updateClan(this);
     }
 
-    public void importMember( @NonNull ClanPlayer cp ) {
+    public void importMember( ClanPlayer cp ) {
         members.add(cp.getUniqueId());
     }
 

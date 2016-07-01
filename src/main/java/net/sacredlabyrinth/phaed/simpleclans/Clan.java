@@ -205,10 +205,7 @@ public class Clan implements Serializable, Comparable<Clan> {
         plugin.getStorageManager().updateClan(this);
     }
 
-    public void importMember( ClanPlayer cp ) {
-        members.add(cp.getUniqueId());
-    }
-
+    public void importMember( ClanPlayer cp ) { members.add(cp.getUniqueId()); }
     public void removeMember(UUID playerUniqueId) { members.remove(playerUniqueId); }
     public int getSize() { return members.size(); }
     public boolean isRival(Clan c) { return rivals.contains( c ); }

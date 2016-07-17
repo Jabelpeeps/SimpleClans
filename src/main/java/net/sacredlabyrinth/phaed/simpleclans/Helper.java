@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.json.simple.parser.ParseException;
 
 import net.sacredlabyrinth.phaed.simpleclans.managers.ClanManager;
 import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDFetcher;
@@ -61,8 +63,7 @@ public class Helper {
         if (content.length() < 2) {
             return content;
         }
-        String first = content.substring(0, 1).toUpperCase();
-        return first + content.substring(1);
+        return content.substring(0, 1).toUpperCase() + content.substring(1);
     }
 
     /**
@@ -98,7 +99,7 @@ public class Helper {
      * @return
      */
     public static Set<String> fromArray2(String... values) {
-        HashSet<String> results = new HashSet<>();
+        Set<String> results = new HashSet<>();
         Collections.addAll(results, values);
         results.remove("");
         return results;
@@ -110,12 +111,11 @@ public class Helper {
      * @return
      */
     public static Set<Clan> fromArray3(String... values) {
-        Set<Clan> results = new HashSet<>();
+        
         ClanManager clanMan = plugin.getClanManager();
-        Arrays.asList( values ).parallelStream()
-                               .map( v -> clanMan.getClan( v ) )
-                               .forEach( c -> results.add( c ) );
-        return results;
+        return Arrays.asList( values ).parallelStream()
+                                      .map( v -> clanMan.getClan( v ) )
+                                      .collect( Collectors.toSet() ); 
     }
     
     /**
@@ -176,7 +176,7 @@ public class Helper {
     public static String toMessage(Set<Clan> args, String sep) {
         if ( args.isEmpty() ) return "";
         
-        return String.join( sep, args.parallelStream().map( c -> c.getTag() ).collect( Collectors.toList() ) );
+        return args.parallelStream().map( c -> c.getTag() ).collect( Collectors.joining( sep ) );
     }
     
     /**
@@ -343,17 +343,17 @@ public class Helper {
      * Sort hashmap by value
 
      */
-    public static Map sortByValue(Map map) {
+    public static <K,V extends Comparable<V>> Map<K,V> sortByValue(Map<K,V> map) {
         
-        List list = new LinkedList(map.entrySet());
+        List<Entry<K,V>> list = new LinkedList<>(map.entrySet());
         
         Collections.sort(list, (o1, o2) -> {
-            return ((Comparable) ((Map.Entry) (o2)).getValue()).compareTo(((Map.Entry) (o1)).getValue());     
+            return o2.getValue().compareTo( o1.getValue() );     
         });
 
-        Map result = new LinkedHashMap();
-        for (Iterator it = list.iterator(); it.hasNext(); )  {
-            Map.Entry entry = (Map.Entry) it.next();
+        Map<K,V> result = new LinkedHashMap<>();
+        for (Iterator<Entry<K,V>> it = list.iterator(); it.hasNext(); )  {
+            Entry<K,V> entry = it.next();
             result.put(entry.getKey(), entry.getValue());
         }
         return result;
@@ -385,8 +385,9 @@ public class Helper {
         try {
             return UUIDFetcher.getUUIDOf(playerName);
             
-        } catch (Exception ex) {
-
+        } catch ( IOException | ParseException e ) {
+                
+            @SuppressWarnings( "deprecation" )
             OfflinePlayer OfflinePlayer = Bukkit.getOfflinePlayer(playerName);
             if (OfflinePlayer != null) {
                 return OfflinePlayer.getUniqueId();

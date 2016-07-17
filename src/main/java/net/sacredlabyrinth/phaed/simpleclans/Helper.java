@@ -174,6 +174,8 @@ public class Helper {
      * @return
      */
     public static String toMessage(Set<Clan> args, String sep) {
+        if ( args.isEmpty() ) return "";
+        
         return String.join( sep, args.parallelStream().map( c -> c.getTag() ).collect( Collectors.toList() ) );
     }
     

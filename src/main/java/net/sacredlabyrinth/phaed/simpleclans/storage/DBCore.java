@@ -42,7 +42,7 @@ public interface DBCore {
      * @param colum
      * @return
      */
-    Boolean existsColumn(String tabell, String colum);
+    Boolean existsColumn(String table, String colum);
 
     ResultSet getResultSet( PreparedStatement query, Class<?>[] types, Object...params  );
 

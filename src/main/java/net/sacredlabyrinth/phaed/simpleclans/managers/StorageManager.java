@@ -32,7 +32,7 @@ public final class StorageManager {
     private SimpleClans plugin;
     private DBCore core;
     private Connection connection;
-    private HashMap<String, ChatBlock> chatBlocks = new HashMap<>();
+    private HashMap<UUID, ChatBlock> chatBlocks = new HashMap<>();
     
     PreparedStatement mostKilled;
     PreparedStatement getPlayers;
@@ -65,7 +65,7 @@ public final class StorageManager {
      * @return
      */
     public ChatBlock getChatBlock(Player player) {       
-        return chatBlocks.get(player.getUniqueId().toString());        
+        return chatBlocks.get(player.getUniqueId());        
     }
 
     /**
@@ -76,11 +76,11 @@ public final class StorageManager {
      */
     public void addChatBlock(CommandSender player, ChatBlock cb) {
         
-        UUID uuid = Helper.getCachedPlayerUUID(player.getName());
+        UUID uuid = ((Player)player).getUniqueId();
 
         if (uuid == null) return;
         
-        chatBlocks.put(uuid.toString(), cb);
+        chatBlocks.put(uuid, cb);
     }
 
     public void initiateDB() {
@@ -258,13 +258,13 @@ public final class StorageManager {
      * Import all data from database to memory
      */
     public void importFromDatabase() {
-        ClanManager clanManager = plugin.getClanManager();
-        clanManager.cleanData();
+        ClanManager clanMan = plugin.getClanManager();
+        clanMan.cleanData();
 
         List<Clan> clans = retrieveClans();
         purgeClans(clans);
 
-        for (Clan clan : clans) clanManager.importClan(clan);
+        for (Clan clan : clans) clanMan.importClan(clan);
 
         for (Clan clan : clans) clan.validateWarring();
 
@@ -281,7 +281,7 @@ public final class StorageManager {
             if (tm != null) {
                 tm.importMember(cp);
             }
-            clanManager.importClanPlayer(cp);
+            clanMan.importClanPlayer(cp);
         }
 
         if (!cps.isEmpty()) {
@@ -308,7 +308,7 @@ public final class StorageManager {
             }
             plugin.getClanManager().importClanPlayer(cp);
 
-            SimpleClans.log("[SimpleClans] ClanPlayer Reloaded: " + player.getName() + ", UUID: " + player.getUniqueId().toString());
+            SimpleClans.log("[SimpleClans] ClanPlayer Reloaded: " + player.getName() + ", UUID: " + player.getUniqueId());
         }
     }
 

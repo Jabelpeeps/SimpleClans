@@ -71,6 +71,8 @@ public class ChatBlock {
             
             List<String> measuredCols = new ArrayList<>();
             String[] row = rows.pollFirst();
+            
+            if ( row == null ) continue;
 
             for (int sid = 0; sid < row.length; sid++) {
                 String col = "";

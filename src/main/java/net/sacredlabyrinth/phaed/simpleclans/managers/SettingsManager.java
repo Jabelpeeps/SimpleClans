@@ -17,6 +17,11 @@ import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
  * @author phaed
  */
 public final class SettingsManager {
+
+    private SimpleClans plugin;
+    private File main;
+    private FileConfiguration config;
+    
     private boolean onlineMode;
     private boolean disableMessages;
     private String clanChatRankColor;
@@ -25,7 +30,6 @@ public final class SettingsManager {
     private boolean dropOnHome;
     private boolean keepOnHome;
     private boolean debugging;
-    private SimpleClans plugin;
     private boolean mChatIntegration;
     private boolean pvpOnlywhileInWar;
     private boolean useColorCodeFromPrefix;
@@ -120,8 +124,6 @@ public final class SettingsManager {
     private String username;
     private String password;
     private boolean safeCivilians;
-    private File main;
-    private FileConfiguration config;
     private boolean compatMode;
     private boolean homebaseSetOnce;
     private int waitSecs;
@@ -202,8 +204,8 @@ public final class SettingsManager {
         purgePlayers = config.getInt("purge.inactive-player-data-days");
         requestFreqencySecs = config.getInt("request.ask-frequency-secs");
         requestMessageColor = config.getString("request.message-color");
-        setMaxAsksPerRequest(config.getInt("request.max-asks-per-request"));
-        pageSize = config.getInt("page.size");
+        maxAsksPerRequest = config.getInt("request.max-asks-per-request");
+        pageSize = config.getInt("page.size", 100);
         pageSep = config.getString("page.separator");
         pageSubTitleColor = config.getString("page.subtitle-color");
         pageHeadingsColor = config.getString("page.headings-color");
@@ -299,6 +301,8 @@ public final class SettingsManager {
     }
 
     public void save() {
+        
+        // TODO why does this have no apparent saving of the individual config values?
         try {
             config.save(main);
         }
@@ -355,7 +359,7 @@ public final class SettingsManager {
      * @return whether the clan is unrivable
      */
     public boolean isUnrivable(String tag) {
-        return unRivableClans.parallelStream().anyMatch( c -> c.equalsIgnoreCase( tag ) );
+        return unRivableClans.contains( tag );
     }
 
     /**
@@ -365,7 +369,7 @@ public final class SettingsManager {
      * @return whether player is banned
      */
     public boolean isBanned(UUID playerUniqueId) {
-        return bannedPlayers.parallelStream().anyMatch( pl -> pl.equals( playerUniqueId ) );
+        return bannedPlayers.contains( playerUniqueId );
     }
 
     /**
@@ -473,7 +477,6 @@ public final class SettingsManager {
     public String getAllyChatTagColor() { return Helper.toColor(allyChatTagColor); }
     public boolean isClanFFOnByDefault() { return clanFFOnByDefault; }
     public boolean isCompatMode() { return compatMode; }
-    public void setCompatMode(boolean _compatMode) { compatMode = _compatMode; }
     public boolean isHomebaseSetOnce() { return homebaseSetOnce; }
     public int getWaitSecs() { return waitSecs; }
     public void setWaitSecs(int _waitSecs) { waitSecs = _waitSecs; }
@@ -504,8 +507,6 @@ public final class SettingsManager {
     public String getTagSeparatorLeaderColor() { return Helper.toColor(tagSeparatorLeaderColor); }
     public String getTagBracketLeaderColor() { return Helper.toColor(tagBracketLeaderColor); }
     public int getMaxAsksPerRequest() { return maxAsksPerRequest; }
-    public void setMaxAsksPerRequest(int _maxAsksPerRequest) { maxAsksPerRequest = _maxAsksPerRequest; }
     public boolean isForceCommandPriority() { return forceCommandPriority; }
-    public void setForceCommandPriority(boolean _forceCommandPriority) { forceCommandPriority = _forceCommandPriority; }
     public int getMaxMembers() { return maxMembers; }
 }

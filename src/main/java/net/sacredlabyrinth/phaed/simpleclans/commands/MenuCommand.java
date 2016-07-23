@@ -29,6 +29,7 @@ public class MenuCommand {
         
         String headColor = settings.getPageHeadingsColor();
         String subColor = settings.getPageSubTitleColor();
+        String clanCommand = settings.getCommandClan();
 
         ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
         Clan clan = cp == null ? null : cp.getClan();
@@ -37,8 +38,6 @@ public class MenuCommand {
         boolean isTrusted = cp != null && cp.isTrusted();
         boolean isVerified = clan != null && clan.isVerified();
         boolean isNonVerified = clan != null && !clan.isVerified();
-
-        String clanCommand = settings.getCommandClan();
 
         ChatBlock chatBlock = new ChatBlock();
 
@@ -208,7 +207,7 @@ public class MenuCommand {
         }
 
         ChatBlock.sendBlank(player);
-        ChatBlock.saySingle(player, settings.getServerName() + subColor + " " + plugin.getLang("clan.commands") + " " + headColor + Helper.generatePageSeparator(settings.getPageSep()));
+        ChatBlock.saySingle(player, settings.getServerName(), subColor, " ", plugin.getLang("clan.commands"), " ", headColor, Helper.generatePageSeparator(settings.getPageSep()));
         ChatBlock.sendBlank(player);
 
         boolean more = chatBlock.sendBlock(player, settings.getPageSize());
@@ -216,7 +215,7 @@ public class MenuCommand {
         if (more) {
             plugin.getStorageManager().addChatBlock(player, chatBlock);
             ChatBlock.sendBlank(player);
-            ChatBlock.sendMessage(player, headColor + MessageFormat.format(plugin.getLang("view.next.page"), settings.getCommandMore()));
+            ChatBlock.sendMessage(player, headColor, MessageFormat.format(plugin.getLang("view.next.page"), settings.getCommandMore()));
         }
 
         ChatBlock.sendBlank(player);
@@ -236,37 +235,18 @@ public class MenuCommand {
 
         String clanCommand = settings.getCommandClan();
 
+        ChatBlock.sendBlank(sender);
+        ChatBlock.saySingle(sender, settings.getServerName(), subColor, " ", plugin.getLang("clan.commands"), " " , headColor, Helper.generatePageSeparator(settings.getPageSep()));
+        ChatBlock.sendBlank(sender);
+        
         ChatBlock chatBlock = new ChatBlock();
 
-        chatBlock.addRow(ChatColor.DARK_RED + "  " + MessageFormat.format(plugin.getLang("0.verify.tag.1.verify.an.unverified.clan"), clanCommand, ChatColor.WHITE));
-        chatBlock.addRow(ChatColor.DARK_RED + "  " + MessageFormat.format(plugin.getLang("0.reload.1.reload.configuration"), clanCommand, ChatColor.WHITE));
-
-        ChatBlock.sendBlank(sender);
-        ChatBlock.saySingle(sender, settings.getServerName() + subColor + " " + plugin.getLang("clan.commands") + " " + headColor + Helper.generatePageSeparator(settings.getPageSep()));
-        ChatBlock.sendBlank(sender);
+        chatBlock.addRow(ChatColor.DARK_RED.toString(), "  ", MessageFormat.format(plugin.getLang("0.verify.tag.1.verify.an.unverified.clan"), clanCommand, ChatColor.WHITE));
+        chatBlock.addRow(ChatColor.DARK_RED.toString(), "  ", MessageFormat.format(plugin.getLang("0.reload.1.reload.configuration"), clanCommand, ChatColor.WHITE));
+        chatBlock.addRow(ChatColor.AQUA.toString(), "  ", MessageFormat.format(plugin.getLang("0.list.1.lists.all.clans"), clanCommand, ChatColor.WHITE));
+        
         chatBlock.sendBlock(sender, settings.getPageSize());
+        
         ChatBlock.sendBlank(sender);
-    }
-
-    /**
-     * Adds a menu item to the /clan menu
-     *
-     * @param syntax
-     * @param description
-     */
-    public void addMenuItem(String syntax, String description) {
-        addMenuItem(syntax, description, ChatColor.AQUA);
-    }
-
-    /**
-     * Adds a menu item to the /clan menu, specifying syntax color
-     * [color] /[syntax] - [description]
-     *
-     * @param syntax
-     * @param description
-     * @param color
-     */
-    public void addMenuItem(String syntax, String description, ChatColor color) {
-        menuItems.add(color + "/" + syntax + ChatColor.WHITE + " - " + description);
     }
 }

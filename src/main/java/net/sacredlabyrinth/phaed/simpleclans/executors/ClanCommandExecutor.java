@@ -114,6 +114,7 @@ public final class ClanCommandExecutor implements CommandExecutor {
         consoleCommands.put( plugin.getLang("verify.command"), new VerifyCommand() );
         consoleCommands.put( plugin.getLang("reload.command"), new ReloadCommand() );
         consoleCommands.put( plugin.getLang("place.command"), new PlaceCommand() );
+        consoleCommands.put( plugin.getLang("list.command"), new ListCommand() );
     }
 
     @Override
@@ -145,10 +146,8 @@ public final class ClanCommandExecutor implements CommandExecutor {
     }
     
     private boolean runCommand(CommandSender sender, Map<String, ClanCommand> cmds, String[] args ) {
-        String subcommand = args[0];
-        String[] subargs = Helper.removeFirst(args);
         try {
-            cmds.get( subcommand.toLowerCase() ).execute( sender, subargs );
+            cmds.get( args[0].toLowerCase() ).execute( sender, Helper.removeFirst(args) );
             return true;
         }
         catch ( NullPointerException e ) {

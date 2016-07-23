@@ -220,11 +220,11 @@ public class Clan implements Serializable, Comparable<Clan> {
     public void setVerified(boolean _verified) { verified = _verified; }
     public String getCapeUrl() { return capeUrl; }
     public void setCapeUrl(String _capeUrl) { capeUrl = _capeUrl; }
-    public String getPackedBb() { return Helper.toMessage(bb, "|"); }
+    public String getPackedBb() { return String.join("|", bb); }
     public void setPackedBb(String packedBb) { bb = Helper.fromArray(packedBb.split("[|]")); }
-    public String getPackedAllies() { return Helper.toMessage(allies, "|"); }
+    public String getPackedAllies() { return Helper.clanToString(allies, "|"); }
     public void setPackedAllies(String packedAllies) { allies = Helper.fromArray3(packedAllies.split("[|]")); }
-    public String getPackedRivals() { return Helper.toMessage(rivals, "|"); }
+    public String getPackedRivals() { return Helper.clanToString(rivals, "|"); }
     public void setPackedRivals(String packedRivals) { rivals = Helper.fromArray3(packedRivals.split("[|]")); }
 
     /**

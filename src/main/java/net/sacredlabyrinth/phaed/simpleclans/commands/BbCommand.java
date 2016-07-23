@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
 import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
-import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
 
@@ -46,7 +45,7 @@ public class BbCommand  implements ClanCommand {
                     }
                 } else if (plugin.getPermissionsManager().has(player, "simpleclans.member.bb-add")) {
                     if (cp.isTrusted()) {
-                        String msg = Helper.toMessage(arg);
+                        String msg = String.join( " ", arg);
                         clan.addBb(player.getName(), ChatColor.AQUA + player.getName() + ": " + ChatColor.WHITE + msg);
                         plugin.getStorageManager().updateClan(clan);
                     } else {

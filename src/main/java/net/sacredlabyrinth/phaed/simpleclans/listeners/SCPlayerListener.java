@@ -26,6 +26,7 @@ import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor;
 import net.sacredlabyrinth.phaed.simpleclans.executors.DenyCommandExecutor;
 import net.sacredlabyrinth.phaed.simpleclans.executors.GlobalCommandExecutor;
 import net.sacredlabyrinth.phaed.simpleclans.executors.MoreCommandExecutor;
+import net.sacredlabyrinth.phaed.simpleclans.managers.ClanManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 /**
@@ -55,12 +56,13 @@ public class SCPlayerListener implements Listener {
         if (split.length == 0) return;
 
         String command = split[0];
+        ClanManager clanMan = plugin.getClanManager();
 
-        if (settings.isTagBasedClanChat() && plugin.getClanManager().isClan(command)) {
+        if (settings.isTagBasedClanChat() && clanMan.isClan(command)) {
             
             if (!settings.getClanChatEnable()) return;
 
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
+            ClanPlayer cp = clanMan.getClanPlayer(player);
 
             if (cp == null) return;
 
@@ -69,75 +71,78 @@ public class SCPlayerListener implements Listener {
                 event.setCancelled(true);
 
                 if (split.length > 1)
-                    plugin.getClanManager()
-                          .processClanChat(player, cp.getTag(), Helper.toMessage(Helper.removeFirst(split)));
+                    clanMan.processClanChat(player, cp.getTag(), String.join( " ", Helper.removeFirst(split)));
             }
         }
         if (command.equals(".")) {
             
             if (!settings.getClanChatEnable()) return;
 
-            ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
+            ClanPlayer cp = clanMan.getClanPlayer(player);
 
             if (cp == null) return;
 
             event.setCancelled(true);
 
             if (split.length > 1)
-                plugin.getClanManager()
-                      .processClanChat(player, cp.getTag(), Helper.toMessage(Helper.removeFirst(split)));
+                clanMan.processClanChat(player, cp.getTag(), String.join( " ", Helper.removeFirst(split)));
         }
 
-        if (settings.isForceCommandPriority()) {
+        if ( settings.isForceCommandPriority() ) {
             
             // what the H*** is this C***?
-            if (command.equalsIgnoreCase(settings.getCommandAlly())) {
-                if (!Bukkit.getPluginCommand(
-                        settings.getCommandAlly() ).equals(
-                                plugin.getCommand(settings.getCommandAlly()))) {
+            String pluginCommand = settings.getCommandAlly();
+            if (command.equalsIgnoreCase(pluginCommand)) {
+                if (!Bukkit.getPluginCommand( pluginCommand ).equals( plugin.getCommand( pluginCommand ) ) ) {                  
                     new AllyCommandExecutor().onCommand(player, null, null, Helper.removeFirst(split));
                     event.setCancelled(true);
                 }
+                return;
             }
-            else if (command.equalsIgnoreCase(settings.getCommandGlobal())) {
-                if (!Bukkit.getPluginCommand(
-                        settings.getCommandGlobal() ).equals(
-                                plugin.getCommand(settings.getCommandGlobal()))) {
+            
+            pluginCommand = settings.getCommandGlobal();
+            if (command.equalsIgnoreCase( pluginCommand )) {
+                if (!Bukkit.getPluginCommand( pluginCommand ).equals( plugin.getCommand( pluginCommand ) ) ) {
                     new GlobalCommandExecutor().onCommand(player, null, null, Helper.removeFirst(split));
                     event.setCancelled(true);
                 }
+                return;
             }
-            else if (command.equalsIgnoreCase(settings.getCommandClan())) {
-                if (!Bukkit.getPluginCommand(
-                        settings.getCommandClan()).equals(
-                                plugin.getCommand(settings.getCommandClan()))) {
+            
+            pluginCommand = settings.getCommandClan();
+            if (command.equalsIgnoreCase( pluginCommand ) ) {
+                if (!Bukkit.getPluginCommand( pluginCommand ).equals( plugin.getCommand( pluginCommand ) ) ) {
                     new ClanCommandExecutor().onCommand(player, null, null, Helper.removeFirst(split));
                     event.setCancelled(true);
                 }
+                return;
             }
-            else if (command.equalsIgnoreCase(settings.getCommandAccept())) {
-                if (!Bukkit.getPluginCommand(
-                        settings.getCommandAccept()).equals(
-                                plugin.getCommand(settings.getCommandAccept()))) {
+            
+            pluginCommand = settings.getCommandAccept();
+            if (command.equalsIgnoreCase( pluginCommand )) {
+                if (!Bukkit.getPluginCommand( pluginCommand ).equals( plugin.getCommand( pluginCommand ) ) ) {
                     new AcceptCommandExecutor().onCommand(player, null, null, Helper.removeFirst(split));
                     event.setCancelled(true);
                 }
+                return;
             }
-            else if (command.equalsIgnoreCase(settings.getCommandDeny())) {
-                if (!Bukkit.getPluginCommand(
-                        settings.getCommandDeny()).equals(
-                                plugin.getCommand(settings.getCommandDeny()))) {
+            
+            pluginCommand = settings.getCommandDeny();
+            if (command.equalsIgnoreCase( pluginCommand )) {
+                if (!Bukkit.getPluginCommand( pluginCommand ).equals( plugin.getCommand( pluginCommand ) ) ) {
                     new DenyCommandExecutor().onCommand(player, null, null, Helper.removeFirst(split));
                     event.setCancelled(true);
                 }
+                return;
             }
-            else if (command.equalsIgnoreCase(settings.getCommandMore())) {
-                if (!Bukkit.getPluginCommand(
-                        settings.getCommandMore()).equals(
-                                plugin.getCommand(settings.getCommandMore()))) {
+            
+            pluginCommand = settings.getCommandMore();
+            if (command.equalsIgnoreCase( pluginCommand ) ) {
+                if (!Bukkit.getPluginCommand( pluginCommand ).equals( plugin.getCommand( pluginCommand ) ) ) {
                     new MoreCommandExecutor().onCommand(player, null, null, Helper.removeFirst(split));
                     event.setCancelled(true);
                 }
+                return;
             }
         }
     }
@@ -147,17 +152,20 @@ public class SCPlayerListener implements Listener {
         if (inBlackListedWorld(event) ) return;
 
         if (event.getPlayer() == null) return;
+        
+        ClanManager clanMan = plugin.getClanManager();
+        SettingsManager settings = plugin.getSettingsManager();
 
         String message = event.getMessage();
-        ClanPlayer cp = plugin.getClanManager().getClanPlayer(event.getPlayer());
+        ClanPlayer cp = clanMan.getClanPlayer(event.getPlayer());
 
         if (cp != null) {
             if (cp.getChannel().equals(ClanPlayer.Channel.CLAN)) {
-                plugin.getClanManager().processClanChat(event.getPlayer(), message);
+                clanMan.processClanChat(event.getPlayer(), message);
                 event.setCancelled(true);
             }
             else if (cp.getChannel().equals(ClanPlayer.Channel.ALLY)) {
-                plugin.getClanManager().processAllyChat(event.getPlayer(), message);
+                clanMan.processAllyChat(event.getPlayer(), message);
                 event.setCancelled(true);
             }
         }
@@ -169,7 +177,7 @@ public class SCPlayerListener implements Listener {
             for (Iterator<?> iter = event.getRecipients().iterator(); iter.hasNext(); ) {
                 Player player = (Player) iter.next();
 
-                ClanPlayer rcp = plugin.getClanManager().getClanPlayer(player);
+                ClanPlayer rcp = clanMan.getClanPlayer(player);
 
                 if (rcp != null) {
                     if (!rcp.isClanChat() && isClanChat) {
@@ -187,8 +195,8 @@ public class SCPlayerListener implements Listener {
             }
         }
 
-        if (plugin.getSettingsManager().isCompatMode()) {
-            if (plugin.getSettingsManager().isChatTags()) {
+        if (settings.isCompatMode()) {
+            if (settings.isChatTags()) {
                 if (cp != null && cp.isTagEnabled()) {
                     String tagLabel = cp.getClan().getTagLabel(cp.isLeader());
 
@@ -210,7 +218,7 @@ public class SCPlayerListener implements Listener {
             }
         }
         else {
-            plugin.getClanManager().updateDisplayName(event.getPlayer());
+            clanMan.updateDisplayName(event.getPlayer());
         }
     }
 
@@ -219,16 +227,18 @@ public class SCPlayerListener implements Listener {
         if ( inBlackListedWorld(event) ) return;
         
         final Player player = event.getPlayer();
-
+        ClanManager clanMan = plugin.getClanManager();
+        SettingsManager settings = plugin.getSettingsManager();
+        
         ClanPlayer cp;
-        if (plugin.getSettingsManager().getUseBungeeCord()) 
-            cp = plugin.getClanManager().getClanPlayerJoinEvent(player);
+        if (settings.getUseBungeeCord()) 
+            cp = clanMan.getClanPlayerJoinEvent(player);
         else 
-            cp = plugin.getClanManager().getClanPlayer(player);
+            cp = clanMan.getClanPlayer(player);
         
         plugin.getStorageManager().updatePlayerNameAsync(player);
-        plugin.getClanManager().updateLastSeen(player);
-        plugin.getClanManager().updateDisplayName(player);
+        clanMan.updateLastSeen(player);
+        clanMan.updateDisplayName(player);
         
         if (cp == null) return;
   
@@ -236,7 +246,7 @@ public class SCPlayerListener implements Listener {
 
         plugin.getPermissionsManager().addPlayerPermissions(cp);
 
-        if (plugin.getSettingsManager().isBbShowOnLogin() && cp.isBbEnabled()) {
+        if (settings.isBbShowOnLogin() && cp.isBbEnabled()) {
         	cp.getClan().displayBb(player);
         }
         plugin.getPermissionsManager().addClanPermissions(cp);
@@ -272,10 +282,11 @@ public class SCPlayerListener implements Listener {
         if (inBlackListedWorld(event) ) return;
 
         Player player = event.getPlayer();
-        ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
+        ClanManager clanMan = plugin.getClanManager();
+        ClanPlayer cp = clanMan.getClanPlayer(player);
 
         plugin.getPermissionsManager().removeClanPlayerPermissions(cp);
-        plugin.getClanManager().updateLastSeen(player);
+        clanMan.updateLastSeen(player);
         plugin.getRequestManager().endPendingRequest(player.getName());
     }
 

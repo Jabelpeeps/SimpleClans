@@ -10,8 +10,8 @@ import org.bukkit.entity.Player;
 
 import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
-import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 public class AllyCommandExecutor implements CommandExecutor {
     SimpleClans plugin;
@@ -23,8 +23,9 @@ public class AllyCommandExecutor implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Player player = (Player) commandSender;
+        SettingsManager settings = plugin.getSettingsManager();
 
-        if (!plugin.getSettingsManager().isAllyChatEnable()) return false;
+        if (!settings.isAllyChatEnable()) return false;
 
         if (strings.length == 0) return false;
 
@@ -66,7 +67,19 @@ public class AllyCommandExecutor implements CommandExecutor {
         }
         else {
             String code = "" + ChatColor.AQUA + ChatColor.WHITE + ChatColor.AQUA + ChatColor.BLACK;
-            String message = code + plugin.getSettingsManager().getAllyChatBracketColor() + plugin.getSettingsManager().getAllyChatTagBracketLeft() + plugin.getSettingsManager().getAllyChatTagColor() + plugin.getSettingsManager().getCommandAlly() + plugin.getSettingsManager().getAllyChatBracketColor() + plugin.getSettingsManager().getAllyChatTagBracketRight() + " " + plugin.getSettingsManager().getAllyChatNameColor() + plugin.getSettingsManager().getAllyChatPlayerBracketLeft() + player.getName() + plugin.getSettingsManager().getAllyChatPlayerBracketRight() + " " + plugin.getSettingsManager().getAllyChatMessageColor() + Helper.toMessage(strings);
+            String message = String.join( "", code,
+                                  settings.getAllyChatBracketColor(), 
+                                  settings.getAllyChatTagBracketLeft(),  
+                                  settings.getAllyChatTagColor(), 
+                                  settings.getCommandAlly(),
+                                  settings.getAllyChatBracketColor(), 
+                                  settings.getAllyChatTagBracketRight(), " ",
+                                  settings.getAllyChatNameColor(), 
+                                  settings.getAllyChatPlayerBracketLeft(), 
+                                  player.getName(), 
+                                  settings.getAllyChatPlayerBracketRight(), " ", 
+                                  settings.getAllyChatMessageColor(),
+                                  String.join( "", strings ) );
             SimpleClans.log(message);
 
             Player self = cp.toPlayer();

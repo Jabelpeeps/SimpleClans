@@ -39,7 +39,7 @@ public class CreateCommand implements ClanCommand {
             String tag = arg[0];
             String cleanTag = Helper.cleanTag(arg[0]);
 
-            String name = Helper.toMessage(Helper.removeFirst(arg));
+            String name = String.join( " ", Helper.removeFirst(arg) );
             PermissionsManager perms = plugin.getPermissionsManager();
 
             if ( !perms.has(player, "simpleclans.mod.bypass") ) {

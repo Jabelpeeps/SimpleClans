@@ -31,7 +31,7 @@ public class SetRankCommand  implements ClanCommand {
                     if (clan.isLeader(player)) {
                         if (arg.length >= 1) {
                             Player ranker = Bukkit.getPlayer( arg[0] );
-                            String rank = Helper.toMessage(Helper.removeFirst(arg));
+                            String rank = String.join( " ", Helper.removeFirst(arg) );
 
                             if (clan.isMember(ranker) || clan.isLeader(ranker)) {
                              

@@ -3,10 +3,8 @@ package net.sacredlabyrinth.phaed.simpleclans;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -86,10 +84,7 @@ public class Helper {
      * @return
      */
     public static List<String> fromArray(String... values) {
-        List<String> results = new ArrayList<>();
-        Collections.addAll(results, values);
-        results.remove("");
-        return results;
+        return Arrays.asList( values ).parallelStream().filter( v -> v.isEmpty() ).collect( Collectors.toList() );
     }
 
     /**
@@ -99,10 +94,7 @@ public class Helper {
      * @return
      */
     public static Set<String> fromArray2(String... values) {
-        Set<String> results = new HashSet<>();
-        Collections.addAll(results, values);
-        results.remove("");
-        return results;
+        return Arrays.asList( values ).parallelStream().filter( v -> v.isEmpty() ).collect( Collectors.toSet() );
     }
     /**
      * Converts string array to HashSet<String>, remove empty strings
@@ -138,42 +130,13 @@ public class Helper {
     }
 
     /**
-     * Converts a string array to a space separated string
-     */
-    public static String toMessage(String[] args) {
-        return String.join( " ", args );
-    }
-
-    /**
-     * Converts a string array to a string with custom separators
-     *
-     * @param args
-     * @param sep
-     * @return
-     */
-    public static String toMessage(String[] args, String sep) {
-        return String.join( sep, args );
-    }
-
-    /**
-     * Converts a string array to a string with custom separators
-     *
-     * @param args
-     * @param sep
-     * @return
-     */
-    public static String toMessage(List<String> args, String sep) {
-        return String.join( sep, args );
-    }
-    
-    /**
      * Converts a Set<Clan> to a string of tags with custom separators
      *
      * @param args
      * @param sep
      * @return
      */
-    public static String toMessage(Set<Clan> args, String sep) {
+    public static String clanToString(Set<Clan> args, String sep) {
         if ( args.isEmpty() ) return "";
         
         return args.parallelStream().map( c -> c.getTag() ).collect( Collectors.joining( sep ) );
@@ -319,7 +282,7 @@ public class Helper {
     }
 
     /**
-     * Returns a prettier coordinate, does not include world
+     * Returns a prettier coordinate, does not include pitch or yaw
      *
      * @param loc
      * @return
@@ -336,7 +299,9 @@ public class Helper {
      * @return
      */
     public static boolean isSameBlock(Location loc, Location loc2) {
-        return loc.getBlockX() == loc2.getBlockX() && loc.getBlockY() == loc2.getBlockY() && loc.getBlockZ() == loc2.getBlockZ();
+        return     loc.getBlockX() == loc2.getBlockX() 
+                && loc.getBlockY() == loc2.getBlockY() 
+                && loc.getBlockZ() == loc2.getBlockZ();
     }
 
     /**

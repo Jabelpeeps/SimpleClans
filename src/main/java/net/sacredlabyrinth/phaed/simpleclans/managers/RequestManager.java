@@ -365,7 +365,7 @@ public final class RequestManager {
                     clan.demote(demotedUniqueId);   
                 }
                 else {
-                    String deniers = Helper.capitalize(Helper.toMessage(Helper.toArray(denies), ", "));
+                    String deniers = Helper.capitalize(String.join(", ", denies));
                     clan.leaderAnnounce(ChatColor.RED + MessageFormat.format(plugin.getLang("denied.demotion"), deniers, demoted));
                 }
             }
@@ -381,7 +381,7 @@ public final class RequestManager {
                     clan.promote(promotedUniqueId);                   
                 }
                 else {
-                    String deniers = Helper.capitalize(Helper.toMessage(Helper.toArray(denies), ", "));
+                    String deniers = Helper.capitalize(String.join(", ", denies));
                     clan.leaderAnnounce(ChatColor.RED + MessageFormat.format(plugin.getLang("denied.the.promotion"), deniers, promoted));
                 }
             }
@@ -393,7 +393,7 @@ public final class RequestManager {
                     clan.disband();
                 }
                 else {
-                    String deniers = Helper.capitalize(Helper.toMessage(Helper.toArray(denies), ", "));
+                    String deniers = Helper.capitalize(String.join(", ", denies));
                     clan.leaderAnnounce(ChatColor.RED + MessageFormat.format(plugin.getLang("clan.deletion"), deniers));
                 }
             }

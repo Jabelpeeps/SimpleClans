@@ -29,12 +29,15 @@ public class HomeCommand  implements ClanCommand {
 
     @Override
     public void execute(CommandSender sender, String[] arg) {
+        
         SimpleClans plugin = SimpleClans.getInstance();
         PermissionsManager perms = plugin.getPermissionsManager();
         ClanManager clanMan = plugin.getClanManager();
+        
         Player player = (Player) sender;
         
         if (arg.length == 2 && arg[0].equalsIgnoreCase("set") && perms.has(player, "simpleclans.mod.home")) {
+            
             if (!clanMan.purchaseHomeTeleportSet(player)) {
                 return;
             }
@@ -46,7 +49,9 @@ public class HomeCommand  implements ClanCommand {
             }
         }
         if (arg.length == 2 && arg[0].equalsIgnoreCase("tp") && perms.has(player, "simpleclans.mod.hometp")) {
+            
             Clan clan = clanMan.getClan(arg[1]);
+            
             if (clan != null) {
                 Location loc = clan.getHomeLocation();
                 if (loc == null) {
@@ -91,6 +96,7 @@ public class HomeCommand  implements ClanCommand {
         else {
             SettingsManager settings = plugin.getSettingsManager();
             String ttag = arg[0];
+            
             if (ttag.equalsIgnoreCase("set")) {
                 if (!cp.isLeader()) {
                     ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.leader.permissions"));

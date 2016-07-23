@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -46,39 +46,14 @@ public class ChatBlock {
         }
     }
 
-    public boolean hasContent() {
-        return !rows.isEmpty();
-    }
+    public void addRow(String... contents) { rows.add(contents); }
+    public int rowsSize() { return rows.size(); }
+    public boolean isEmpty() { return rows.isEmpty(); }
+    public boolean sendBlock(CommandSender player) { return sendBlock(player, null, 0); }
+    public boolean sendBlock(CommandSender player, String prefix) { return sendBlock(player, prefix, 0); }
+    public boolean sendBlock(CommandSender player, int amount) { return sendBlock(player, null, amount); }
 
-    public void addRow(String... contents) {
-        rows.add(contents);
-    }
-
-    public int size() {
-        return rows.size();
-    }
-
-    public boolean isEmpty() {
-        return rows.isEmpty();
-    }
-
-    public void clear() {
-        rows.clear();
-    }
-
-    public boolean sendBlock(CommandSender player) {
-        return sendBlock(player, null, 0);
-    }
-
-    public boolean sendBlock(CommandSender player, String prefix) {
-        return sendBlock(player, prefix, 0);
-    }
-
-    public boolean sendBlock(CommandSender player, int amount) {
-        return sendBlock(player, null, amount);
-    }
-
-    boolean sendBlock(CommandSender player, String prefix, int amount) {
+    public boolean sendBlock(CommandSender player, String prefix, int amount) {
         if (player == null || rows.isEmpty()) return false;
 
         if (amount == 0) amount = rows.size();
@@ -100,8 +75,11 @@ public class ChatBlock {
             for (int sid = 0; sid < row.length; sid++) {
                 String col = "";
                 String section = row[sid];
-                double colsize = (columnSizes.size() >= (sid + 1)) ? columnSizes.get(sid) : 0;
-                String align = (columnAlignments.size() >= (sid + 1)) ? columnAlignments.get(sid) : "l";
+                double colsize = ( columnSizes.size() >= sid + 1 ) ? columnSizes.get(sid) 
+                                                                   : 0;
+                
+                String align = ( columnAlignments.size() >= sid + 1 ) ? columnAlignments.get(sid) 
+                                                                      : "l";
 
                 if (align.equalsIgnoreCase("r")) {
                     if (msgLength(section) > colsize) 
@@ -175,19 +153,14 @@ public class ChatBlock {
     }
 
     private int calculatedRowSize(List<String> cols) {
-        int out = 0;
-
-        for (String col : cols) {
-            out += msgLength(col);
-        }
-        return out;
+        return (int) cols.parallelStream().collect( Collectors.summingDouble( c -> msgLength( c ) ) ).doubleValue();
     }
 
     int getMaxWidth(int col) {
         double maxWidth = 0;
 
         for (String[] row : rows) {
-            maxWidth = Math.max(maxWidth, msgLength(row[col]));
+            maxWidth = Math.max(maxWidth, msgLength( row[col] ) );
         }
         return (int) maxWidth;
     }
@@ -252,7 +225,7 @@ public class ChatBlock {
             return msg;
         }
         while (msgLength(msg) < length) {
-            msg = " " + msg;
+            msg += " ";
         }
         return msg;
     }
@@ -295,14 +268,10 @@ public class ChatBlock {
         return length;
     }
 
+    private static Pattern pattern = Pattern.compile("ÃƒÂ¯Ã‚Â¿Ã‚Â½.");
+    
     private static String cleanColors(String str) {
-        String patternStr = "ÃƒÂ¯Ã‚Â¿Ã‚Â½.";
-        String replacementStr = "";
-
-        Pattern pattern = Pattern.compile(patternStr);
-        Matcher matcher = pattern.matcher(str);
-
-        return matcher.replaceAll(replacementStr);
+        return pattern.matcher( str ).replaceAll( "" );
     }
 
     /**
@@ -437,7 +406,7 @@ public class ChatBlock {
     public static void saySingle(CommandSender receiver, String msg) {
         if (receiver == null) return;
 
-        receiver.sendMessage(colorize(new String[] {cropRightToFit(msg, lineLength)})[0]);
+        receiver.sendMessage( colorize( cropRightToFit( msg, lineLength ) ) );
     }
 
     public static void saySingle(CommandSender receiver, String...msg) {
@@ -449,7 +418,7 @@ public class ChatBlock {
     public static void sendMessage(CommandSender receiver, String msg) {
         if (receiver == null) return; 
 
-        String[] message = colorize(wordWrap(msg));
+        String[] message = say ( msg );
 
         for (String out : message) {
             receiver.sendMessage(out);
@@ -478,7 +447,7 @@ public class ChatBlock {
      * @return
      */
     public static String[] say(String message) {
-        return colorize(wordWrap(message));
+        return colorize( wordWrap(message) );
     }
 
     private static String[] colorize(String[] message) {

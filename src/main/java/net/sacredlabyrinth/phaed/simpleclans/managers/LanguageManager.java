@@ -32,7 +32,7 @@ public class LanguageManager {
     }
 
     private void check() {
-        boolean exists = (file).exists();
+        boolean exists = file.exists();
 
         loadDefaults();
 

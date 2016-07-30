@@ -3,10 +3,7 @@ package net.sacredlabyrinth.phaed.simpleclans.managers;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -18,7 +15,7 @@ import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
  */
 public final class SettingsManager {
 
-    private SimpleClans plugin;
+    private SimpleClans plugin = SimpleClans.getInstance();;
     private File main;
     private FileConfiguration config;
     
@@ -40,7 +37,6 @@ public final class SettingsManager {
     private boolean requireVerification;
     private List<Integer> itemsList;
     private List<String> blacklistedWorlds;
-    private Set<UUID> bannedPlayers = new HashSet<>();
     private List<String> disallowedWords;
     private List<String> disallowedColors;
     private List<String> unRivableClans;
@@ -141,7 +137,6 @@ public final class SettingsManager {
     private int maxMembers;
 
     public SettingsManager() {
-        plugin = SimpleClans.getInstance();
         config = plugin.getConfig();
         main = new File(plugin.getDataFolder() + File.separator + "config.yml");
         load();
@@ -173,12 +168,6 @@ public final class SettingsManager {
         pvpOnlywhileInWar = config.getBoolean("settings.pvp-only-while-at-war");
         enableAutoGroups = config.getBoolean("settings.enable-auto-groups");
         useColorCodeFromPrefix = config.getBoolean("settings.use-colorcode-from-prefix-for-name");
-
-        config.getStringList("settings.banned-players")
-              .parallelStream()
-              .map( s -> UUID.fromString( s ) )
-              .forEach( u -> bannedPlayers.add( u ) );
-
         compatMode = config.getBoolean("settings.chat-compatibility-mode");
         disallowedColors = config.getStringList("settings.disallowed-tag-colors");
         blacklistedWorlds = config.getStringList("settings.blacklisted-worlds");
@@ -362,38 +351,7 @@ public final class SettingsManager {
         return unRivableClans.contains( tag );
     }
 
-    /**
-     * Check whether a player is banned
-     *
-     * @param playerUniqueId the player's name
-     * @return whether player is banned
-     */
-    public boolean isBanned(UUID playerUniqueId) {
-        return bannedPlayers.contains( playerUniqueId );
-    }
-
-    /**
-     * Add a player to the banned list
-     *
-     * @param playerUniqueId the player's name
-     */
-    public void addBanned(UUID playerUniqueId) {
-        bannedPlayers.add(playerUniqueId);
-        save();
-    }
-
-    /**
-     * Remove a player from the banned list
-     *
-     * @param playerUniqueId the player's name
-     */
-    public void removeBanned(UUID playerUniqueId) {
-        bannedPlayers.remove(playerUniqueId);
-        save();
-    }
-
     public boolean isRequireVerification() { return requireVerification; }
-    public Set<UUID> getBannedPlayers() { return Collections.unmodifiableSet(bannedPlayers); }
     public List<String> getDisallowedColors() { return Collections.unmodifiableList(disallowedColors); }
     public List<String> getunRivableClans() { return Collections.unmodifiableList(unRivableClans); }
     public int getRivalLimitPercent() { return rivalLimitPercent; }

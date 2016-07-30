@@ -46,16 +46,18 @@ public final class TeleportManager {
     }
 
     private void dropItems(Player player) {
+        
         if (plugin.getSettingsManager().isDropOnHome()) {
+            
             PlayerInventory inv = player.getInventory();
             ItemStack[] contents = inv.getContents();
 
+            List<Integer> itemsList = plugin.getSettingsManager().getItemsList();
+            
             for (ItemStack item : contents) {
                 if (item == null) {
                     continue;
                 }
-
-                List<Integer> itemsList = plugin.getSettingsManager().getItemsList();
 
                 if (itemsList.contains(item.getTypeId())) {
                     player.getWorld().dropItemNaturally(player.getLocation(), item);
@@ -64,25 +66,21 @@ public final class TeleportManager {
             }
         }
         else if (plugin.getSettingsManager().isKeepOnHome()) {
-            try {
-                PlayerInventory inv = player.getInventory();
-                ItemStack[] contents = inv.getContents().clone();
 
-                for (ItemStack item : contents) {
-                    if (item == null) {
-                        continue;
-                    }
+            PlayerInventory inv = player.getInventory();
+            ItemStack[] contents = inv.getContents().clone();
 
-                    List<Integer> itemsList = plugin.getSettingsManager().getItemsList();
-
-                    if (!itemsList.contains(item.getTypeId())) {
-                        player.getWorld().dropItemNaturally(player.getLocation(), item);
-                        inv.remove(item);
-                    }
+            List<Integer> itemsList = plugin.getSettingsManager().getItemsList();
+            
+            for (ItemStack item : contents) {
+                if (item == null) {
+                    continue;
                 }
-            }
-            catch (Exception ex) {
-                ex.printStackTrace();
+
+                if (!itemsList.contains(item.getTypeId())) {
+                    player.getWorld().dropItemNaturally(player.getLocation(), item);
+                    inv.remove(item);
+                }
             }
         }
     }

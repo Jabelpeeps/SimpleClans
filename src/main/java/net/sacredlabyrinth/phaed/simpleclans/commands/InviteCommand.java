@@ -38,7 +38,7 @@ public class InviteCommand  implements ClanCommand {
                         if (invited != null) {
                             if (plugin.getPermissionsManager().has(invited, "simpleclans.member.can-join")) {
                                 if (!invited.getName().equals(player.getName())) {
-                                    if (!plugin.getSettingsManager().isBanned(invited.getUniqueId())) {
+                                    if (!plugin.getBansManager().isBanned(invited.getUniqueId())) {
                                         ClanPlayer cpInv = plugin.getClanManager().getClanPlayer(invited);
 
                                         if (cpInv == null) {

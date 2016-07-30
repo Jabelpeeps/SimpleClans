@@ -251,11 +251,6 @@ public class SCPlayerListener implements Listener {
         }
         plugin.getPermissionsManager().addClanPermissions(cp);
 
-        if (event.getPlayer().isOp()) {
-            for (String message : plugin.getMessages()) {
-                event.getPlayer().sendMessage(ChatColor.YELLOW + message);
-            }
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

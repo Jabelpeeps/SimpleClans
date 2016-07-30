@@ -126,7 +126,7 @@ public final class ClanCommandExecutor implements CommandExecutor {
             if (plugin.getSettingsManager().isBlacklistedWorld(player.getLocation().getWorld().getName()))
                 return true;
 
-            if (plugin.getSettingsManager().isBanned(player.getUniqueId())) {
+            if (plugin.getBansManager().isBanned(player.getUniqueId())) {
                 ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("banned"));
                 return true;
             }

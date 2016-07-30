@@ -20,7 +20,7 @@ public class MoreCommandExecutor implements CommandExecutor {
         Player player = (Player) commandSender;
         SettingsManager settings = plugin.getSettingsManager();
 
-        if (settings.isBanned(player.getUniqueId())) {
+        if (plugin.getBansManager().isBanned(player.getUniqueId())) {
             ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("banned"));
             return false;
         }

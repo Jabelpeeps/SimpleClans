@@ -14,12 +14,12 @@ tag:
         char: ' .'
 settings:
     online-mode: true
-    disable-messages: false
     tameable-mobs-sharing: false
     teleport-blocks: false
     teleport-home-on-spawn: false
     drop-items-on-clan-home: false
     keep-items-on-clan-home: false
+    # specify a list of items to either be dropped or kept (depending on settings above) on teleporting home.
     item-list: []
     show-debug-info: false
     mchat-integration: true
@@ -51,7 +51,7 @@ commands:
     accept: accept
     deny: deny
     global: global
-    force-priority: true
+    force-priority: false
 economy:
     creation-price: 100.0
     purchase-clan-create: false

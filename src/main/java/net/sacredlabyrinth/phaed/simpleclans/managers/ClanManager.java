@@ -330,7 +330,7 @@ public final class ClanManager {
                 plugin.getStorageManager().updateClan(clan);
             }
         }
-        plugin.getSettingsManager().addBanned(player.getUniqueId());
+        plugin.getBansManager().addBanned(player.getUniqueId());
     }
 
     public int getRivableClanCount() {

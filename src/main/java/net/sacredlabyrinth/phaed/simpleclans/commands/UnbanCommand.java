@@ -25,11 +25,11 @@ public class UnbanCommand  implements ClanCommand {
             if (arg.length == 1) {
                 Player banned = Bukkit.getPlayer( arg[0] );
 
-                if (plugin.getSettingsManager().isBanned(banned.getUniqueId())) {
+                if (plugin.getBansManager().isBanned(banned.getUniqueId())) {
 
                     ChatBlock.sendMessage(banned, ChatColor.AQUA + plugin.getLang("you.have.been.unbanned.from.clan.commands"));
 
-                    plugin.getSettingsManager().removeBanned(banned.getUniqueId());
+                    plugin.getBansManager().removeBanned(banned.getUniqueId());
                     ChatBlock.sendMessage(player, ChatColor.AQUA + plugin.getLang("player.removed.from.the.banned.list"));
                 }
                 else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("this.player.is.not.banned"));

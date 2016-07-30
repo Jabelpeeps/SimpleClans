@@ -27,7 +27,7 @@ public class BanCommand  implements ClanCommand {
                 Player banned = Bukkit.getPlayer( arg[0] );
                 
                 UUID PlayerUniqueId = banned.getUniqueId();
-                if (!plugin.getSettingsManager().isBanned(PlayerUniqueId)) {
+                if (!plugin.getBansManager().isBanned(PlayerUniqueId)) {
                     Player pl = SimpleClans.getInstance().getServer().getPlayer(PlayerUniqueId);
 
                     if (pl != null) {

@@ -1,18 +1,10 @@
 package net.sacredlabyrinth.phaed.simpleclans;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import net.sacredlabyrinth.phaed.simpleclans.executors.AcceptCommandExecutor;
@@ -23,6 +15,7 @@ import net.sacredlabyrinth.phaed.simpleclans.executors.GlobalCommandExecutor;
 import net.sacredlabyrinth.phaed.simpleclans.executors.MoreCommandExecutor;
 import net.sacredlabyrinth.phaed.simpleclans.listeners.SCEntityListener;
 import net.sacredlabyrinth.phaed.simpleclans.listeners.SCPlayerListener;
+import net.sacredlabyrinth.phaed.simpleclans.managers.BansManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.ClanManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.PermissionsManager;
@@ -36,7 +29,6 @@ import net.sacredlabyrinth.phaed.simpleclans.managers.TeleportManager;
  */
 public class SimpleClans extends JavaPlugin {
 
-    private ArrayList<String> messages = new ArrayList<>();
     private static SimpleClans instance;
     private static final Logger logger = Logger.getLogger("Minecraft");
     private ClanManager clanManager;
@@ -46,6 +38,7 @@ public class SimpleClans extends JavaPlugin {
     private PermissionsManager permissionsManager;
     private TeleportManager teleportManager;
     private LanguageManager languageManager;
+    private BansManager bansManager;
 
     public static Logger getLog() {
         return logger;
@@ -104,7 +97,6 @@ public class SimpleClans extends JavaPlugin {
 
         getCommand(settingsManager.getCommandClan()).setTabCompleter(new PlayerNameTabCompleter());
 
-        pullMessages();
         logger.info("[SimpleClans] Modo Multithreading: " + settingsManager.getUseThreads());
         logger.info("[SimpleClans] Modo BungeeCord: " + settingsManager.getUseBungeeCord());
     }
@@ -114,54 +106,16 @@ public class SimpleClans extends JavaPlugin {
         Bukkit.getScheduler().cancelTasks(this);
         storageManager.closeConnection();
         permissionsManager.savePermissions();
+        bansManager.saveBans();
     }
 
-    public void pullMessages() {
-        if (settingsManager.isDisableMessages()) {
-            return;
-        }
-
-        try {
-            BufferedReader in = new BufferedReader(
-                                    new InputStreamReader(
-                                          new URL("https://minecraftcubed.net/pluginmessage/").openStream()
-                                                  , StandardCharsets.UTF_8));
-
-            String message;
-            while ((message = in.readLine()) != null) {
-                messages.add(message);
-                Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + message);
-            }
-            in.close();
-        }
-        catch (IOException e) { }
-    }
-
-    public ClanManager getClanManager() {
-        return clanManager;
-    }
-    public RequestManager getRequestManager() {
-        return requestManager;
-    }
-    public StorageManager getStorageManager() {
-        return storageManager;
-    }
-    public SettingsManager getSettingsManager() {
-        return settingsManager;
-    }
-    public PermissionsManager getPermissionsManager() {
-        return permissionsManager;
-    }
-    public String getLang(String msg) {
-        return languageManager.get(msg);
-    }
-    public TeleportManager getTeleportManager() {
-        return teleportManager;
-    }
-    public List<String> getMessages() {
-        return messages;
-    }
-    public LanguageManager getLanguageManager() {
-        return languageManager;
-    }
+    public ClanManager getClanManager() { return clanManager; }
+    public RequestManager getRequestManager() { return requestManager; }
+    public StorageManager getStorageManager() { return storageManager; }
+    public SettingsManager getSettingsManager() { return settingsManager; }
+    public PermissionsManager getPermissionsManager() { return permissionsManager; }
+    public String getLang(String msg) { return languageManager.get(msg); }
+    public TeleportManager getTeleportManager() { return teleportManager; }
+    public LanguageManager getLanguageManager() { return languageManager; }
+    public BansManager getBansManager() { return bansManager; }
 }

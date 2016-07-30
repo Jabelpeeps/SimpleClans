@@ -22,7 +22,7 @@ public class AcceptCommandExecutor implements CommandExecutor {
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Player player = (Player) commandSender;
 
-        if (plugin.getSettingsManager().isBanned(player.getUniqueId())) {
+        if (plugin.getBansManager().isBanned(player.getUniqueId())) {
             ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("banned"));
             return false;
         }

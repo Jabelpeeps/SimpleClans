@@ -14,7 +14,7 @@ import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
  *
  * @author cc_madelg
  */
-public class SQLiteCore implements DBCore {
+public class SQLiteCore extends AbstractDBCore {
     private Logger log;
     private Connection connection;
     private String dbLocation;
@@ -25,10 +25,10 @@ public class SQLiteCore implements DBCore {
      *
      * @param dbLocation
      */
-    public SQLiteCore(String dbLocation) {
-        this.dbName = "SimpleClans";
-        this.dbLocation = dbLocation;
-        this.log = SimpleClans.getLog();
+    public SQLiteCore(String _dbLocation) {
+        dbName = "SimpleClans";
+        dbLocation = _dbLocation;
+        log = SimpleClans.getLog();
 
         initialize();
     }
@@ -56,6 +56,67 @@ public class SQLiteCore implements DBCore {
         }
         catch (ClassNotFoundException ex) {
             log.severe("You need the SQLite library " + ex);
+        }
+        
+        if (!existsTable("sc_clans")) {
+            SimpleClans.log("Creating table: sc_clans");
+
+            String query = "CREATE TABLE IF NOT EXISTS `sc_clans` ( "
+                            + "`id` bigint(20), "
+                            + "`verified` tinyint(1) default '0', "
+                            + "`tag` varchar(25) NOT NULL, "
+                            + "`color_tag` varchar(25) NOT NULL, "
+                            + "`name` varchar(100) NOT NULL, "
+                            + "`friendly_fire` tinyint(1) default '0', "
+                            + "`founded` bigint NOT NULL, "
+                            + "`last_used` bigint NOT NULL, "
+                            + "`packed_allies` text NOT NULL, "
+                            + "`packed_rivals` text NOT NULL, "
+                            + "`packed_bb` mediumtext NOT NULL, "
+                            + "`cape_url` varchar(255) NOT NULL, "
+                            + "`flags` text NOT NULL, "
+                            + "`balance` double(64,2) default 0.0,  "
+                            + "PRIMARY KEY  (`id`), UNIQUE (`tag`));";
+            execute(query);
+        }
+
+        if (!existsTable("sc_players")) {
+            SimpleClans.log("Creating table: sc_players");
+
+            String query = "CREATE TABLE IF NOT EXISTS `sc_players` ( "
+                            + "`id` bigint(20), "
+                            + "`name` varchar(16) NOT NULL, "
+                            + "`uuid` CHAR(36) NOT NULL, "
+                            + "`leader` tinyint(1) default '0', "
+                            + "`tag` varchar(25) NOT NULL, "
+                            + "`friendly_fire` tinyint(1) default '0', "
+                            + "`neutral_kills` int(11) default NULL, "
+                            + "`rival_kills` int(11) default NULL, "
+                            + "`civilian_kills` int(11) default NULL, "
+                            + "`deaths` int(11) default NULL, "
+                            + "`last_seen` bigint NOT NULL, "
+                            + "`join_date` bigint NOT NULL, "
+                            + "`trusted` tinyint(1) default '0', "
+                            + "`flags` text NOT NULL, "
+                            + "`packed_past_clans` text, "
+                            + "PRIMARY KEY  (`id`), UNIQUE (`name`));";
+            execute(query);
+        }
+
+        if (!existsTable("sc_kills")) {
+            SimpleClans.log("Creating table: sc_kills");
+
+            String query = "CREATE TABLE IF NOT EXISTS `sc_kills` ( "
+                            + "`kill_id` bigint(20), "
+                            + "`attacker` varchar(16) NOT NULL, "
+                            + "`attacker_tag` varchar(16) NOT NULL, "
+                            + "`attacker_uuid` CHAR(36) NOT NULL, "
+                            + "`victim` varchar(16) NOT NULL, "
+                            + "`victim_tag` varchar(16) NOT NULL, "
+                            + "`victim_uuid` CHAR(36) NOT NULL, "
+                            + "`kill_type` varchar(1) NOT NULL, "
+                            + "PRIMARY KEY  (`kill_id`));";
+            execute(query);
         }
     }
 
@@ -88,7 +149,7 @@ public class SQLiteCore implements DBCore {
                 connection.close();
             }
         }
-        catch (Exception e) {
+        catch (SQLException e) {
             log.severe("Failed to close database connection! " + e.getMessage());
         }
     }
@@ -140,7 +201,7 @@ public class SQLiteCore implements DBCore {
         try (ResultSet col = getConnection().getMetaData().getColumns(null, null, table, column)){
             return col.next();
         }
-        catch (Exception e) {
+        catch (SQLException e) {
             log.severe("Failed to check if column " + column + " exists in table " + table + " : " + e.getMessage());
             return false;
         }
@@ -150,24 +211,15 @@ public class SQLiteCore implements DBCore {
     public ResultSet getResultSet( PreparedStatement query, Class<?>[] types, Object...params ) {
         try {
             if (types != null) {
-                for ( int i = 0; i < params.length; i++ ) {
-                    
-                    if ( types[i].equals( String.class ) ) {
-                        query.setString( i + 1, (String) params[i] );
-                    }
-                    else if ( types[i].equals( int.class ) ) {
-                        query.setInt( i + 1, (int) params[i] );
-                    }
-                    else if ( types[i].equals( long.class ) ) {
-                        query.setLong( i + 1, (long) params[i] );
-                    }
-                    else if ( types[i].equals( double.class ) ) {
-                        query.setDouble( i + 1, (double) params[i] );
-                    }
-                }
+                query = setupStatement( query, types, params );
             }
-            if (query.execute())
-                return query.getResultSet();
+            try {
+                if (query.execute())
+                    return query.getResultSet();
+            }
+            finally {
+                query.close();
+            }
         }
         catch (SQLException ex) {
             log.severe(ex.getMessage());
@@ -180,23 +232,14 @@ public class SQLiteCore implements DBCore {
     public void executeUpdate( PreparedStatement query, Class<?>[] types, Object...params ) {
         try {
             if (types != null) {
-                for ( int i = 0; i < params.length; i++ ) {
-                    
-                    if ( types[i].equals( String.class ) ) {
-                        query.setString( i + 1, (String) params[i] );
-                    }
-                    else if ( types[i].equals( int.class ) ) {
-                        query.setInt( i + 1, (int) params[i] );
-                    }
-                    else if ( types[i].equals( long.class ) ) {
-                        query.setLong( i + 1, (long) params[i] );
-                    }
-                    else if ( types[i].equals( double.class ) ) {
-                        query.setDouble( i + 1, (double) params[i] );
-                    }
-                }
+                query = setupStatement( query, types, params );
             }
-            query.executeUpdate();
+            try {
+                query.executeUpdate();
+            }
+            finally {
+                query.close();
+            }
         }
         catch (SQLException ex) {
             log.severe(ex.getMessage());

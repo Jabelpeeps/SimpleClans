@@ -86,76 +86,15 @@ public final class StorageManager {
     public void initiateDB() {
         SettingsManager settings = plugin.getSettingsManager();
         if (settings.isUseMysql()) {
-            core = new MySQLCore(settings.getHost(), settings.getDatabase(), settings.getPort(), settings.getUsername(), settings.getPassword());
+            core = new MySQLCore( settings.getHost(), 
+                                  settings.getDatabase(), 
+                                  settings.getPort(), 
+                                  settings.getUsername(), 
+                                  settings.getPassword());
 
             if (core.checkConnection()) {
                 connection = core.getConnection();
-                
                 SimpleClans.log("[SimpleClans] " + plugin.getLang("mysql.connection.successful"));
-
-                if (!core.existsTable("sc_clans")) {
-                    SimpleClans.log("Creating table: sc_clans");
-
-                    String query = "CREATE TABLE IF NOT EXISTS `sc_clans` ( "
-                                    + "`id` bigint(20) NOT NULL auto_increment, "
-                                    + "`verified` tinyint(1) default '0', "
-                                    + "`tag` varchar(25) NOT NULL, "
-                                    + "`color_tag` varchar(25) NOT NULL, "
-                                    + "`name` varchar(100) NOT NULL, "
-                                    + "`friendly_fire` tinyint(1) default '0', "
-                                    + "`founded` bigint NOT NULL, "
-                                    + "`last_used` bigint NOT NULL, "
-                                    + "`packed_allies` text NOT NULL, "
-                                    + "`packed_rivals` text NOT NULL, "
-                                    + "`packed_bb` mediumtext NOT NULL, "
-                                    + "`cape_url` varchar(255) NOT NULL, "
-                                    + "`flags` text NOT NULL, "
-                                    + "`balance` double(64,2), "
-                                    + "PRIMARY KEY  (`id`), "
-                                    + "UNIQUE KEY `uq_simpleclans_1` (`tag`));";
-                    core.execute(query);
-                }
-
-                if (!core.existsTable("sc_players")) {
-                    SimpleClans.log("Creating table: sc_players");
-
-                    String query = "CREATE TABLE IF NOT EXISTS `sc_players` ( "
-                                    + "`id` bigint(20) NOT NULL auto_increment, "
-                                    + "`name` varchar(16) NOT NULL, "
-                                    + "`uuid` CHAR(36) NOT NULL, "
-                                    + "`leader` tinyint(1) default '0', "
-                                    + "`tag` varchar(25) NOT NULL, "
-                                    + "`friendly_fire` tinyint(1) default '0', "
-                                    + "`neutral_kills` int(11) default NULL, "
-                                    + "`rival_kills` int(11) default NULL, "
-                                    + "`civilian_kills` int(11) default NULL, "
-                                    + "`deaths` int(11) default NULL, "
-                                    + "`last_seen` bigint NOT NULL, "
-                                    + "`join_date` bigint NOT NULL, "
-                                    + "`trusted` tinyint(1) default '0', "
-                                    + "`flags` text NOT NULL, "
-                                    + "`packed_past_clans` text, "
-                                    + "PRIMARY KEY  (`id`), "
-                                    + "UNIQUE INDEX `uq_player_uuid` (`uuid`)"
-                                    + ");";
-                    core.execute(query);
-                }
-
-                if (!core.existsTable("sc_kills")) {
-                    SimpleClans.log("Creating table: sc_kills");
-
-                    String query = "CREATE TABLE IF NOT EXISTS `sc_kills` ( "
-                                    + "`kill_id` bigint(20) NOT NULL auto_increment, "
-                                    + "`attacker` varchar(16) NOT NULL, "
-                                    + "`attacker_tag` varchar(16) NOT NULL, "
-                                    + "`attacker_uuid` CHAR(36) NOT NULL, "
-                                    + "`victim` varchar(16) NOT NULL, "
-                                    + "`victim_tag` varchar(16) NOT NULL, "
-                                    + "`victim_uuid` CHAR(36) NOT NULL, "
-                                    + "`kill_type` varchar(1) NOT NULL, "
-                                    + "PRIMARY KEY  (`kill_id`));";
-                    core.execute(query);
-                }
             }
             else Bukkit.getConsoleSender().sendMessage("[SimpleClans] " + ChatColor.RED + plugin.getLang("mysql.connection.failed"));
         }
@@ -165,67 +104,6 @@ public final class StorageManager {
             if (core.checkConnection()) {
                 connection = core.getConnection();
                 SimpleClans.log("[SimpleClans] " + plugin.getLang("sqlite.connection.successful"));
-
-                if (!core.existsTable("sc_clans")) {
-                    SimpleClans.log("Creating table: sc_clans");
-
-                    String query = "CREATE TABLE IF NOT EXISTS `sc_clans` ( "
-                                    + "`id` bigint(20), "
-                                    + "`verified` tinyint(1) default '0', "
-                                    + "`tag` varchar(25) NOT NULL, "
-                                    + "`color_tag` varchar(25) NOT NULL, "
-                                    + "`name` varchar(100) NOT NULL, "
-                                    + "`friendly_fire` tinyint(1) default '0', "
-                                    + "`founded` bigint NOT NULL, "
-                                    + "`last_used` bigint NOT NULL, "
-                                    + "`packed_allies` text NOT NULL, "
-                                    + "`packed_rivals` text NOT NULL, "
-                                    + "`packed_bb` mediumtext NOT NULL, "
-                                    + "`cape_url` varchar(255) NOT NULL, "
-                                    + "`flags` text NOT NULL, "
-                                    + "`balance` double(64,2) default 0.0,  "
-                                    + "PRIMARY KEY  (`id`), UNIQUE (`tag`));";
-                    core.execute(query);
-                }
-
-                if (!core.existsTable("sc_players")) {
-                    SimpleClans.log("Creating table: sc_players");
-
-                    String query = "CREATE TABLE IF NOT EXISTS `sc_players` ( "
-                                    + "`id` bigint(20), "
-                                    + "`name` varchar(16) NOT NULL, "
-                                    + "`uuid` CHAR(36) NOT NULL, "
-                                    + "`leader` tinyint(1) default '0', "
-                                    + "`tag` varchar(25) NOT NULL, "
-                                    + "`friendly_fire` tinyint(1) default '0', "
-                                    + "`neutral_kills` int(11) default NULL, "
-                                    + "`rival_kills` int(11) default NULL, "
-                                    + "`civilian_kills` int(11) default NULL, "
-                                    + "`deaths` int(11) default NULL, "
-                                    + "`last_seen` bigint NOT NULL, "
-                                    + "`join_date` bigint NOT NULL, "
-                                    + "`trusted` tinyint(1) default '0', "
-                                    + "`flags` text NOT NULL, "
-                                    + "`packed_past_clans` text, "
-                                    + "PRIMARY KEY  (`id`), UNIQUE (`name`));";
-                    core.execute(query);
-                }
-
-                if (!core.existsTable("sc_kills")) {
-                    SimpleClans.log("Creating table: sc_kills");
-
-                    String query = "CREATE TABLE IF NOT EXISTS `sc_kills` ( "
-                                    + "`kill_id` bigint(20), "
-                                    + "`attacker` varchar(16) NOT NULL, "
-                                    + "`attacker_tag` varchar(16) NOT NULL, "
-                                    + "`attacker_uuid` CHAR(36) NOT NULL, "
-                                    + "`victim` varchar(16) NOT NULL, "
-                                    + "`victim_tag` varchar(16) NOT NULL, "
-                                    + "`victim_uuid` CHAR(36) NOT NULL, "
-                                    + "`kill_type` varchar(1) NOT NULL, "
-                                    + "PRIMARY KEY  (`kill_id`));";
-                    core.execute(query);
-                }
             }
             else {
                 Bukkit.getConsoleSender().sendMessage("[SimpleClans] " + ChatColor.RED + plugin.getLang("sqlite.connection.failed"));

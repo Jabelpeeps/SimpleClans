@@ -20,10 +20,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.json.simple.parser.ParseException;
 
 import net.sacredlabyrinth.phaed.simpleclans.managers.ClanManager;
-import net.sacredlabyrinth.phaed.simpleclans.uuid.UUIDFetcher;
 
 /**
  * @author phaed
@@ -308,24 +306,27 @@ public class Helper {
      * Sort hashmap by value
 
      */
-    public static <K,V extends Comparable<V>> Map<K,V> sortByValue(Map<K,V> map) {
+    public static <K,V extends Comparable<V>> Map<K,V> sortByValue( Map<K,V> map ) {
         
-        List<Entry<K,V>> list = new LinkedList<>(map.entrySet());
+        List<Entry<K,V>> list = new LinkedList<>( map.entrySet() );
         
         Collections.sort(list, (o1, o2) -> {
             return o2.getValue().compareTo( o1.getValue() );     
         });
 
         Map<K,V> result = new LinkedHashMap<>();
-        for (Iterator<Entry<K,V>> it = list.iterator(); it.hasNext(); )  {
+        for ( Iterator<Entry<K,V>> it = list.iterator(); it.hasNext(); )  {
             Entry<K,V> entry = it.next();
-            result.put(entry.getKey(), entry.getValue());
+            result.put( entry.getKey(), entry.getValue() );
         }
         return result;
     }
 
     public static boolean isVanished(Player player) {
-        if (player != null && player.hasMetadata("vanished") && !player.getMetadata("vanished").isEmpty()) {
+        if (    player != null 
+                && player.hasMetadata("vanished") 
+                && !player.getMetadata("vanished").isEmpty()) {
+            
         	return player.getMetadata("vanished").get(0).asBoolean();
         }
         return false;
@@ -346,18 +347,6 @@ public class Helper {
             if ( each.getName().equalsIgnoreCase( playerName ) )
                 return each.getUniqueId();
         }
-        
-        try {
-            return UUIDFetcher.getUUIDOf(playerName);
-            
-        } catch ( IOException | ParseException e ) {
-                
-            @SuppressWarnings( "deprecation" )
-            OfflinePlayer OfflinePlayer = Bukkit.getOfflinePlayer(playerName);
-            if (OfflinePlayer != null) {
-                return OfflinePlayer.getUniqueId();
-            }
-            return null;
-        }
+        return null;    
     }
 }

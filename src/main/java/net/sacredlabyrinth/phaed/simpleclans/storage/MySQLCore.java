@@ -8,12 +8,11 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
-import net.sacredlabyrinth.phaed.simpleclans.threads.ThreadUpdateSQL;
 
 /**
  * @author cc_madelg
  */
-public class MySQLCore implements DBCore {
+public class MySQLCore extends AbstractDBCore {
 
     private Logger log;
     private Connection connection;
@@ -38,13 +37,80 @@ public class MySQLCore implements DBCore {
     private void initialize() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?useUnicode=true&characterEncoding=utf-8", username, password);
+            connection = DriverManager.getConnection( "jdbc:mysql://" + host + 
+                                                      ":" + port + 
+                                                      "/" + database + 
+                                                      "?useUnicode=true&characterEncoding=utf-8", username, password );
         }
         catch (ClassNotFoundException e) {
             log.severe("ClassNotFoundException! " + e.getMessage());
         }
         catch (SQLException e) {
             log.severe("SQLException! " + e.getMessage());
+        }
+        
+        if (!existsTable("sc_clans")) {
+            SimpleClans.log("Creating table: sc_clans");
+
+            String query = "CREATE TABLE IF NOT EXISTS `sc_clans` ( "
+                            + "`id` bigint(20) NOT NULL auto_increment, "
+                            + "`verified` tinyint(1) default '0', "
+                            + "`tag` varchar(25) NOT NULL, "
+                            + "`color_tag` varchar(25) NOT NULL, "
+                            + "`name` varchar(100) NOT NULL, "
+                            + "`friendly_fire` tinyint(1) default '0', "
+                            + "`founded` bigint NOT NULL, "
+                            + "`last_used` bigint NOT NULL, "
+                            + "`packed_allies` text NOT NULL, "
+                            + "`packed_rivals` text NOT NULL, "
+                            + "`packed_bb` mediumtext NOT NULL, "
+                            + "`cape_url` varchar(255) NOT NULL, "
+                            + "`flags` text NOT NULL, "
+                            + "`balance` double(64,2), "
+                            + "PRIMARY KEY  (`id`), "
+                            + "UNIQUE KEY `uq_simpleclans_1` (`tag`));";
+            execute(query);
+        }
+
+        if (!existsTable("sc_players")) {
+            SimpleClans.log("Creating table: sc_players");
+
+            String query = "CREATE TABLE IF NOT EXISTS `sc_players` ( "
+                            + "`id` bigint(20) NOT NULL auto_increment, "
+                            + "`name` varchar(16) NOT NULL, "
+                            + "`uuid` CHAR(36) NOT NULL, "
+                            + "`leader` tinyint(1) default '0', "
+                            + "`tag` varchar(25) NOT NULL, "
+                            + "`friendly_fire` tinyint(1) default '0', "
+                            + "`neutral_kills` int(11) default NULL, "
+                            + "`rival_kills` int(11) default NULL, "
+                            + "`civilian_kills` int(11) default NULL, "
+                            + "`deaths` int(11) default NULL, "
+                            + "`last_seen` bigint NOT NULL, "
+                            + "`join_date` bigint NOT NULL, "
+                            + "`trusted` tinyint(1) default '0', "
+                            + "`flags` text NOT NULL, "
+                            + "`packed_past_clans` text, "
+                            + "PRIMARY KEY  (`id`), "
+                            + "UNIQUE INDEX `uq_player_uuid` (`uuid`)"
+                            + ");";
+            execute(query);
+        }
+
+        if (!existsTable("sc_kills")) {
+            SimpleClans.log("Creating table: sc_kills");
+
+            String query = "CREATE TABLE IF NOT EXISTS `sc_kills` ( "
+                            + "`kill_id` bigint(20) NOT NULL auto_increment, "
+                            + "`attacker` varchar(16) NOT NULL, "
+                            + "`attacker_tag` varchar(16) NOT NULL, "
+                            + "`attacker_uuid` CHAR(36) NOT NULL, "
+                            + "`victim` varchar(16) NOT NULL, "
+                            + "`victim_tag` varchar(16) NOT NULL, "
+                            + "`victim_uuid` CHAR(36) NOT NULL, "
+                            + "`kill_type` varchar(1) NOT NULL, "
+                            + "PRIMARY KEY  (`kill_id`));";
+            execute(query);
         }
     }
 
@@ -79,7 +145,7 @@ public class MySQLCore implements DBCore {
                 connection.close();
             }
         }
-        catch (Exception e) {
+        catch (SQLException e) {
             log.severe("Failed to close database connection! " + e.getMessage());
         }
     }
@@ -132,7 +198,7 @@ public class MySQLCore implements DBCore {
         try (ResultSet col = getConnection().getMetaData().getColumns(null, null, table, column) ) {
             return col.next();
         }
-        catch (Exception e) {
+        catch (SQLException e) {
             log.severe("Failed to check if column " + column + " exists in table " + table + " : " + e.getMessage());
             return false;
         }
@@ -148,24 +214,15 @@ public class MySQLCore implements DBCore {
     public ResultSet getResultSet(PreparedStatement query, Class<?>[] types, Object...params  ) {
         try {
             if (types != null) {
-                for ( int i = 0; i < params.length; i++ ) {
-                    
-                    if ( types[i].equals( String.class ) ) {
-                        query.setString( i + 1, (String) params[i] );
-                    }
-                    else if ( types[i].equals( int.class ) ) {
-                        query.setInt( i + 1, (int) params[i] );
-                    }
-                    else if ( types[i].equals( long.class ) ) {
-                        query.setLong( i + 1, (long) params[i] );
-                    }
-                    else if ( types[i].equals( double.class ) ) {
-                        query.setDouble( i + 1, (double) params[i] );
-                    }
-                }
+                query = setupStatement( query, types, params );
             }
-            if (query.execute())
-                return query.getResultSet();
+            try {
+                if (query.execute())
+                    return query.getResultSet();
+            }
+            finally {
+                query.close();
+            }
         }
         catch (SQLException ex) {
             log.severe(ex.getMessage());
@@ -182,23 +239,14 @@ public class MySQLCore implements DBCore {
         }
         try {
             if (types != null) {
-                for ( int i = 0; i < params.length; i++ ) {
-                    
-                    if ( types[i].equals( String.class ) ) {
-                        query.setString( i + 1, (String) params[i] );
-                    }
-                    else if ( types[i].equals( int.class ) ) {
-                        query.setInt( i + 1, (int) params[i] );
-                    }
-                    else if ( types[i].equals( long.class ) ) {
-                        query.setLong( i + 1, (long) params[i] );
-                    }
-                    else if ( types[i].equals( double.class ) ) {
-                        query.setDouble( i + 1, (double) params[i] );
-                    }
-                }
+                query = setupStatement( query, types, params );
             }
-            query.executeUpdate();
+            try {
+                query.executeUpdate();
+            }
+            finally {
+                query.close();
+            }
         }
         catch (SQLException ex) {
             log.severe(ex.getMessage());

@@ -1,4 +1,4 @@
-package net.sacredlabyrinth.phaed.simpleclans.threads;
+package net.sacredlabyrinth.phaed.simpleclans.storage;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

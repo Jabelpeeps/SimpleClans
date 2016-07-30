@@ -33,8 +33,8 @@ settings:
     - staff
     - mod
     show-unverified-on-list: false
+    # list worlds that you do not want SimpleClans to be active in.
     blacklisted-worlds: []
-    banned-players: []
     disallowed-tags:
     - vip
     - clan

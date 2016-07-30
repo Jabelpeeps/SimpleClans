@@ -85,6 +85,7 @@ public final class TeleportManager {
         }
     }
 
+    @SuppressWarnings( "deprecation" )
     private void startCounter() {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
     

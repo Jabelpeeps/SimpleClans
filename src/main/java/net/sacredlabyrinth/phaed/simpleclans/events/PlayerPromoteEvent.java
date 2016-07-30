@@ -1,9 +1,10 @@
 package net.sacredlabyrinth.phaed.simpleclans.events;
 
-import net.sacredlabyrinth.phaed.simpleclans.Clan;
-import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+
+import net.sacredlabyrinth.phaed.simpleclans.Clan;
+import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 
 /**
  *
@@ -15,25 +16,21 @@ public class PlayerPromoteEvent extends Event {
     private final Clan clan;
     private final ClanPlayer target;
 
-    public PlayerPromoteEvent(Clan clan, ClanPlayer target) {
-        this.clan = clan;
-        this.target = target;
+    public PlayerPromoteEvent(Clan _clan, ClanPlayer _target) {
+        clan = _clan;
+        target = _target;
     }
 
     public Clan getClan() {
-        return this.clan;
+        return clan;
     }
 
     public ClanPlayer getClanPlayer() {
-        return this.target;
+        return target;
     }
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 }

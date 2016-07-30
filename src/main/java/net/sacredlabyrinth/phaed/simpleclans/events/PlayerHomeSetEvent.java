@@ -1,11 +1,12 @@
 package net.sacredlabyrinth.phaed.simpleclans.events;
 
-import net.sacredlabyrinth.phaed.simpleclans.Clan;
-import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+
+import net.sacredlabyrinth.phaed.simpleclans.Clan;
+import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 
 /**
  *
@@ -19,10 +20,10 @@ public class PlayerHomeSetEvent extends Event implements Cancellable {
     private final ClanPlayer cp;
     private final Location loc;
 
-    public PlayerHomeSetEvent(Clan clan, ClanPlayer cp, Location loc) {
-        this.clan = clan;
-        this.cp = cp;
-        this.loc = loc;
+    public PlayerHomeSetEvent(Clan _clan, ClanPlayer _cp, Location _loc) {
+        clan = _clan;
+        cp = _cp;
+        loc = _loc;
     }
 
     @Override
@@ -31,8 +32,8 @@ public class PlayerHomeSetEvent extends Event implements Cancellable {
     }
 
     @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
+    public void setCancelled(boolean _cancelled) {
+        cancelled = _cancelled;
     }
 
     public Clan getClan() {
@@ -40,19 +41,15 @@ public class PlayerHomeSetEvent extends Event implements Cancellable {
     }
 
     public ClanPlayer getClanPlayer() {
-        return this.cp;
+        return cp;
     }
 
     public Location getLocation() {
-        return this.loc;
+        return loc;
     }
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 }

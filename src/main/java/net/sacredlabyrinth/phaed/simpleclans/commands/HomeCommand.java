@@ -27,6 +27,7 @@ import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
  */
 public class HomeCommand  implements ClanCommand {
 
+    @SuppressWarnings( "deprecation" )
     @Override
     public void execute(CommandSender sender, String[] arg) {
         

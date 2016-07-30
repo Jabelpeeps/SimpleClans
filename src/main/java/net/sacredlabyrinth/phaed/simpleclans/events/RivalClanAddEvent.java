@@ -1,8 +1,9 @@
 package net.sacredlabyrinth.phaed.simpleclans.events;
 
-import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+
+import net.sacredlabyrinth.phaed.simpleclans.Clan;
 
 /**
  *
@@ -14,25 +15,21 @@ public class RivalClanAddEvent extends Event {
     private final Clan clanFirst;
     private final Clan clanSecond;
 
-    public RivalClanAddEvent(Clan clanFirst, Clan clanSecond) {
-        this.clanFirst = clanFirst;
-        this.clanSecond = clanSecond;
+    public RivalClanAddEvent(Clan _clanFirst, Clan _clanSecond) {
+        clanFirst = _clanFirst;
+        clanSecond = _clanSecond;
     }
 
     public Clan getClanFirst() {
-        return this.clanFirst;
+        return clanFirst;
     }
 
     public Clan getClanSecond() {
-        return this.clanSecond;
+        return clanSecond;
     }
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 }

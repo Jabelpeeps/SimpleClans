@@ -47,7 +47,7 @@ public class ThreadUpdateSQL extends Thread {
         }
         catch (SQLException ex) {
             if (!ex.toString().contains("not return ResultSet")) {
-                SimpleClans.getLog().severe("[Thread] Error at SQL " + Arrays.asList( params ));
+                SimpleClans.getInstance().getLogger().severe("[Thread] Error at SQL " + Arrays.asList( params ));
                 ex.printStackTrace();
             }
         }

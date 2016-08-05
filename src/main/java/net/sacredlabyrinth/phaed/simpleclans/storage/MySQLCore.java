@@ -14,6 +14,7 @@ import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
  */
 public class MySQLCore extends AbstractDBCore {
 
+    private SimpleClans plugin = SimpleClans.getInstance();
     private Logger log;
     private Connection connection;
     private String host;
@@ -29,8 +30,8 @@ public class MySQLCore extends AbstractDBCore {
         host = _host;
         username = _username;
         password = _password;
-        log = SimpleClans.getLog();
-        usingThreads = SimpleClans.getInstance().getSettingsManager().getUseThreads();
+        log = plugin.getLogger();
+        usingThreads = plugin.getSettingsManager().getUseThreads();
         initialize();
     }
 

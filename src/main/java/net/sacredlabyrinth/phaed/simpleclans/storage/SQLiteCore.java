@@ -15,6 +15,7 @@ import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
  * @author cc_madelg
  */
 public class SQLiteCore extends AbstractDBCore {
+
     private Logger log;
     private Connection connection;
     private String dbLocation;
@@ -28,7 +29,7 @@ public class SQLiteCore extends AbstractDBCore {
     public SQLiteCore(String _dbLocation) {
         dbName = "SimpleClans";
         dbLocation = _dbLocation;
-        log = SimpleClans.getLog();
+        log = SimpleClans.getInstance().getLogger();
 
         initialize();
     }

@@ -30,28 +30,20 @@ import net.sacredlabyrinth.phaed.simpleclans.managers.TeleportManager;
 public class SimpleClans extends JavaPlugin {
 
     private static SimpleClans instance;
-    private static final Logger logger = Logger.getLogger("Minecraft");
-    private ClanManager clanManager;
-    private RequestManager requestManager;
-    private StorageManager storageManager;
-    private static SettingsManager settingsManager;
-    private PermissionsManager permissionsManager;
+    private static Logger logger;
+    private ClanManager clanMan;
+    private RequestManager reqMan;
+    private StorageManager stor;
+    private static SettingsManager settings;
+    private PermissionsManager perms;
     private TeleportManager teleportManager;
-    private LanguageManager languageManager;
+    private LanguageManager lang;
     private BansManager bansManager;
 
-    public static Logger getLog() {
-        return logger;
-    }
-
     public static void debug(String msg) {
-        if (settingsManager.isDebugging()) {
+        if (settings.isDebugging()) {
             logger.log(Level.INFO, msg);
         }
-    }
-
-    public static SimpleClans getInstance() {
-        return instance;
     }
 
     public static void log(String msg, Object... arg) {
@@ -65,58 +57,61 @@ public class SimpleClans extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        logger = getLogger();
 
-        settingsManager = new SettingsManager();
-        languageManager = new LanguageManager();
-        permissionsManager = new PermissionsManager();
-        requestManager = new RequestManager();
-        clanManager = new ClanManager();
-        storageManager = new StorageManager();
+        settings = new SettingsManager();
+        lang = new LanguageManager();
+        perms = new PermissionsManager();
+        reqMan = new RequestManager();
+        clanMan = new ClanManager();
+        stor = new StorageManager();
         teleportManager = new TeleportManager();
+        bansManager = new BansManager();
 
         logger.info( MessageFormat.format( 
-                languageManager.get( "version.loaded" ), getDescription().getName(), getDescription().getVersion()));
+                lang.get( "version.loaded" ), getDescription().getName(), getDescription().getVersion() ) );
 
-        Bukkit.getPluginManager().registerEvents(new SCEntityListener(), this);
-        Bukkit.getPluginManager().registerEvents(new SCPlayerListener(), this);
+        Bukkit.getPluginManager().registerEvents( new SCEntityListener(), this );
+        Bukkit.getPluginManager().registerEvents( new SCPlayerListener(), this );
 
-        permissionsManager.loadPermissions();
+        perms.loadPermissions();
 
-        CommandHelper.registerCommand(settingsManager.getCommandClan());
-        CommandHelper.registerCommand(settingsManager.getCommandAccept());
-        CommandHelper.registerCommand(settingsManager.getCommandDeny());
-        CommandHelper.registerCommand(settingsManager.getCommandMore());
-        CommandHelper.registerCommand(settingsManager.getCommandAlly());
-        CommandHelper.registerCommand(settingsManager.getCommandGlobal());
+        CommandHelper.registerCommand( settings.getCommandClan() );
+        CommandHelper.registerCommand( settings.getCommandAccept() );
+        CommandHelper.registerCommand( settings.getCommandDeny() );
+        CommandHelper.registerCommand( settings.getCommandMore() );
+        CommandHelper.registerCommand( settings.getCommandAlly() );
+        CommandHelper.registerCommand( settings.getCommandGlobal() );
 
-        getCommand(settingsManager.getCommandClan()).setExecutor(new ClanCommandExecutor());
-        getCommand(settingsManager.getCommandAccept()).setExecutor(new AcceptCommandExecutor());
-        getCommand(settingsManager.getCommandDeny()).setExecutor(new DenyCommandExecutor());
-        getCommand(settingsManager.getCommandMore()).setExecutor(new MoreCommandExecutor());
-        getCommand(settingsManager.getCommandAlly()).setExecutor(new AllyCommandExecutor());
-        getCommand(settingsManager.getCommandGlobal()).setExecutor(new GlobalCommandExecutor());
+        getCommand( settings.getCommandClan() ).setExecutor( new ClanCommandExecutor() );
+        getCommand( settings.getCommandAccept() ).setExecutor( new AcceptCommandExecutor() );
+        getCommand( settings.getCommandDeny() ).setExecutor( new DenyCommandExecutor() );
+        getCommand( settings.getCommandMore() ).setExecutor( new MoreCommandExecutor() );
+        getCommand( settings.getCommandAlly() ).setExecutor( new AllyCommandExecutor() );
+        getCommand( settings.getCommandGlobal() ).setExecutor( new GlobalCommandExecutor() );
 
-        getCommand(settingsManager.getCommandClan()).setTabCompleter(new PlayerNameTabCompleter());
+        getCommand( settings.getCommandClan() ).setTabCompleter( new PlayerNameTabCompleter() );
 
-        logger.info("[SimpleClans] Modo Multithreading: " + settingsManager.getUseThreads());
-        logger.info("[SimpleClans] Modo BungeeCord: " + settingsManager.getUseBungeeCord());
+        logger.info( "Modo Multithreading: " + settings.getUseThreads() );
+        logger.info( "Modo BungeeCord: " + settings.getUseBungeeCord() );
     }
 
     @Override
     public void onDisable() {
         Bukkit.getScheduler().cancelTasks(this);
-        storageManager.closeConnection();
-        permissionsManager.savePermissions();
+        stor.closeConnection();
+        perms.savePermissions();
         bansManager.saveBans();
     }
 
-    public ClanManager getClanManager() { return clanManager; }
-    public RequestManager getRequestManager() { return requestManager; }
-    public StorageManager getStorageManager() { return storageManager; }
-    public SettingsManager getSettingsManager() { return settingsManager; }
-    public PermissionsManager getPermissionsManager() { return permissionsManager; }
-    public String getLang(String msg) { return languageManager.get(msg); }
+    public static SimpleClans getInstance() { return instance; }
+    public ClanManager getClanManager() { return clanMan; }
+    public RequestManager getRequestManager() { return reqMan; }
+    public StorageManager getStorageManager() { return stor; }
+    public SettingsManager getSettingsManager() { return settings; }
+    public PermissionsManager getPermissionsManager() { return perms; }
+    public String getLang(String msg) { return lang.get(msg); }
     public TeleportManager getTeleportManager() { return teleportManager; }
-    public LanguageManager getLanguageManager() { return languageManager; }
+    public LanguageManager getLanguageManager() { return lang; }
     public BansManager getBansManager() { return bansManager; }
 }

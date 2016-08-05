@@ -250,8 +250,8 @@ public final class StorageManager {
             }
         }
         catch (SQLException ex) {
-            SimpleClans.getLog().severe(String.format("An Error occurred: %s", ex.getErrorCode()));
-            SimpleClans.getLog().log(Level.SEVERE, null, ex);         
+            plugin.getLogger().severe(String.format("An Error occurred: %s", ex.getErrorCode()));
+            plugin.getLogger().log(Level.SEVERE, null, ex);         
         }
         return out;
     }
@@ -277,8 +277,8 @@ public final class StorageManager {
             }
         }
         catch (SQLException ex) {
-            SimpleClans.getLog().severe(String.format("An Error occurred: %s", ex.getErrorCode()));
-            SimpleClans.getLog().log(Level.SEVERE, null, ex);
+            plugin.getLogger().severe(String.format("An Error occurred: %s", ex.getErrorCode()));
+            plugin.getLogger().log(Level.SEVERE, null, ex);
         }
         return clan;
     }
@@ -336,8 +336,8 @@ public final class StorageManager {
             }
         }
         catch (SQLException ex) {
-            SimpleClans.getLog().severe(String.format("An Error occurred: %s", ex.getErrorCode()));
-            SimpleClans.getLog().log(Level.SEVERE, null, ex);
+            plugin.getLogger().severe(String.format("An Error occurred: %s", ex.getErrorCode()));
+            plugin.getLogger().log(Level.SEVERE, null, ex);
         }
         return out;
     }
@@ -417,8 +417,8 @@ public final class StorageManager {
             }
         }
         catch (SQLException ex) {
-            SimpleClans.getLog().severe(String.format("An Error occurred: %s", ex.getErrorCode()));
-            SimpleClans.getLog().log(Level.SEVERE, null, ex);
+            plugin.getLogger().severe(String.format("An Error occurred: %s", ex.getErrorCode()));
+            plugin.getLogger().log(Level.SEVERE, null, ex);
         }
         return null;
     }
@@ -676,8 +676,8 @@ public final class StorageManager {
             }
         }
         catch (SQLException ex) {
-            SimpleClans.getLog().severe(String.format("An Error occurred: %s", ex.getErrorCode()));
-            SimpleClans.getLog().log(Level.SEVERE, null, ex);
+            plugin.getLogger().severe(String.format("An Error occurred: %s", ex.getErrorCode()));
+            plugin.getLogger().log(Level.SEVERE, null, ex);
         }
         return out;
     }
@@ -701,8 +701,8 @@ public final class StorageManager {
             }
         }
         catch (SQLException ex) {
-            SimpleClans.getLog().severe(String.format("An Error occurred: %s", ex.getErrorCode()));
-            SimpleClans.getLog().log(Level.SEVERE, null, ex);
+            plugin.getLogger().severe(String.format("An Error occurred: %s", ex.getErrorCode()));
+            plugin.getLogger().log(Level.SEVERE, null, ex);
         }
         return out;
     }

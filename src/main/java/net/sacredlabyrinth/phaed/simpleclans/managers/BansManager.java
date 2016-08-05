@@ -1,12 +1,14 @@
 package net.sacredlabyrinth.phaed.simpleclans.managers;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -17,10 +19,12 @@ public class BansManager {
 
     private SimpleClans plugin = SimpleClans.getInstance();
     private Set<UUID> bannedPlayers = new HashSet<>();
+    private File bansFile;
     private FileConfiguration bans;
     
-    BansManager() {
-        bans = YamlConfiguration.loadConfiguration( new File( plugin.getDataFolder(), "bans.yml") );
+    public BansManager() {
+        bansFile = new File( plugin.getDataFolder(), "bans.yml");
+        bans = YamlConfiguration.loadConfiguration( bansFile );
          
         bans.getStringList("bans")
             .parallelStream()
@@ -39,6 +43,12 @@ public class BansManager {
                      .forEach( e -> newBans.add( e ) );
         
         bans.set( "bans", newBans );
+        try {
+            bans.save( bansFile );
+        } catch ( IOException e1 ) {
+            plugin.getLogger().log( Level.SEVERE, "Error saving Bans list to bans.yml." );
+            e1.printStackTrace();
+        }
     }
     /**
      * Check whether a player is banned

@@ -13,6 +13,7 @@ import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 
 /**
  *
@@ -24,6 +25,7 @@ public class UntrustCommand  implements ClanCommand {
     public void execute(CommandSender sender, String[] arg) {
         Player player = (Player) sender;
         SimpleClans plugin = SimpleClans.getInstance();
+        LanguageManager lang = plugin.getLanguageManager();
 
         if (plugin.getPermissionsManager().has(player, "simpleclans.leader.settrust")) {
             ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
@@ -41,30 +43,32 @@ public class UntrustCommand  implements ClanCommand {
                                     if (!clan.isLeader(trusted)) {
                                         ClanPlayer tcp = plugin.getClanManager().getAnyClanPlayer(trusted.getUniqueId());
                                         if (tcp == null)  {
-                                            ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.player.matched"));
+                                            ChatBlock.sendMessage(player, ChatColor.RED, lang.get("no.player.matched"));
                                             return;
                                         }                                       
                                         if (tcp.isTrusted()) {
-                                            clan.addBb(player.getName(), ChatColor.AQUA + MessageFormat.format(plugin.getLang("has.been.given.untrusted.status.by"), Helper.capitalize(trusted.getName()), player.getName()));
+                                            clan.addBb(player.getName(), ChatColor.AQUA + MessageFormat.format(
+                                                    lang.get("has.been.given.untrusted.status.by"), 
+                                                    Helper.capitalize(trusted.getName()), player.getName()));
                                             tcp.setTrusted(false);
                                             plugin.getStorageManager().updateClanPlayer(tcp);
                                         }
-                                        else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("this.player.is.already.untrusted"));
+                                        else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("this.player.is.already.untrusted"));
                                     }
-                                    else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("leaders.cannot.be.untrusted"));
+                                    else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("leaders.cannot.be.untrusted"));
                                 }
-                                else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("the.player.is.not.a.member.of.your.clan"));
+                                else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("the.player.is.not.a.member.of.your.clan"));
                             }
-                            else ChatBlock.sendMessage(player,  ChatColor.RED + plugin.getLang("you.cannot.untrust.yourself"));
+                            else ChatBlock.sendMessage(player,  ChatColor.RED, lang.get("you.cannot.untrust.yourself"));
                         }
-                        else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.player.matched"));
+                        else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("no.player.matched"));
                     }
-                    else ChatBlock.sendMessage(player, ChatColor.RED + MessageFormat.format(plugin.getLang("usage.0.untrust.player"), plugin.getSettingsManager().getCommandClan()));
+                    else ChatBlock.sendMessage(player, ChatColor.RED, MessageFormat.format(lang.get("usage.0.untrust.player"), plugin.getSettingsManager().getCommandClan()));
                 }
-                else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.leader.permissions"));
+                else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("no.leader.permissions"));
             }
-            else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("not.a.member.of.any.clan"));
+            else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("not.a.member.of.any.clan"));
         }
-        else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
+        else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("insufficient.permissions"));
     }
 }

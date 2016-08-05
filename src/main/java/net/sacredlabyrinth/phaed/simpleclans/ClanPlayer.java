@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -425,11 +426,9 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer> {
                             useChatShortcut = (Boolean) flags.get(flag);
                     }
                     catch (Exception ex) {
-                        for (StackTraceElement el : ex.getStackTrace()) {
-                            System.out.print("Failed reading flag: " + flag);
-                            System.out.print("Value: " + flags.get(flag));
-                            System.out.print(el.toString());
-                        }
+                        plugin.getLogger().log( Level.WARNING, "Failed reading flag: " + flag );
+                        plugin.getLogger().log( Level.WARNING, "Value: " + flags.get(flag) );
+                        ex.printStackTrace();
                     }
                 }
             }

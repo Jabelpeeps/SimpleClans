@@ -14,6 +14,8 @@ import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 /**
  * @author phaed
@@ -24,75 +26,68 @@ public class LeaderboardCommand implements ClanCommand  {
     public void execute(CommandSender sender, String[] arg) {
         Player player = (Player) sender;
         SimpleClans plugin = SimpleClans.getInstance();
-        String headColor = plugin.getSettingsManager().getPageHeadingsColor();
-        String subColor = plugin.getSettingsManager().getPageSubTitleColor();
+        LanguageManager lang = plugin.getLanguageManager();
+        SettingsManager settings = plugin.getSettingsManager();
+        String headColor = settings.getPageHeadingsColor();
+        String subColor = settings.getPageSubTitleColor();
         NumberFormat formatter = new DecimalFormat("#.#");
 
-        if (arg.length == 0)
-        {
-            if (plugin.getPermissionsManager().has(player, "simpleclans.anyone.leaderboard"))
-            {
+        if (arg.length == 0) {
+            if (plugin.getPermissionsManager().has(player, "simpleclans.anyone.leaderboard")) {
                 List<ClanPlayer> clanPlayers = plugin.getClanManager().getAllClanPlayers();
                 plugin.getClanManager().sortClanPlayersByKDR(clanPlayers);
 
                 ChatBlock chatBlock = new ChatBlock();
 
                 ChatBlock.sendBlank(player);
-                ChatBlock.saySingle(player, plugin.getSettingsManager().getServerName() + subColor + " " + plugin.getLang("leaderboard.command") + " " + headColor + Helper.generatePageSeparator(plugin.getSettingsManager().getPageSep()));
+                ChatBlock.saySingle(player, settings.getServerName(), subColor, " ", lang.get("leaderboard.command"), 
+                        " ", headColor, Helper.generatePageSeparator(settings.getPageSep()));
                 ChatBlock.sendBlank(player);
-                ChatBlock.sendMessage(player, headColor + MessageFormat.format(plugin.getLang("total.clan.players.0"), subColor + clanPlayers.size()));
+                ChatBlock.sendMessage(player, headColor, MessageFormat.format(
+                        lang.get("total.clan.players.0"), subColor, clanPlayers.size()));
                 ChatBlock.sendBlank(player);
 
                 chatBlock.setAlignment("c", "l", "c", "c", "c", "c");
-                chatBlock.addRow("  " + headColor + plugin.getLang("rank"), plugin.getLang("player"), plugin.getLang("kdr"), plugin.getLang("clan"), plugin.getLang("seen"));
+                chatBlock.addRow("  " + headColor + lang.get("rank"), lang.get("player"), lang.get("kdr"), lang.get("clan"), lang.get("seen"));
 
                 int rank = 1;
 
-                for (ClanPlayer cp : clanPlayers)
-                {
+                for (ClanPlayer cp : clanPlayers) {
                     Player p = cp.toPlayer();
 
                     boolean isOnline = false;
 
-                    if (p != null)
-                    {
+                    if (p != null) {
                         isOnline = true;
                     }
 
 
-                    String name = (cp.isLeader() ? plugin.getSettingsManager().getPageLeaderColor() : (cp.isTrusted() ? plugin.getSettingsManager().getPageTrustedColor() : plugin.getSettingsManager().getPageUnTrustedColor())) + cp.getName();
-                    String lastSeen = isOnline ? ChatColor.GREEN + plugin.getLang("online") : ChatColor.WHITE + cp.getLastSeenDaysString();
+                    String name = (cp.isLeader() ? settings.getPageLeaderColor() 
+                                                 : (cp.isTrusted() ? settings.getPageTrustedColor() 
+                                                                   : settings.getPageUnTrustedColor())) + cp.getName();
+                    String lastSeen = isOnline ? ChatColor.GREEN + lang.get("online") 
+                                               : ChatColor.WHITE + cp.getLastSeenDaysString();
 
-                    String clanTag = ChatColor.WHITE + plugin.getLang("free.agent");
+                    String clanTag = ChatColor.WHITE + lang.get("free.agent");
 
-                    if (cp.getClan() != null)
-                    {
+                    if (cp.getClan() != null) {
                         clanTag = cp.getClan().getColorTag();
                     }
 
                     chatBlock.addRow("  " + rank, name, ChatColor.YELLOW + "" + formatter.format(cp.getKDR()), ChatColor.WHITE + clanTag, lastSeen);
                     rank++;
                 }
+                boolean more = chatBlock.sendBlock(player, settings.getPageSize());
 
-                boolean more = chatBlock.sendBlock(player, plugin.getSettingsManager().getPageSize());
-
-                if (more)
-                {
+                if (more) {
                     plugin.getStorageManager().addChatBlock(player, chatBlock);
                     ChatBlock.sendBlank(player);
-                    ChatBlock.sendMessage(player, headColor + MessageFormat.format(plugin.getLang("view.next.page"), plugin.getSettingsManager().getCommandMore()));
+                    ChatBlock.sendMessage(player, headColor, MessageFormat.format(lang.get("view.next.page"), settings.getCommandMore()));
                 }
-
                 ChatBlock.sendBlank(player);
             }
-            else
-            {
-                ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
-            }
+            else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("insufficient.permissions"));
         }
-        else
-        {
-            ChatBlock.sendMessage(player, ChatColor.RED + MessageFormat.format(plugin.getLang("usage.0.leaderboard"), plugin.getSettingsManager().getCommandClan()));
-        }
+        else ChatBlock.sendMessage(player, ChatColor.RED, MessageFormat.format(lang.get("usage.0.leaderboard"), settings.getCommandClan()));
     }
 }

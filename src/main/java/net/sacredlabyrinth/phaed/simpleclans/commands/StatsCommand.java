@@ -15,6 +15,8 @@ import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 /**
  * @author phaed
@@ -25,38 +27,42 @@ public class StatsCommand implements ClanCommand {
     public void execute(CommandSender sender, String[] arg) {
         Player player = (Player) sender;
         SimpleClans plugin = SimpleClans.getInstance();
-        String headColor = plugin.getSettingsManager().getPageHeadingsColor();
-        String subColor = plugin.getSettingsManager().getPageSubTitleColor();
+        SettingsManager settings = plugin.getSettingsManager();
+        LanguageManager lang = plugin.getLanguageManager();
+        String headColor = settings.getPageHeadingsColor();
+        String subColor = settings.getPageSubTitleColor();
         NumberFormat formatter = new DecimalFormat("#.#");
 
-        if (plugin.getPermissionsManager().has(player, "simpleclans.member.stats"))
-        {
+        if (plugin.getPermissionsManager().has(player, "simpleclans.member.stats")) {
             ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
 
-            if (cp != null)
-            {
+            if (cp != null) {
                 Clan clan = cp.getClan();
 
-                if (clan.isVerified())
-                {
-                    if (cp.isTrusted())
-                    {
-                        if (arg.length == 0)
-                        {
+                if (clan.isVerified()) {
+                    if (cp.isTrusted()) {
+                        if (arg.length == 0) {
                             ChatBlock chatBlock = new ChatBlock();
 
-
-                            ChatBlock.saySingle(player, plugin.getSettingsManager().getPageClanNameColor() + Helper.capitalize(clan.getName()) + subColor+ " " + plugin.getLang("stats") + " " + headColor + Helper.generatePageSeparator(plugin.getSettingsManager().getPageSep()));
+                            ChatBlock.saySingle(player, settings.getPageClanNameColor(), Helper.capitalize(clan.getName()), 
+                                                        subColor, " ", lang.get("stats"), " ", 
+                                                        headColor, Helper.generatePageSeparator(settings.getPageSep()));
                             ChatBlock.sendBlank(player);
 
-                            ChatBlock.sendMessage(player, headColor + plugin.getLang("kdr") + " = " + subColor + plugin.getLang("kill.death.ratio"));
-                            ChatBlock.sendMessage(player, headColor + plugin.getLang("weights") + " = " + plugin.getLang("rival") + ": " + subColor + plugin.getSettingsManager().getKwRival() + headColor + " " + plugin.getLang("neutral") + ": " + subColor + plugin.getSettingsManager().getKwNeutral() + headColor + " " + plugin.getLang("civilian") + ": " + subColor + plugin.getSettingsManager().getKwCivilian());
+                            ChatBlock.sendMessage(player, headColor , lang.get("kdr"), " = ", subColor, lang.get("kill.death.ratio"));
+                            ChatBlock.sendMessage(player, headColor, lang.get("weights"), " = ", lang.get("rival"), ": ", 
+                                                          subColor, String.valueOf( settings.getKwRival() ), 
+                                                          headColor, " ", lang.get("neutral"), ": " , 
+                                                          subColor, String.valueOf( settings.getKwNeutral() ), 
+                                                          headColor, " ", lang.get("civilian"), ": ", 
+                                                          subColor, String.valueOf( settings.getKwCivilian() ) );
                             ChatBlock.sendBlank(player);
 
                             chatBlock.setFlexibility(true, false, false, false, false, false, false);
                             chatBlock.setAlignment("l", "c", "c", "c", "c", "c", "c");
 
-                            chatBlock.addRow("  " + headColor + plugin.getLang("name"), plugin.getLang("kdr"), plugin.getLang("rival"), plugin.getLang("neutral"), plugin.getLang("civilian.abbreviation"), plugin.getLang("deaths"));
+                            chatBlock.addRow("  ", headColor, lang.get("name"), lang.get("kdr"), lang.get("rival"), 
+                                            lang.get("neutral"), lang.get("civilian.abbreviation"), lang.get("deaths"));
 
                             List<ClanPlayer> leaders = clan.getLeaders();
                             plugin.getClanManager().sortClanPlayersByKDR(leaders);
@@ -64,64 +70,57 @@ public class StatsCommand implements ClanCommand {
                             List<ClanPlayer> members = clan.getNonLeaders();
                             plugin.getClanManager().sortClanPlayersByKDR(members);
 
-                            for (ClanPlayer cpm : leaders)
-                            {
-                                String name = (cpm.isLeader() ? plugin.getSettingsManager().getPageLeaderColor() : (cpm.isTrusted() ? plugin.getSettingsManager().getPageTrustedColor() : plugin.getSettingsManager().getPageUnTrustedColor())) + cpm.getName();
+                            for (ClanPlayer cpm : leaders) {
+                                String name = (cpm.isLeader() ? settings.getPageLeaderColor() 
+                                                              : (cpm.isTrusted() ? settings.getPageTrustedColor() 
+                                                                                 : settings.getPageUnTrustedColor())) 
+                                            + cpm.getName();
                                 String rival = NumberFormat.getInstance().format(cpm.getRivalKills());
                                 String neutral = NumberFormat.getInstance().format(cpm.getNeutralKills());
                                 String civilian = NumberFormat.getInstance().format(cpm.getCivilianKills());
                                 String deaths = NumberFormat.getInstance().format(cpm.getDeaths());
                                 String kdr = formatter.format(cpm.getKDR());
 
-                                chatBlock.addRow("  " + name, ChatColor.YELLOW + kdr, ChatColor.WHITE + rival, ChatColor.GRAY + neutral, ChatColor.DARK_GRAY + civilian, ChatColor.DARK_RED + deaths);
+                                chatBlock.addRow("  ", name, ChatColor.YELLOW + kdr, ChatColor.WHITE + rival, 
+                                                        ChatColor.GRAY + neutral, ChatColor.DARK_GRAY + civilian, 
+                                                        ChatColor.DARK_RED + deaths);
                             }
 
-                            for (ClanPlayer cpm : members)
-                            {
-                                String name = (cpm.isLeader() ? plugin.getSettingsManager().getPageLeaderColor() : (cpm.isTrusted() ? plugin.getSettingsManager().getPageTrustedColor() : plugin.getSettingsManager().getPageUnTrustedColor())) + cpm.getName();
+                            for (ClanPlayer cpm : members) {
+                                String name = (cpm.isLeader() ? settings.getPageLeaderColor() 
+                                                              : (cpm.isTrusted() ? settings.getPageTrustedColor() 
+                                                                                 : settings.getPageUnTrustedColor())) 
+                                            + cpm.getName();
                                 String rival = NumberFormat.getInstance().format(cpm.getRivalKills());
                                 String neutral = NumberFormat.getInstance().format(cpm.getNeutralKills());
                                 String civilian = NumberFormat.getInstance().format(cpm.getCivilianKills());
                                 String deaths = NumberFormat.getInstance().format(cpm.getDeaths());
                                 String kdr = formatter.format(cpm.getKDR());
 
-                                chatBlock.addRow("  " + name, ChatColor.YELLOW + kdr, ChatColor.WHITE + rival, ChatColor.GRAY + neutral, ChatColor.DARK_GRAY + civilian, ChatColor.DARK_RED + deaths);
+                                chatBlock.addRow("  ", name, ChatColor.YELLOW + kdr, ChatColor.WHITE + rival, 
+                                                        ChatColor.GRAY + neutral, ChatColor.DARK_GRAY + civilian, 
+                                                        ChatColor.DARK_RED + deaths);
                             }
 
-                            boolean more = chatBlock.sendBlock(player, plugin.getSettingsManager().getPageSize());
+                            boolean more = chatBlock.sendBlock(player, settings.getPageSize());
 
-                            if (more)
-                            {
+                            if (more) {
                                 plugin.getStorageManager().addChatBlock(player, chatBlock);
                                 ChatBlock.sendBlank(player);
-                                ChatBlock.sendMessage(player, headColor + MessageFormat.format(plugin.getLang("view.next.page"), plugin.getSettingsManager().getCommandMore()));
+                                ChatBlock.sendMessage(player, headColor, MessageFormat.format(
+                                                        lang.get("view.next.page"), settings.getCommandMore()));
                             }
 
                             ChatBlock.sendBlank(player);
                         }
-                        else
-                        {
-                            ChatBlock.sendMessage(player, ChatColor.RED + MessageFormat.format(plugin.getLang("usage.0.stats"), plugin.getSettingsManager().getCommandClan()));
-                        }
+                        else ChatBlock.sendMessage(player, ChatColor.RED, MessageFormat.format(lang.get("usage.0.stats"), settings.getCommandClan()));
                     }
-                    else
-                    {
-                        ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("only.trusted.players.can.access.clan.stats"));
-                    }
+                    else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("only.trusted.players.can.access.clan.stats"));
                 }
-                else
-                {
-                    ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("clan.is.not.verified"));
-                }
+                else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("clan.is.not.verified"));
             }
-            else
-            {
-                ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("not.a.member.of.any.clan"));
-            }
+            else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("not.a.member.of.any.clan"));
         }
-        else
-        {
-            ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
-        }
+        else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("insufficient.permissions"));
     }
 }

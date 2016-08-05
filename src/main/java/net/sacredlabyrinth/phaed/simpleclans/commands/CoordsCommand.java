@@ -18,6 +18,7 @@ import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 /**
@@ -30,6 +31,7 @@ public class CoordsCommand implements ClanCommand  {
         Player player = (Player) sender;
         SimpleClans plugin = SimpleClans.getInstance();
         SettingsManager settings = plugin.getSettingsManager();
+        LanguageManager lang = plugin.getLanguageManager();
         String headColor = settings.getPageHeadingsColor();
         String subColor = settings.getPageSubTitleColor();
 
@@ -47,7 +49,7 @@ public class CoordsCommand implements ClanCommand  {
                             chatBlock.setFlexibility(true, false, false, false);
                             chatBlock.setAlignment("l", "c", "c", "c");
 
-                            chatBlock.addRow("  " + headColor + plugin.getLang("name"), plugin.getLang("distance"), plugin.getLang("coords.upper"), plugin.getLang("world"));
+                            chatBlock.addRow("  " + headColor + lang.get("name"), lang.get("distance"), lang.get("coords.upper"), lang.get("world"));
 
                             Set<ClanPlayer> members = Helper.stripOffLinePlayers(clan.getMembers());
 
@@ -57,7 +59,9 @@ public class CoordsCommand implements ClanCommand  {
                                 Player p = cpm.toPlayer();
 
                                 if (p != null) {
-                                    String name = (cpm.isLeader() ? settings.getPageLeaderColor() : (cpm.isTrusted() ? settings.getPageTrustedColor() : settings.getPageUnTrustedColor())) + cpm.getName();
+                                    String name = (cpm.isLeader() ? settings.getPageLeaderColor() 
+                                                                  : (cpm.isTrusted() ? settings.getPageTrustedColor() 
+                                                                                     : settings.getPageUnTrustedColor() ) ) + cpm.getName();
                                     Location loc = p.getLocation();
                                     int distance = (int) Math.ceil(loc.toVector().distance(player.getLocation().toVector()));
                                     String coords = loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ();
@@ -77,7 +81,11 @@ public class CoordsCommand implements ClanCommand  {
                                 }
 
                                 ChatBlock.sendBlank(player);
-                                ChatBlock.saySingle(player, settings.getPageClanNameColor() + Helper.capitalize(clan.getName()) + subColor+ " " + plugin.getLang("coords") + " " + headColor + Helper.generatePageSeparator(settings.getPageSep()));
+                                ChatBlock.saySingle(player, settings.getPageClanNameColor(),
+                                                            Helper.capitalize( clan.getName() ),
+                                                            subColor, " " , lang.get("coords"), 
+                                                            " ", headColor, 
+                                                            Helper.generatePageSeparator( settings.getPageSep() ) );
                                 ChatBlock.sendBlank(player);
 
                                 boolean more = chatBlock.sendBlock(player, settings.getPageSize());
@@ -85,20 +93,21 @@ public class CoordsCommand implements ClanCommand  {
                                 if (more) {
                                     plugin.getStorageManager().addChatBlock(player, chatBlock);
                                     ChatBlock.sendBlank(player);
-                                    ChatBlock.sendMessage(player, headColor + MessageFormat.format(plugin.getLang("view.next.page"), settings.getCommandMore()));
+                                    ChatBlock.sendMessage(player, headColor + MessageFormat.format(
+                                            lang.get("view.next.page"), settings.getCommandMore()));
                                 }
                                 ChatBlock.sendBlank(player);
                             }
-                            else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("you.are.the.only.member.online"));
+                            else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("you.are.the.only.member.online"));
                         }
-                        else ChatBlock.sendMessage(player, ChatColor.RED + MessageFormat.format(plugin.getLang("usage.0.coords"), settings.getCommandClan()));
+                        else ChatBlock.sendMessage(player, ChatColor.RED, MessageFormat.format(lang.get("usage.0.coords"), settings.getCommandClan()));
                     }
-                    else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("only.trusted.players.can.access.clan.coords"));
+                    else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("only.trusted.players.can.access.clan.coords"));
                 }
-                else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("clan.is.not.verified"));
+                else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("clan.is.not.verified"));
             }
-            else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("not.a.member.of.any.clan"));
+            else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("not.a.member.of.any.clan"));
         }
-        else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
+        else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("insufficient.permissions"));
     }
 }

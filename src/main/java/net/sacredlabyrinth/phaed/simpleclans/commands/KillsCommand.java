@@ -14,6 +14,7 @@ import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.StorageManager;
 
@@ -24,6 +25,7 @@ public class KillsCommand implements ClanCommand {
         SimpleClans plugin = SimpleClans.getInstance();
         StorageManager stor = plugin.getStorageManager();
         SettingsManager settings = plugin.getSettingsManager();
+        LanguageManager lang = plugin.getLanguageManager();
         String headColor = plugin.getSettingsManager().getPageHeadingsColor();
         String subColor = plugin.getSettingsManager().getPageSubTitleColor();
 
@@ -45,12 +47,12 @@ public class KillsCommand implements ClanCommand {
                         chatBlock.setFlexibility(true, false);
                         chatBlock.setAlignment("l", "c");
 
-                        chatBlock.addRow("  " + headColor + plugin.getLang("victim"), plugin.getLang("killcount"));
+                        chatBlock.addRow("  " + headColor + lang.get("victim"), lang.get("killcount"));
 
                         Map<String, Integer> killsPerPlayerUnordered = stor.getKillsPerPlayer(((Player)player).getUniqueId());
 
                         if (killsPerPlayerUnordered.isEmpty()) {
-                            ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("nokillsfound"));
+                            ChatBlock.sendMessage(player, ChatColor.RED, lang.get("nokillsfound"));
                             return;
                         }
 
@@ -62,7 +64,10 @@ public class KillsCommand implements ClanCommand {
                             chatBlock.addRow("  " + playerKills.getKey(), ChatColor.AQUA + "" + count);
                         }
 
-                        ChatBlock.saySingle(player, settings.getPageClanNameColor() + Helper.capitalize(((Player)player).getName()) + subColor + " " + plugin.getLang("kills") + " " + headColor + Helper.generatePageSeparator(settings.getPageSep()));
+                        ChatBlock.saySingle( player, settings.getPageClanNameColor(), 
+                                                     Helper.capitalize(((Player)player).getName()),
+                                                     subColor, " ", lang.get("kills"), 
+                                                     " ", headColor, Helper.generatePageSeparator(settings.getPageSep()));
                         ChatBlock.sendBlank(player);
 
                         boolean more = chatBlock.sendBlock(player, settings.getPageSize());
@@ -70,16 +75,16 @@ public class KillsCommand implements ClanCommand {
                         if (more) {
                             stor.addChatBlock(player, chatBlock);
                             ChatBlock.sendBlank(player);
-                            ChatBlock.sendMessage(player, headColor + MessageFormat.format(plugin.getLang("view.next.page"), settings.getCommandMore()));
+                            ChatBlock.sendMessage(player, headColor, MessageFormat.format(lang.get("view.next.page"), settings.getCommandMore()));
                         }
                         ChatBlock.sendBlank(player);
                     }
-                    else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("only.trusted.players.can.access.clan.stats"));
+                    else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("only.trusted.players.can.access.clan.stats"));
                 }
-                else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("clan.is.not.verified"));
+                else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("clan.is.not.verified"));
             }
-            else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("not.a.member.of.any.clan"));
+            else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("not.a.member.of.any.clan"));
         }
-        else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
+        else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("insufficient.permissions"));
     }
 }

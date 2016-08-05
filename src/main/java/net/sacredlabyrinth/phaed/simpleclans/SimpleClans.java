@@ -110,7 +110,6 @@ public class SimpleClans extends JavaPlugin {
     public StorageManager getStorageManager() { return stor; }
     public SettingsManager getSettingsManager() { return settings; }
     public PermissionsManager getPermissionsManager() { return perms; }
-    public String getLang(String msg) { return lang.get(msg); }
     public TeleportManager getTeleportManager() { return teleportManager; }
     public LanguageManager getLanguageManager() { return lang; }
     public BansManager getBansManager() { return bansManager; }

@@ -13,6 +13,7 @@ import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
 import net.sacredlabyrinth.phaed.simpleclans.managers.ClanManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.PermissionsManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
@@ -27,13 +28,14 @@ public class CreateCommand implements ClanCommand {
         Player player = (Player) sender;
         SimpleClans plugin = SimpleClans.getInstance();
         SettingsManager settings = plugin.getSettingsManager();
+        LanguageManager lang = plugin.getLanguageManager();
 
         if (!plugin.getPermissionsManager().has(player, "simpleclans.leader.create")) {
-            ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
+            ChatBlock.sendMessage(player, ChatColor.RED, lang.get("insufficient.permissions"));
         }
         else if (arg.length < 2) {
-            ChatBlock.sendMessage(player, ChatColor.RED + MessageFormat.format(plugin.getLang("usage.create.tag"), settings.getCommandClan()));
-            ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("example.clan.create"));
+            ChatBlock.sendMessage(player, ChatColor.RED, MessageFormat.format(lang.get("usage.create.tag"), settings.getCommandClan()));
+            ChatBlock.sendMessage(player, ChatColor.RED, lang.get("example.clan.create"));
         } 
         else {
             String tag = arg[0];
@@ -44,72 +46,65 @@ public class CreateCommand implements ClanCommand {
 
             if ( !perms.has(player, "simpleclans.mod.bypass") ) {
                 if (cleanTag.length() > settings.getTagMaxLength()) {
-                    ChatBlock.sendMessage( player, 
-                            ChatColor.RED + MessageFormat.format(
-                                    plugin.getLang("your.clan.tag.cannot.be.longer.than.characters"), settings.getTagMaxLength()));
+                    ChatBlock.sendMessage( player, ChatColor.RED, MessageFormat.format(
+                           lang.get("your.clan.tag.cannot.be.longer.than.characters"), settings.getTagMaxLength()));
                     return;
                 }
                 if (cleanTag.length() < settings.getTagMinLength()) {
-                    ChatBlock.sendMessage(player, 
-                            ChatColor.RED + MessageFormat.format(
-                                    plugin.getLang("your.clan.tag.must.be.longer.than.characters"), settings.getTagMinLength()));                 
+                    ChatBlock.sendMessage(player, ChatColor.RED, MessageFormat.format(
+                           lang.get("your.clan.tag.must.be.longer.than.characters"), settings.getTagMinLength()));                 
                     return;
                 }
                 if (settings.hasDisallowedColor(tag)) {
-                    ChatBlock.sendMessage(player, 
-                            ChatColor.RED + MessageFormat.format(
-                                    plugin.getLang("your.tag.cannot.contain.the.following.colors"), settings.getDisallowedColorString()));
+                    ChatBlock.sendMessage(player, ChatColor.RED, MessageFormat.format(
+                           lang.get("your.tag.cannot.contain.the.following.colors"), settings.getDisallowedColorString()));
                     return;
                 }
                 if (Helper.stripColors(name).length() > settings.getClanMaxLength()) {
-                    ChatBlock.sendMessage(player, 
-                            ChatColor.RED + MessageFormat.format(
-                                    plugin.getLang("your.clan.name.cannot.be.longer.than.characters"), settings.getClanMaxLength()));                   
+                    ChatBlock.sendMessage(player, ChatColor.RED, MessageFormat.format(
+                           lang.get("your.clan.name.cannot.be.longer.than.characters"), settings.getClanMaxLength()));                   
                     return;
                 } 
                 if (Helper.stripColors(name).length() < settings.getClanMinLength()) {
-                    ChatBlock.sendMessage(player, 
-                            ChatColor.RED + MessageFormat.format(
-                                    plugin.getLang("your.clan.name.must.be.longer.than.characters"), settings.getClanMinLength()));                    
+                    ChatBlock.sendMessage(player, ChatColor.RED, MessageFormat.format(
+                           lang.get("your.clan.name.must.be.longer.than.characters"), settings.getClanMinLength()));                    
                     return;
                 }
                 if (settings.isDisallowedWord(cleanTag.toLowerCase())) {
-                    ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("that.tag.name.is.disallowed"));
+                    ChatBlock.sendMessage(player, ChatColor.RED, lang.get("that.tag.name.is.disallowed"));
                     return;
                 }
             }
             
             if (!cleanTag.matches("[0-9a-zA-Z]*")) {
-                ChatBlock.sendMessage(player, 
-                        ChatColor.RED + plugin.getLang("your.clan.tag.can.only.contain.letters.numbers.and.color.codes"));
+                ChatBlock.sendMessage(player, ChatColor.RED, lang.get("your.clan.tag.can.only.contain.letters.numbers.and.color.codes"));
                 return;
             }
             if (name.contains("&")) {
-                ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("your.clan.name.cannot.contain.color.codes"));
+                ChatBlock.sendMessage(player, ChatColor.RED, lang.get("your.clan.name.cannot.contain.color.codes"));
                 return;
             }    
             ClanManager clanManager = plugin.getClanManager();
             ClanPlayer cp = clanManager.getClanPlayer(player);
 
             if (cp != null) {
-                ChatBlock.sendMessage(player, 
-                        ChatColor.RED + MessageFormat.format(
-                                plugin.getLang("you.must.first.resign"), cp.getClan().getName()));
+                ChatBlock.sendMessage(player, ChatColor.RED, MessageFormat.format(
+                                lang.get("you.must.first.resign"), cp.getClan().getName()));
                 return;
             }
             if (clanManager.isClan(cleanTag)) {
-                ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("clan.with.this.tag.already.exists"));
+                ChatBlock.sendMessage(player, ChatColor.RED, lang.get("clan.with.this.tag.already.exists"));
                 return;
             }
             if (clanManager.purchaseCreation(player)) {
                 clanManager.createClan(player, tag, name);
 
                 Clan clan = clanManager.getClan(tag);
-                clan.addBb(player.getName(), ChatColor.AQUA + MessageFormat.format(plugin.getLang("clan.created"), name));
+                clan.addBb(player.getName(), ChatColor.AQUA + MessageFormat.format(lang.get("clan.created"), name));
                 plugin.getStorageManager().updateClan(clan);
 
                 if (settings.isRequireVerification() && !perms.has(player, "simpleclans.mod.verify")) {
-                    ChatBlock.sendMessage(player, ChatColor.AQUA + plugin.getLang("get.your.clan.verified.to.access.advanced.features"));
+                    ChatBlock.sendMessage(player, ChatColor.AQUA, lang.get("get.your.clan.verified.to.access.advanced.features"));
                 }                                                        
             }           
         }  

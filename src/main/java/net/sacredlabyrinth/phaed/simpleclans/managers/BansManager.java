@@ -43,8 +43,10 @@ public class BansManager {
                      .forEach( e -> newBans.add( e ) );
         
         bans.set( "bans", newBans );
+        
         try {
             bans.save( bansFile );
+            
         } catch ( IOException e1 ) {
             plugin.getLogger().log( Level.SEVERE, "Error saving Bans list to bans.yml." );
             e1.printStackTrace();

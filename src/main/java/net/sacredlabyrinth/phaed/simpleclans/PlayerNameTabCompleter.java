@@ -9,24 +9,27 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
+
 public class PlayerNameTabCompleter implements TabCompleter {
-    private String clanCommand = SimpleClans.getInstance().getSettingsManager().getCommandClan();
+    SimpleClans plugin = SimpleClans.getInstance();
+    private String clanCommand = plugin.getSettingsManager().getCommandClan();
     private List<String> commands = new ArrayList<>();
+    LanguageManager lang = plugin.getLanguageManager();
     
     PlayerNameTabCompleter() {
-        SimpleClans plugin = SimpleClans.getInstance();
-        commands.add( plugin.getLang("lookup.command") );
-        commands.add( plugin.getLang("ban.command") );
-        commands.add( plugin.getLang("unban.command") );
-        commands.add( plugin.getLang("kick.command") );
-        commands.add( plugin.getLang("trust.command") );
-        commands.add( plugin.getLang("untrust.command") );
-        commands.add( plugin.getLang("promote.command") );
-        commands.add( plugin.getLang("demote.command") );
-        commands.add( plugin.getLang("setrank.command") );
-        commands.add( plugin.getLang("place.command") );
-        commands.add( plugin.getLang("invite.command") );
-        commands.add( plugin.getLang("kills.command") );
+        commands.add( lang.get("lookup.command") );
+        commands.add( lang.get("ban.command") );
+        commands.add( lang.get("unban.command") );
+        commands.add( lang.get("kick.command") );
+        commands.add( lang.get("trust.command") );
+        commands.add( lang.get("untrust.command") );
+        commands.add( lang.get("promote.command") );
+        commands.add( lang.get("demote.command") );
+        commands.add( lang.get("setrank.command") );
+        commands.add( lang.get("place.command") );
+        commands.add( lang.get("invite.command") );
+        commands.add( lang.get("kills.command") );
     }
 
     @Override

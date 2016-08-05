@@ -41,7 +41,8 @@ public final class TeleportManager {
         waitingPlayers.add( new TeleportState(player, dest, clanName) );
         
         if (secs > 0) {
-            ChatBlock.sendMessage(player, ChatColor.AQUA + MessageFormat.format(plugin.getLang("waiting.for.teleport.stand.still.for.0.seconds"), secs));
+            ChatBlock.sendMessage( player, ChatColor.AQUA, MessageFormat.format( 
+                    plugin.getLanguageManager().get( "waiting.for.teleport.stand.still.for.0.seconds"), secs ));
         }
     }
 
@@ -87,8 +88,9 @@ public final class TeleportManager {
 
     @SuppressWarnings( "deprecation" )
     private void startCounter() {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask( plugin, () -> {
     
+            LanguageManager lang = plugin.getLanguageManager();
             for (Iterator<TeleportState> iter = waitingPlayers.iterator(); iter.hasNext(); ) {
                 TeleportState state = iter.next();
 
@@ -122,17 +124,17 @@ public final class TeleportManager {
 
                             player.teleport(new Location(loc.getWorld(), loc.getBlockX() + .5, loc.getBlockY(), loc.getBlockZ() + .5));
 
-                            ChatBlock.sendMessage(player, ChatColor.AQUA + MessageFormat.format(plugin.getLang("now.at.homebase"), state.getClanName()));
+                            ChatBlock.sendMessage(player, ChatColor.AQUA, MessageFormat.format(lang.get("now.at.homebase"), state.getClanName()));
                         }
-                        else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("you.moved.teleport.cancelled"));
+                        else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("you.moved.teleport.cancelled"));
 
                         iter.remove();
                     }
                     else if (!Helper.isSameBlock(player.getLocation(), state.getLocation())) {
-                            ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("you.moved.teleport.cancelled"));
+                            ChatBlock.sendMessage(player, ChatColor.RED, lang.get("you.moved.teleport.cancelled"));
                             iter.remove();
                     }
-                    else ChatBlock.sendMessage(player, ChatColor.AQUA + "" + state.getCounter());
+                    else ChatBlock.sendMessage(player, ChatColor.AQUA, String.valueOf( state.getCounter() ) );
                 }
                 else iter.remove();
 

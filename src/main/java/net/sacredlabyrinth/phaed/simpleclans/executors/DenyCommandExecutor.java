@@ -13,6 +13,7 @@ import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.RequestManager;
 
 public class DenyCommandExecutor implements CommandExecutor {
@@ -21,9 +22,10 @@ public class DenyCommandExecutor implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Player player = (Player) commandSender;
+        LanguageManager lang = plugin.getLanguageManager();
 
         if (plugin.getBansManager().isBanned(player.getUniqueId())) {
-            ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("banned"));
+            ChatBlock.sendMessage(player, ChatColor.RED, lang.get("banned"));
             return false;
         }
 
@@ -37,20 +39,21 @@ public class DenyCommandExecutor implements CommandExecutor {
                 if (reqMan.hasRequest(clan.getTag())) {
                     if (!cp.hasVote(reqMan.getRequest( clan.getTag() ))) {
                         reqMan.deny(cp);
-                        clan.leaderAnnounce(ChatColor.RED + MessageFormat.format(plugin.getLang("has.voted.to.deny"), Helper.capitalize(player.getName())));
+                        clan.leaderAnnounce(ChatColor.RED + 
+                                MessageFormat.format(lang.get("has.voted.to.deny"), Helper.capitalize(player.getName())));
                     }
-                    else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("you.have.already.voted"));
+                    else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("you.have.already.voted"));
                 }
-                else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("nothing.to.deny"));
+                else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("nothing.to.deny"));
             }
-            else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.leader.permissions"));
+            else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("no.leader.permissions"));
         }
         else if (plugin.getRequestManager().hasRequest(player.getUniqueId().toString())) {
          
             cp = plugin.getClanManager().getCreateClanPlayer(player.getUniqueId());
             reqMan.deny(cp);
         }
-        else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("nothing.to.deny"));
+        else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("nothing.to.deny"));
 
         return false;
     }

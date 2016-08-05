@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 public class MoreCommandExecutor implements CommandExecutor {
@@ -19,9 +20,10 @@ public class MoreCommandExecutor implements CommandExecutor {
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Player player = (Player) commandSender;
         SettingsManager settings = plugin.getSettingsManager();
+        LanguageManager lang = plugin.getLanguageManager();
 
         if (plugin.getBansManager().isBanned(player.getUniqueId())) {
-            ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("banned"));
+            ChatBlock.sendMessage(player, ChatColor.RED, lang.get("banned"));
             return false;
         }
 
@@ -32,11 +34,12 @@ public class MoreCommandExecutor implements CommandExecutor {
 
             if (chatBlock.rowsSize() > 0) {
                 ChatBlock.sendBlank(player);
-                ChatBlock.sendMessage(player, settings.getPageHeadingsColor(), MessageFormat.format(plugin.getLang("view.next.page"), settings.getCommandMore()));
+                ChatBlock.sendMessage(player, settings.getPageHeadingsColor(), 
+                        MessageFormat.format(lang.get("view.next.page"), settings.getCommandMore()));
             }
             ChatBlock.sendBlank(player);
         }
-        else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("nothing.more.to.see"));
+        else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("nothing.more.to.see"));
 
         return false;
     }

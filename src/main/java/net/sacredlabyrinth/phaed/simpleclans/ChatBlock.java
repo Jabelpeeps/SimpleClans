@@ -433,6 +433,13 @@ public class ChatBlock {
         sendMessage(receiver, String.join("", msg));
     }
     
+    public static void sendMessage(CommandSender receiver, ChatColor colour, String... msg ) {
+        if (receiver == null) return;
+        
+        sendMessage(receiver, colour.toString().concat( String.join( "", msg ) ) );
+    }
+    
+    
     public void startColor(String _color) {
         color = _color;
     }

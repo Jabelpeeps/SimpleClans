@@ -32,6 +32,7 @@ import net.sacredlabyrinth.phaed.simpleclans.events.PlayerPromoteEvent;
 import net.sacredlabyrinth.phaed.simpleclans.events.RivalClanAddEvent;
 import net.sacredlabyrinth.phaed.simpleclans.events.RivalClanRemoveEvent;
 import net.sacredlabyrinth.phaed.simpleclans.managers.ClanManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.PermissionsManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
@@ -102,17 +103,18 @@ public class Clan implements Serializable, Comparable<Clan> {
      */
     public void deposit(double amount, Player player) {
         PermissionsManager perms = plugin.getPermissionsManager();
+        LanguageManager lang = plugin.getLanguageManager();
         if (perms.playerHasMoney(player, amount)) {
             if (perms.playerChargeMoney(player, amount)) {
                 
-                player.sendMessage(ChatColor.AQUA + MessageFormat.format(plugin.getLang("player.clan.deposit"), amount));
-                addBb(player.getName(), ChatColor.AQUA + MessageFormat.format(plugin.getLang("bb.clan.deposit"), amount));
+                player.sendMessage(ChatColor.AQUA + MessageFormat.format(lang.get("player.clan.deposit"), amount));
+                addBb(player.getName(), ChatColor.AQUA + MessageFormat.format(lang.get("bb.clan.deposit"), amount));
                 balance += amount;
                 plugin.getStorageManager().updateClan(this);
             }
-            else player.sendMessage(ChatColor.AQUA + plugin.getLang("not.sufficient.money"));
+            else player.sendMessage(ChatColor.AQUA + lang.get("not.sufficient.money"));
         }
-        else player.sendMessage(ChatColor.AQUA + plugin.getLang("not.sufficient.money"));
+        else player.sendMessage(ChatColor.AQUA + lang.get("not.sufficient.money"));
     }
 
     /**
@@ -122,16 +124,17 @@ public class Clan implements Serializable, Comparable<Clan> {
      * @param player
      */
     public void withdraw(double amount, Player player) {
+        LanguageManager lang = plugin.getLanguageManager();
         if (balance >= amount) {
             if (plugin.getPermissionsManager().playerGrantMoney(player, amount)) {
                 
-                player.sendMessage(ChatColor.AQUA + MessageFormat.format(plugin.getLang("player.clan.withdraw"), amount));
-                addBb(player.getName(), ChatColor.AQUA + MessageFormat.format(plugin.getLang("bb.clan.withdraw"), amount));
+                player.sendMessage(ChatColor.AQUA + MessageFormat.format(lang.get("player.clan.withdraw"), amount));
+                addBb(player.getName(), ChatColor.AQUA + MessageFormat.format(lang.get("bb.clan.withdraw"), amount));
                 balance -= amount;
                 plugin.getStorageManager().updateClan(this);
             }
         }
-        else player.sendMessage(ChatColor.AQUA + plugin.getLang("clan.bank.not.enough.money"));
+        else player.sendMessage(ChatColor.AQUA + lang.get("clan.bank.not.enough.money"));
     }
 
     public String getName() { return name; }
@@ -774,7 +777,8 @@ public class Clan implements Serializable, Comparable<Clan> {
                 ChatBlock.sendMessage(pl, message);
             }
         }
-        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[" + plugin.getLang("clan.announce") + ChatColor.AQUA + "] " + ChatColor.AQUA + "[" + Helper.getColorName(playerName) + ChatColor.WHITE + "] " + message);
+        LanguageManager lang = plugin.getLanguageManager();
+        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[" + lang.get("clan.announce") + ChatColor.AQUA + "] " + ChatColor.AQUA + "[" + Helper.getColorName(playerName) + ChatColor.WHITE + "] " + message);
     }
 
     /**
@@ -794,7 +798,8 @@ public class Clan implements Serializable, Comparable<Clan> {
                 ChatBlock.sendMessage(pl, message);
             }
         }
-        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[" + plugin.getLang("leader.announce") + ChatColor.AQUA + "] " + ChatColor.WHITE + message);
+        LanguageManager lang = plugin.getLanguageManager();
+        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[" + lang.get("leader.announce") + ChatColor.AQUA + "] " + ChatColor.WHITE + message);
     }
 
     /**
@@ -819,8 +824,9 @@ public class Clan implements Serializable, Comparable<Clan> {
     public void displayBb(Player player) {
         if (verified) {
             SettingsManager settings = plugin.getSettingsManager();
+            LanguageManager lang = plugin.getLanguageManager();
             ChatBlock.sendBlank(player);
-            ChatBlock.saySingle(player, MessageFormat.format(plugin.getLang("bulletin.board.header"), settings.getBbAccentColor(), settings.getPageHeadingsColor(), Helper.capitalize(getName())));
+            ChatBlock.saySingle(player, MessageFormat.format(lang.get("bulletin.board.header"), settings.getBbAccentColor(), settings.getPageHeadingsColor(), Helper.capitalize(getName())));
 
             int maxSize = settings.getBbSize();
 
@@ -858,18 +864,19 @@ public class Clan implements Serializable, Comparable<Clan> {
         clans.remove(this);
 
         for (Clan c : clans) {
-            String disbanded = plugin.getLang("clan.disbanded");
+            LanguageManager lang = plugin.getLanguageManager();
+            String disbanded = lang.get("clan.disbanded");
 
             if (c.removeWarringClan(this)) {
-                c.addBb(disbanded, ChatColor.AQUA + MessageFormat.format(plugin.getLang("you.are.no.longer.at.war"), Helper.capitalize(c.getName()), getColorTag()));
+                c.addBb(disbanded, ChatColor.AQUA + MessageFormat.format(lang.get("you.are.no.longer.at.war"), Helper.capitalize(c.getName()), getColorTag()));
             }
 
             if ( rivals.remove( c ) ) {
-                c.addBb(disbanded, ChatColor.AQUA + MessageFormat.format(plugin.getLang("has.been.disbanded.rivalry.ended"), Helper.capitalize(getName())));
+                c.addBb(disbanded, ChatColor.AQUA + MessageFormat.format(lang.get("has.been.disbanded.rivalry.ended"), Helper.capitalize(getName())));
             }
 
             if ( allies.remove( c ) ) {
-                c.addBb(disbanded, ChatColor.AQUA + MessageFormat.format(plugin.getLang("has.been.disbanded.alliance.ended"), Helper.capitalize(getName())));
+                c.addBb(disbanded, ChatColor.AQUA + MessageFormat.format(lang.get("has.been.disbanded.alliance.ended"), Helper.capitalize(getName())));
             }
         }
 

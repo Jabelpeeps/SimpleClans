@@ -12,6 +12,8 @@ import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 /**
  * @author phaed
@@ -19,57 +21,49 @@ import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanC
 public class AlliancesCommand implements ClanCommand  {
 
     @Override
-    public void execute(CommandSender player, String[] arg)
-    {
+    public void execute(CommandSender player, String[] arg) {
         SimpleClans plugin = SimpleClans.getInstance();
-        String headColor = plugin.getSettingsManager().getPageHeadingsColor();
-        String subColor = plugin.getSettingsManager().getPageSubTitleColor();
+        LanguageManager lang = plugin.getLanguageManager();
+        SettingsManager settings = plugin.getSettingsManager();
+        
+        String headColor = settings.getPageHeadingsColor();
+        String subColor = settings.getPageSubTitleColor();
 
-        if (arg.length == 0)
-        {
-            if (plugin.getPermissionsManager().has((Player) player, "simpleclans.anyone.alliances"))
-            {
+        if (arg.length == 0)  {
+            if (plugin.getPermissionsManager().has((Player) player, "simpleclans.anyone.alliances")) {
                 List<Clan> clans = plugin.getClanManager().getClans();
                 plugin.getClanManager().sortClansByKDR(clans);
 
                 ChatBlock chatBlock = new ChatBlock();
 
                 ChatBlock.sendBlank(player);
-                ChatBlock.saySingle(player, plugin.getSettingsManager().getServerName() + subColor + " " + plugin.getLang("alliances") + " " + headColor + Helper.generatePageSeparator(plugin.getSettingsManager().getPageSep()));
+                ChatBlock.saySingle(player, settings.getServerName(), subColor, " " , lang.get("alliances"), " ", 
+                                            headColor, Helper.generatePageSeparator( settings.getPageSep() ) );
                 ChatBlock.sendBlank(player);
 
                 chatBlock.setAlignment("l", "l");
-                chatBlock.addRow("  " + headColor + plugin.getLang("clan"), plugin.getLang("allies"));
+                chatBlock.addRow("  ", headColor, lang.get("clan"), lang.get("allies"));
 
-                for (Clan clan : clans)
-                {
-                    if (!clan.isVerified())
-                    {
+                for (Clan clan : clans) {
+                    if (!clan.isVerified()) {
                         continue;
                     }
 
-                    chatBlock.addRow("  " + ChatColor.AQUA + clan.getName(), clan.getAllyString(ChatColor.DARK_GRAY + ", "));
+                    chatBlock.addRow("  ", ChatColor.AQUA.toString(), clan.getName(), clan.getAllyString( ChatColor.DARK_GRAY + ", "));
                 }
 
                 boolean more = chatBlock.sendBlock(player, plugin.getSettingsManager().getPageSize());
 
-                if (more)
-                {
+                if (more) {
                     plugin.getStorageManager().addChatBlock(player, chatBlock);
                     ChatBlock.sendBlank(player);
-                    ChatBlock.sendMessage(player, headColor + MessageFormat.format(plugin.getLang("view.next.page"), plugin.getSettingsManager().getCommandMore()));
+                    ChatBlock.sendMessage(player, headColor + MessageFormat.format(lang.get("view.next.page"), settings.getCommandMore()));
                 }
 
                 ChatBlock.sendBlank(player);
             }
-            else
-            {
-                ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("insufficient.permissions"));
-            }
+            else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("insufficient.permissions"));
         }
-        else
-        {
-            ChatBlock.sendMessage(player, ChatColor.RED + MessageFormat.format(plugin.getLang("usage.clan.alliances"), plugin.getSettingsManager().getCommandClan()));
-        }
+        else ChatBlock.sendMessage(player, ChatColor.RED, MessageFormat.format(lang.get("usage.clan.alliances"), settings.getCommandClan()));
     }
 }

@@ -19,6 +19,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 /**
@@ -164,13 +165,14 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer> {
      */
     public String getLastSeenDaysString() {
         double days = Dates.differenceInDays(lastSeen, System.currentTimeMillis());
+        LanguageManager lang = plugin.getLanguageManager();
 
         if (days < 1) 
-            return plugin.getLang("today");
+            return lang.get("today");
         else if (Math.round(days) == 1) 
-            return MessageFormat.format(plugin.getLang("1.color.day"), ChatColor.GRAY);
+            return MessageFormat.format(lang.get("1.color.day"), ChatColor.GRAY);
         else 
-            return MessageFormat.format(plugin.getLang("many.color.days"), Math.round(days), ChatColor.GRAY);
+            return MessageFormat.format(lang.get("many.color.days"), Math.round(days), ChatColor.GRAY);
     }
 
     public int getRivalKills() { return rivalKills; }
@@ -300,7 +302,7 @@ public class ClanPlayer implements Serializable, Comparable<ClanPlayer> {
     public String getPastClansString(String sep) {
         String out = String.join( sep, pastClans );
 
-        return out.trim().isEmpty() ? plugin.getLang("none") : out;
+        return out.trim().isEmpty() ? plugin.getLanguageManager().get("none") : out;
     }
 
     public Clan getClan() { return clan; }

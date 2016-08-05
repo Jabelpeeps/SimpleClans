@@ -249,7 +249,10 @@ public final class ClanManager {
         for (Player player : players) {
             ChatBlock.sendMessage(player, ChatColor.DARK_GRAY + "* " + ChatColor.AQUA + msg);
         }
-        Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "[" + plugin.getLang("server.announce") + "] " + ChatColor.WHITE + msg);
+        Bukkit.getConsoleSender().sendMessage(
+                String.join( "", ChatColor.AQUA.toString(), "[",
+                                 plugin.getLanguageManager().get("server.announce"), "] ",
+                                 ChatColor.WHITE.toString(), msg ) );
     }
 
     /**
@@ -348,12 +351,13 @@ public final class ClanManager {
      * @return
      */
     public String getArmorString(PlayerInventory inv) {
+        LanguageManager lang = plugin.getLanguageManager();
         String out = "";
 
         ItemStack h = inv.getHelmet();
 
         if (h != null) {
-            String helmet = plugin.getLang("armor.h");
+            String helmet = lang.get("armor.h");
             switch (h.getType()) {
                 case CHAINMAIL_HELMET:
                     out += ChatColor.WHITE + helmet; break;
@@ -372,7 +376,7 @@ public final class ClanManager {
         ItemStack c = inv.getChestplate();
 
         if (c != null) {
-            String chestplate = plugin.getLang("armor.c");
+            String chestplate = lang.get("armor.c");
             switch ( c.getType()) {
                 case CHAINMAIL_CHESTPLATE:
                     out += ChatColor.WHITE + chestplate; break;
@@ -391,7 +395,7 @@ public final class ClanManager {
         ItemStack l = inv.getLeggings();
 
         if (l != null) {
-            String leggings = plugin.getLang("armor.l");
+            String leggings = lang.get("armor.l");
             switch (l.getType()) {
                 case CHAINMAIL_LEGGINGS:
                     out += ChatColor.WHITE + leggings; break;
@@ -410,7 +414,7 @@ public final class ClanManager {
         ItemStack b = inv.getBoots();
 
         if (b != null) {
-            String boots = plugin.getLang("armor.B");
+            String boots = lang.get("armor.B");
             switch (b.getType()) {
                 case CHAINMAIL_BOOTS:
                     out += ChatColor.WHITE + boots; break;
@@ -439,6 +443,7 @@ public final class ClanManager {
      * @return
      */
     public String getWeaponString(PlayerInventory inv) {
+        LanguageManager lang = plugin.getLanguageManager();        
         String headColor = plugin.getSettingsManager().getPageHeadingsColor();
 
         StringJoiner joiner = new StringJoiner( "," ); 
@@ -446,43 +451,43 @@ public final class ClanManager {
         int count = getItemCount(inv.all(Material.DIAMOND_SWORD));
 
         if (count > 0) {
-            joiner.add( ChatColor.AQUA + plugin.getLang("weapon.S") + headColor + (count > 1 ? count + "" : "" ));
+            joiner.add( ChatColor.AQUA + lang.get("weapon.S") + headColor + (count > 1 ? count + "" : "" ));
         }
 
         count = getItemCount(inv.all(Material.GOLD_SWORD));
 
         if (count > 0) {
-            joiner.add( ChatColor.YELLOW + plugin.getLang("weapon.S") + headColor + (count > 1 ? count + "" : "" ));
+            joiner.add( ChatColor.YELLOW + lang.get("weapon.S") + headColor + (count > 1 ? count + "" : "" ));
         }
 
         count = getItemCount(inv.all(Material.IRON_SWORD));
 
         if (count > 0) {
-            joiner.add( ChatColor.WHITE + plugin.getLang("weapon.S") + headColor + (count > 1 ? count + "" : "" ));
+            joiner.add( ChatColor.WHITE + lang.get("weapon.S") + headColor + (count > 1 ? count + "" : "" ));
         }
 
         count = getItemCount(inv.all(Material.STONE_SWORD));
 
         if (count > 0) {
-            joiner.add( ChatColor.GRAY + plugin.getLang("weapon.S") + headColor + (count > 1 ? count + "" : "" ));
+            joiner.add( ChatColor.GRAY + lang.get("weapon.S") + headColor + (count > 1 ? count + "" : "" ));
         }
 
         count = getItemCount(inv.all(Material.WOOD_SWORD));
 
         if (count > 0) {
-            joiner.add( ChatColor.GOLD + plugin.getLang("weapon.S") + headColor + (count > 1 ? count + "" : "" ));
+            joiner.add( ChatColor.GOLD + lang.get("weapon.S") + headColor + (count > 1 ? count + "" : "" ));
         }
 
         count = getItemCount(inv.all(Material.BOW));
 
         if (count > 0) {
-            joiner.add( ChatColor.GOLD + plugin.getLang("weapon.B") + headColor + (count > 1 ? count + "" : "" ));
+            joiner.add( ChatColor.GOLD + lang.get("weapon.B") + headColor + (count > 1 ? count + "" : "" ));
         }
 
         count = getItemCount(inv.all(Material.ARROW));
 
         if (count > 0) {
-            joiner.add( ChatColor.GOLD + plugin.getLang("weapon.A") + headColor + count );
+            joiner.add( ChatColor.GOLD + lang.get("weapon.A") + headColor + count );
         }
 
         if ( joiner.length() < 2 ) {
@@ -602,7 +607,7 @@ public final class ClanManager {
         }
 
         if (out == 0) {
-            return ChatColor.BLACK + plugin.getLang("none");
+            return ChatColor.BLACK + plugin.getLanguageManager().get("none");
         }
         return new DecimalFormat("#.#").format(out) + "" + ChatColor.GOLD + "h";
     }
@@ -691,13 +696,15 @@ public final class ClanManager {
         double price = settings.getCreationPrice();
 
         PermissionsManager perms = plugin.getPermissionsManager();
+        LanguageManager lang = plugin.getLanguageManager();
+        
         if (perms.hasEconomy()) {
             if (perms.playerHasMoney(player, price)) {
                 perms.playerChargeMoney(player, price);
-                player.sendMessage(ChatColor.RED + MessageFormat.format(plugin.getLang("account.has.been.debited"), price));
+                player.sendMessage(ChatColor.RED + MessageFormat.format(lang.get("account.has.been.debited"), price));
             }
             else {
-                player.sendMessage(ChatColor.RED + plugin.getLang("not.sufficient.money"));
+                player.sendMessage(ChatColor.RED + lang.get("not.sufficient.money"));
                 return false;
             }
         }
@@ -718,13 +725,15 @@ public final class ClanManager {
         double price = settings.getInvitePrice();
 
         PermissionsManager perms = plugin.getPermissionsManager();
+        LanguageManager lang = plugin.getLanguageManager();
+        
         if (perms.hasEconomy()) {
             if (perms.playerHasMoney(player, price)) {
                 perms.playerChargeMoney(player, price);
-                player.sendMessage(ChatColor.RED + MessageFormat.format(plugin.getLang("account.has.been.debited"), price));
+                player.sendMessage(ChatColor.RED + MessageFormat.format(lang.get("account.has.been.debited"), price));
             }
             else {
-                player.sendMessage(ChatColor.RED + plugin.getLang("not.sufficient.money"));
+                player.sendMessage(ChatColor.RED + lang.get("not.sufficient.money"));
                 return false;
             }
         }
@@ -745,13 +754,15 @@ public final class ClanManager {
         double price = settings.getHomeTeleportPrice();
 
         PermissionsManager perms = plugin.getPermissionsManager();
+        LanguageManager lang = plugin.getLanguageManager();
+        
         if (perms.hasEconomy()) {
             if (perms.playerHasMoney(player, price)) {
                 perms.playerChargeMoney(player, price);
-                player.sendMessage(ChatColor.RED + MessageFormat.format(plugin.getLang("account.has.been.debited"), price));
+                player.sendMessage(ChatColor.RED + MessageFormat.format(lang.get("account.has.been.debited"), price));
             }
             else {
-                player.sendMessage(ChatColor.RED + plugin.getLang("not.sufficient.money"));
+                player.sendMessage(ChatColor.RED + lang.get("not.sufficient.money"));
                 return false;
             }
         }
@@ -772,13 +783,15 @@ public final class ClanManager {
         double price = settings.getHomeTeleportPriceSet();
 
         PermissionsManager perms = plugin.getPermissionsManager();
+        LanguageManager lang = plugin.getLanguageManager();
+        
         if (perms.hasEconomy()) {
             if (perms.playerHasMoney(player, price)) {
                 perms.playerChargeMoney(player, price);
-                player.sendMessage(ChatColor.RED + MessageFormat.format(plugin.getLang("account.has.been.debited"), price));
+                player.sendMessage(ChatColor.RED + MessageFormat.format(lang.get("account.has.been.debited"), price));
             }
             else {
-                player.sendMessage(ChatColor.RED + plugin.getLang("not.sufficient.money"));
+                player.sendMessage(ChatColor.RED + lang.get("not.sufficient.money"));
                 return false;
             }
         }
@@ -799,13 +812,15 @@ public final class ClanManager {
         double price = settings.getVerificationPrice();
 
         PermissionsManager perms = plugin.getPermissionsManager();
+        LanguageManager lang = plugin.getLanguageManager();
+        
         if (perms.hasEconomy()) {
             if (perms.playerHasMoney(player, price)) {
                 perms.playerChargeMoney(player, price);
-                player.sendMessage(ChatColor.RED + MessageFormat.format(plugin.getLang("account.has.been.debited"), price));
+                player.sendMessage(ChatColor.RED + MessageFormat.format(lang.get("account.has.been.debited"), price));
             }
             else {
-                player.sendMessage(ChatColor.RED + plugin.getLang("not.sufficient.money"));
+                player.sendMessage(ChatColor.RED + lang.get("not.sufficient.money"));
                 return false;
             }
         }
@@ -836,6 +851,7 @@ public final class ClanManager {
     public void processClanChat(Player player, String msg) {
         SettingsManager settings = plugin.getSettingsManager();
         ClanPlayer cp = plugin.getClanManager().getClanPlayer(player.getUniqueId());
+        LanguageManager lang = plugin.getLanguageManager();
 
         if (cp == null) return;
 
@@ -845,27 +861,27 @@ public final class ClanManager {
 
         String command = split[0];
 
-        if (command.equals(plugin.getLang("on"))) {
+        if (command.equals(lang.get("on"))) {
             cp.setClanChat(true);
             plugin.getStorageManager().updateClanPlayer(cp);
             ChatBlock.sendMessage(player, ChatColor.AQUA + "You have enabled clan chat");
         }
-        else if (command.equals(plugin.getLang("off"))) {
+        else if (command.equals(lang.get("off"))) {
             cp.setClanChat(false);
             plugin.getStorageManager().updateClanPlayer(cp);
             ChatBlock.sendMessage(player, ChatColor.AQUA + "You have disabled clan chat");
         }
-        else if (command.equals(plugin.getLang("join"))) {
+        else if (command.equals(lang.get("join"))) {
             cp.setChannel(ClanPlayer.Channel.CLAN);
             plugin.getStorageManager().updateClanPlayer(cp);
             ChatBlock.sendMessage(player, ChatColor.AQUA + "You have joined clan chat");
         }
-        else if (command.equals(plugin.getLang("leave"))) {
+        else if (command.equals(lang.get("leave"))) {
             cp.setChannel(ClanPlayer.Channel.NONE);
             plugin.getStorageManager().updateClanPlayer(cp);
             ChatBlock.sendMessage(player, ChatColor.AQUA + "You have left clan chat");
         }
-        else if (command.equals(plugin.getLang("mute"))) {
+        else if (command.equals(lang.get("mute"))) {
             if (cp.isMuted()) {
                 cp.setMuted(true);
                 ChatBlock.sendMessage(player, ChatColor.AQUA + "You have muted clan chat");
@@ -880,14 +896,45 @@ public final class ClanManager {
             String tag;
 
             if (cp.getRank() != null && !cp.getRank().isEmpty())  {
-                tag = settings.getClanChatBracketColor() + settings.getClanChatTagBracketLeft() + settings.getClanChatRankColor() + cp.getRank() + settings.getClanChatBracketColor() + settings.getClanChatTagBracketRight() + " ";
+                tag = String.join( "", settings.getClanChatBracketColor(),
+                                       settings.getClanChatTagBracketLeft(),
+                                       settings.getClanChatRankColor(),
+                                       cp.getRank(),
+                                       settings.getClanChatBracketColor(),
+                                       settings.getClanChatTagBracketRight(),
+                                       " " );
             }
             else {
-                tag = settings.getClanChatBracketColor() + settings.getClanChatTagBracketLeft() + settings.getTagDefaultColor() + cp.getClan().getColorTag() + settings.getClanChatBracketColor() + settings.getClanChatTagBracketRight() + " ";
+                tag = String.join( "", settings.getClanChatBracketColor(),
+                                       settings.getClanChatTagBracketLeft(),
+                                       settings.getTagDefaultColor(),
+                                       cp.getClan().getColorTag(),
+                                       settings.getClanChatBracketColor(),
+                                       settings.getClanChatTagBracketRight(),
+                                       " " );
             }
-
-            String message = code + Helper.parseColors(tag) + settings.getClanChatNameColor() + settings.getClanChatPlayerBracketLeft() + player.getName() + settings.getClanChatPlayerBracketRight() + " " + settings.getClanChatMessageColor() + msg;
-            String eyeMessage = code + settings.getClanChatBracketColor() + settings.getClanChatTagBracketLeft() + settings.getTagDefaultColor() + cp.getClan().getColorTag() + settings.getClanChatBracketColor() + settings.getClanChatTagBracketRight() + " " + settings.getClanChatNameColor() + settings.getClanChatPlayerBracketLeft() + player.getName() + settings.getClanChatPlayerBracketRight() + " " + settings.getClanChatMessageColor() + msg;
+            String message = String.join( "", code,
+                                              Helper.parseColors(tag),
+                                              settings.getClanChatNameColor(),
+                                              settings.getClanChatPlayerBracketLeft(),
+                                              player.getName(),
+                                              settings.getClanChatPlayerBracketRight(),
+                                              " ", settings.getClanChatMessageColor(),
+                                              msg );
+            
+            String eyeMessage = String.join( "", code,
+                                                 settings.getClanChatBracketColor(),
+                                                 settings.getClanChatTagBracketLeft(),
+                                                 settings.getTagDefaultColor(),
+                                                 cp.getClan().getColorTag(),
+                                                 settings.getClanChatBracketColor(),
+                                                 settings.getClanChatTagBracketRight(),
+                                                 " ", settings.getClanChatNameColor(),
+                                                 settings.getClanChatPlayerBracketLeft(),
+                                                 player.getName(),
+                                                 settings.getClanChatPlayerBracketRight(),
+                                                 " ", settings.getClanChatMessageColor(),
+                                                 msg );
 
             Bukkit.getConsoleSender().sendMessage(eyeMessage);
 
@@ -938,6 +985,7 @@ public final class ClanManager {
      */
     public void processAllyChat(Player player, String msg) {
         ClanPlayer cp = plugin.getClanManager().getClanPlayer(player);
+        LanguageManager lang = plugin.getLanguageManager();
 
         if (cp == null) return;
 
@@ -947,27 +995,27 @@ public final class ClanManager {
 
         String command = split[0];
 
-        if (command.equals(plugin.getLang("on"))) {
+        if (command.equals(lang.get("on"))) {
             cp.setAllyChat(true);
             plugin.getStorageManager().updateClanPlayer(cp);
             ChatBlock.sendMessage(player, ChatColor.AQUA + "You have enabled ally chat");
         }
-        else if (command.equals(plugin.getLang("off"))) {
+        else if (command.equals(lang.get("off"))) {
             cp.setAllyChat(false);
             plugin.getStorageManager().updateClanPlayer(cp);
             ChatBlock.sendMessage(player, ChatColor.AQUA + "You have disabled ally chat");
         }
-        else if (command.equals(plugin.getLang("join"))) {
+        else if (command.equals(lang.get("join"))) {
             cp.setChannel(ClanPlayer.Channel.ALLY);
             plugin.getStorageManager().updateClanPlayer(cp);
             ChatBlock.sendMessage(player, ChatColor.AQUA + "You have joined ally chat");
         }
-        else if (command.equals(plugin.getLang("leave"))) {
+        else if (command.equals(lang.get("leave"))) {
             cp.setChannel(ClanPlayer.Channel.NONE);
             plugin.getStorageManager().updateClanPlayer(cp);
             ChatBlock.sendMessage(player, ChatColor.AQUA + "You have left ally chat");
         }
-        else if (command.equals(plugin.getLang("mute"))) {
+        else if (command.equals(lang.get("mute"))) {
             if (!cp.isMutedAlly()) {
                 cp.setMutedAlly(true);
                 ChatBlock.sendMessage(player, ChatColor.AQUA + "You have muted ally chat");
@@ -980,7 +1028,19 @@ public final class ClanManager {
         else {
             SettingsManager settings = plugin.getSettingsManager();
             String code = "" + ChatColor.AQUA + ChatColor.WHITE + ChatColor.AQUA + ChatColor.BLACK;
-            String message = code + settings.getAllyChatBracketColor() + settings.getAllyChatTagBracketLeft() + settings.getAllyChatTagColor() + settings.getCommandAlly() + settings.getAllyChatBracketColor() + settings.getAllyChatTagBracketRight() + " " + settings.getAllyChatNameColor() + settings.getAllyChatPlayerBracketLeft() + player.getName() + settings.getAllyChatPlayerBracketRight() + " " + settings.getAllyChatMessageColor() + msg;
+            String message = String.join( "", code,
+                                              settings.getAllyChatBracketColor(),
+                                              settings.getAllyChatTagBracketLeft(),
+                                              settings.getAllyChatTagColor(),
+                                              settings.getCommandAlly(),
+                                              settings.getAllyChatBracketColor(),
+                                              settings.getAllyChatTagBracketRight(),
+                                              " ", settings.getAllyChatNameColor(),
+                                              settings.getAllyChatPlayerBracketLeft(),
+                                              player.getName(),
+                                              settings.getAllyChatPlayerBracketRight(),
+                                              " ", settings.getAllyChatMessageColor(),
+                                              msg );
             SimpleClans.log(message);
 
             Player self = cp.toPlayer();
@@ -1012,6 +1072,7 @@ public final class ClanManager {
      */
     public boolean processGlobalChat(Player player, String msg) {
         ClanPlayer cp = plugin.getClanManager().getClanPlayer(player.getUniqueId());
+        LanguageManager lang = plugin.getLanguageManager();
         
         if (cp == null) return false;
 
@@ -1021,12 +1082,12 @@ public final class ClanManager {
 
         String command = split[0];
 
-        if (command.equals(plugin.getLang("on"))) {
+        if (command.equals(lang.get("on"))) {
             cp.setGlobalChat(true);
             plugin.getStorageManager().updateClanPlayer(cp);
             ChatBlock.sendMessage(player, ChatColor.AQUA + "You have enabled global chat");
         }
-        else if (command.equals(plugin.getLang("off"))) {
+        else if (command.equals(lang.get("off"))) {
             cp.setGlobalChat(false);
             plugin.getStorageManager().updateClanPlayer(cp);
             ChatBlock.sendMessage(player, ChatColor.AQUA + "You have disabled global chat");

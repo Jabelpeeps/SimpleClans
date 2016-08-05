@@ -85,6 +85,7 @@ public final class StorageManager {
 
     public void initiateDB() {
         SettingsManager settings = plugin.getSettingsManager();
+        LanguageManager lang = plugin.getLanguageManager();
         if (settings.isUseMysql()) {
             core = new MySQLCore( settings.getHost(), 
                                   settings.getDatabase(), 
@@ -94,20 +95,22 @@ public final class StorageManager {
 
             if (core.checkConnection()) {
                 connection = core.getConnection();
-                SimpleClans.log("[SimpleClans] " + plugin.getLang("mysql.connection.successful"));
+                SimpleClans.log("[SimpleClans] " + lang.get("mysql.connection.successful"));
             }
-            else Bukkit.getConsoleSender().sendMessage("[SimpleClans] " + ChatColor.RED + plugin.getLang("mysql.connection.failed"));
+            else Bukkit.getConsoleSender().sendMessage( String.join( "", "[SimpleClans] ",
+                                                                        ChatColor.RED.toString(),
+                                                                        lang.get("mysql.connection.failed") ) );
         }
         else {
             core = new SQLiteCore(plugin.getDataFolder().getPath());
 
             if (core.checkConnection()) {
                 connection = core.getConnection();
-                SimpleClans.log("[SimpleClans] " + plugin.getLang("sqlite.connection.successful"));
+                SimpleClans.log("[SimpleClans] " + lang.get("sqlite.connection.successful"));
             }
-            else {
-                Bukkit.getConsoleSender().sendMessage("[SimpleClans] " + ChatColor.RED + plugin.getLang("sqlite.connection.failed"));
-            }
+            else Bukkit.getConsoleSender().sendMessage( String.join( "", "[SimpleClans] ", 
+                                                                        ChatColor.RED.toString(), 
+                                                                        lang.get("sqlite.connection.failed" ) ) );
         }
     }
 
@@ -137,6 +140,7 @@ public final class StorageManager {
      */
     public void importFromDatabase() {
         ClanManager clanMan = plugin.getClanManager();
+        LanguageManager lang = plugin.getLanguageManager();
         clanMan.cleanData();
 
         List<Clan> clans = retrieveClans();
@@ -147,7 +151,7 @@ public final class StorageManager {
         for (Clan clan : clans) clan.validateWarring();
 
         if (!clans.isEmpty()) {
-            SimpleClans.log(MessageFormat.format("[SimpleClans] " + plugin.getLang("clans"), clans.size()));
+            SimpleClans.log(MessageFormat.format("[SimpleClans] " + lang.get("clans"), clans.size()));
         }
 
         List<ClanPlayer> cps = retrieveClanPlayers();
@@ -163,7 +167,7 @@ public final class StorageManager {
         }
 
         if (!cps.isEmpty()) {
-            SimpleClans.log(MessageFormat.format("[SimpleClans] " + plugin.getLang("clan.players"), cps.size()));
+            SimpleClans.log(MessageFormat.format("[SimpleClans] " + lang.get("clan.players"), cps.size()));
         }
     }
 
@@ -203,8 +207,9 @@ public final class StorageManager {
                 purge.add(clan);              
             }
         }
+        LanguageManager lang = plugin.getLanguageManager();
         for (Clan clan : purge) {
-            SimpleClans.log("[SimpleClans] " + MessageFormat.format(plugin.getLang("purging.clan"), clan.getName()));
+            SimpleClans.log("[SimpleClans] " + MessageFormat.format(lang.get("purging.clan"), clan.getName()));
             deleteClan(clan);
             clans.remove(clan);
         }
@@ -218,8 +223,9 @@ public final class StorageManager {
             	purge.add(cp);
             }
         }
+        LanguageManager lang = plugin.getLanguageManager();
         for (ClanPlayer cp : purge) {
-            SimpleClans.log("[SimpleClans] " + MessageFormat.format(plugin.getLang("purging.player.data"), cp.getName()));
+            SimpleClans.log("[SimpleClans] " + MessageFormat.format(lang.get("purging.player.data"), cp.getName()));
             deleteClanPlayer(cp);
             cps.remove(cp);
         }

@@ -23,6 +23,7 @@ import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
+import net.sacredlabyrinth.phaed.simpleclans.managers.StorageManager;
 
 /**
  * @author phaed
@@ -64,6 +65,7 @@ public class SCEntityListener implements Listener {
             }
 
             if (attacker != null ) {
+                StorageManager stor = plugin.getStorageManager();
                 ClanPlayer acp = plugin.getClanManager().getCreateClanPlayer(attacker.getUniqueId());
                 ClanPlayer vcp = plugin.getClanManager().getCreateClanPlayer(victim.getUniqueId());
                 
@@ -76,7 +78,7 @@ public class SCEntityListener implements Listener {
                 
                 if (vClan == null || aClan == null || !vClan.isVerified() || !aClan.isVerified()) {
                     acp.addCivilianKill();
-                    plugin.getStorageManager().insertKill(attacker, acp.getTag(), victim, "", "c");
+                    stor.insertKill(attacker, acp.getTag(), victim, "", "c");
                 } else if (aClan.isRival(vClan)) {
                     if (aClan.isWarring(vClan)) {
                         reward = kdr * multipier * 4;
@@ -84,26 +86,29 @@ public class SCEntityListener implements Listener {
                         reward = kdr * multipier * 2;
                     }
                     acp.addRivalKill();
-                    plugin.getStorageManager().insertKill(attacker, acp.getTag(), victim, vcp.getTag(), "r");
+                    stor.insertKill(attacker, acp.getTag(), victim, vcp.getTag(), "r");
                 } else if (aClan.isAlly(vClan)) {
                     reward = kdr * multipier * - 1;
                 } else {
                     reward = kdr * multipier;
                     acp.addNeutralKill();
-                    plugin.getStorageManager().insertKill(attacker, acp.getTag(), victim, vcp.getTag(), "n");
+                    stor.insertKill(attacker, acp.getTag(), victim, vcp.getTag(), "n");
                 }
 
                 if (aClan != null && reward != 0 && settings.isMoneyPerKill()) {
                     List<ClanPlayer> list = aClan.getOnlineMembers();
                     for (ClanPlayer cp : list) {
                         double money = Math.round((reward / list.size()) * 100D) / 100D;
-                        cp.toPlayer().sendMessage(ChatColor.AQUA + MessageFormat.format(plugin.getLang("player.got.money"), money, victim.getName(), kdr));
+                        
+                        cp.toPlayer().sendMessage(ChatColor.AQUA + MessageFormat.format(
+                                plugin.getLanguageManager().get("player.got.money"), money, victim.getName(), kdr ) );
+                        
                         plugin.getPermissionsManager().playerGrantMoney(cp.toPlayer(), money);
                     }
                 }
                 // record death for victim
                 vcp.addDeath();
-                plugin.getStorageManager().updateClanPlayerAsync(vcp);
+                stor.updateClanPlayerAsync(vcp);
             }
         }
     }

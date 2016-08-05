@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 
 public class GlobalCommandExecutor implements CommandExecutor {
     SimpleClans plugin;
@@ -29,13 +30,14 @@ public class GlobalCommandExecutor implements CommandExecutor {
         if (cp == null) return false;
 
         String subCommand = strings[0];
+        LanguageManager lang = plugin.getLanguageManager();
 
-        if (subCommand.equals(plugin.getLang("on"))) {
+        if (subCommand.equals(lang.get("on"))) {
             cp.setGlobalChat(true);
             plugin.getStorageManager().updateClanPlayer(cp);
             ChatBlock.sendMessage(player, ChatColor.AQUA + "You have enabled global chat");
         }
-        else if (subCommand.equals(plugin.getLang("off"))) {
+        else if (subCommand.equals(lang.get("off"))) {
             cp.setGlobalChat(false);
             plugin.getStorageManager().updateClanPlayer(cp);
             ChatBlock.sendMessage(player, ChatColor.AQUA + "You have disabled global chat");

@@ -15,6 +15,7 @@ import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
 import net.sacredlabyrinth.phaed.simpleclans.executors.ClanCommandExecutor.ClanCommand;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 
@@ -27,6 +28,7 @@ public class ListCommand implements ClanCommand {
     public void execute(CommandSender sender, String[] arg) {
         SimpleClans plugin = SimpleClans.getInstance();
         SettingsManager settings = plugin.getSettingsManager();
+        LanguageManager lang = plugin.getLanguageManager();
         
         String headColor = settings.getPageHeadingsColor();
         String subColor = settings.getPageSubTitleColor();
@@ -43,15 +45,18 @@ public class ListCommand implements ClanCommand {
                     ChatBlock chatBlock = new ChatBlock();
 
                     ChatBlock.sendBlank(sender);
-                    ChatBlock.saySingle(sender, settings.getServerName() + subColor + " " + plugin.getLang("clans.lower") + " " + headColor + Helper.generatePageSeparator(settings.getPageSep()));
+                    ChatBlock.saySingle(
+                            sender, settings.getServerName(), subColor, " ", lang.get("clans.lower"), " ", headColor, 
+                                                                Helper.generatePageSeparator(settings.getPageSep() ) );
                     ChatBlock.sendBlank(sender);
-                    ChatBlock.sendMessage(sender, headColor + plugin.getLang("total.clans") + " " + subColor + clans.size());
+                    ChatBlock.sendMessage(
+                            sender, headColor, lang.get("total.clans"), " ", subColor, String.valueOf( clans.size() ) );
                     ChatBlock.sendBlank(sender);
 
                     chatBlock.setAlignment("c", "l", "c", "c");
                     chatBlock.setFlexibility(false, true, false, false);
 
-                    chatBlock.addRow("  " + headColor + plugin.getLang("rank"), plugin.getLang("name"), plugin.getLang("kdr"), plugin.getLang("members"));
+                    chatBlock.addRow("  ", headColor, lang.get("rank"), lang.get("name"), lang.get("kdr"), lang.get("members"));
 
                     int rank = 1;
 
@@ -73,7 +78,7 @@ public class ListCommand implements ClanCommand {
                         String kdr = clan.isVerified() ? ChatColor.YELLOW + "" + formatter.format(clan.getTotalKDR()) 
                                                        : "";
 
-                        chatBlock.addRow("  " + rank, fullname, kdr, size);
+                        chatBlock.addRow("  ", String.valueOf( rank ), fullname, kdr, size);
                         rank++;
                     }
 
@@ -82,15 +87,16 @@ public class ListCommand implements ClanCommand {
                     if (more) {
                         plugin.getStorageManager().addChatBlock(sender, chatBlock);
                         ChatBlock.sendBlank(sender);
-                        ChatBlock.sendMessage(sender, headColor + MessageFormat.format(plugin.getLang("view.next.page"), settings.getCommandMore()));
+                        ChatBlock.sendMessage( 
+                                sender, headColor, MessageFormat.format( lang.get("view.next.page"), settings.getCommandMore()));
                     }
 
                     ChatBlock.sendBlank(sender);
                 }
-                else ChatBlock.sendMessage(sender, ChatColor.RED + plugin.getLang("no.clans.have.been.created"));
+                else ChatBlock.sendMessage(sender, ChatColor.RED, lang.get("no.clans.have.been.created"));
             }
-            else ChatBlock.sendMessage(sender, ChatColor.RED + MessageFormat.format(plugin.getLang("usage.list"), settings.getCommandClan()));
+            else ChatBlock.sendMessage(sender, ChatColor.RED, MessageFormat.format(lang.get("usage.list"), settings.getCommandClan()));
         }
-        else ChatBlock.sendMessage(sender, ChatColor.RED + plugin.getLang("insufficient.permissions"));
+        else ChatBlock.sendMessage(sender, ChatColor.RED, lang.get("insufficient.permissions"));
     }
 }

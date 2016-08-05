@@ -13,6 +13,7 @@ import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.Helper;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.RequestManager;
 
 public class AcceptCommandExecutor implements CommandExecutor {
@@ -21,9 +22,10 @@ public class AcceptCommandExecutor implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Player player = (Player) commandSender;
+        LanguageManager lang = plugin.getLanguageManager();
 
         if (plugin.getBansManager().isBanned(player.getUniqueId())) {
-            ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("banned"));
+            ChatBlock.sendMessage(player, ChatColor.RED, lang.get("banned"));
             return false;
         }
 
@@ -37,13 +39,14 @@ public class AcceptCommandExecutor implements CommandExecutor {
                 if (reqMan.hasRequest(clan.getTag())) {
                     if (!cp.hasVote(reqMan.getRequest( clan.getTag() ))) {
                         reqMan.accept(cp);
-                        clan.leaderAnnounce(ChatColor.GREEN + MessageFormat.format(plugin.getLang("voted.to.accept"), Helper.capitalize(player.getName())));
+                        clan.leaderAnnounce(ChatColor.GREEN + MessageFormat.format(
+                                lang.get("voted.to.accept"), Helper.capitalize(player.getName())));
                     }
-                    else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("you.have.already.voted"));
+                    else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("you.have.already.voted"));
                 }
-                else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("nothing.to.accept"));
+                else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("nothing.to.accept"));
             }
-            else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("no.leader.permissions"));
+            else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("no.leader.permissions"));
         }
         else if (reqMan.hasRequest(player.getUniqueId().toString())) {
                 
@@ -52,7 +55,7 @@ public class AcceptCommandExecutor implements CommandExecutor {
 
             plugin.getRequestManager().accept(cp);
         }
-        else ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("nothing.to.accept"));
+        else ChatBlock.sendMessage(player, ChatColor.RED, lang.get("nothing.to.accept"));
         
         return false;
     }

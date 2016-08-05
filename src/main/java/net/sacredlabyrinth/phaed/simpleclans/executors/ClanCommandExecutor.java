@@ -53,12 +53,13 @@ import net.sacredlabyrinth.phaed.simpleclans.commands.UntrustCommand;
 import net.sacredlabyrinth.phaed.simpleclans.commands.VerifyCommand;
 import net.sacredlabyrinth.phaed.simpleclans.commands.VitalsCommand;
 import net.sacredlabyrinth.phaed.simpleclans.commands.WarCommand;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 
 /**
  * @author phaed
  */
 public final class ClanCommandExecutor implements CommandExecutor {
-    private SimpleClans plugin;
+    private SimpleClans plugin = SimpleClans.getInstance();
     private Map<String, ClanCommand> commands = new HashMap<>();
     private Map<String, ClanCommand> consoleCommands = new HashMap<>();
     private MenuCommand menuCommand;
@@ -68,53 +69,54 @@ public final class ClanCommandExecutor implements CommandExecutor {
     }
 
     public ClanCommandExecutor() {
-        plugin = SimpleClans.getInstance();
+        LanguageManager lang = plugin.getLanguageManager();
+        
         menuCommand = new MenuCommand();
         
-        commands.put( plugin.getLang("create.command"), new CreateCommand() );
-        commands.put( plugin.getLang("list.command"), new ListCommand() );
-        commands.put( plugin.getLang("profile.command"), new ProfileCommand() );
-        commands.put( plugin.getLang("roster.command"), new RosterCommand() );
-        commands.put( plugin.getLang("lookup.command"), new LookupCommand() );
-        commands.put( plugin.getLang("leaderboard.command"), new LeaderboardCommand() );
-        commands.put( plugin.getLang("alliances.command"), new AlliancesCommand() );
-        commands.put( plugin.getLang("rivalries.command"), new RivalriesCommand() );
-        commands.put( plugin.getLang("vitals.command"), new VitalsCommand() );
-        commands.put( plugin.getLang("coords.command"), new CoordsCommand() );
-        commands.put( plugin.getLang("stats.command"), new StatsCommand() );
-        commands.put( plugin.getLang("ally.command"), new AllyCommand() );
-        commands.put( plugin.getLang("rival.command"), new RivalCommand() );
-        commands.put( plugin.getLang("bb.command"), new BbCommand() );
-        commands.put( plugin.getLang("modtag.command"), new ModtagCommand() );
-        commands.put( plugin.getLang("toggle.command"), new ToggleCommand() );
-        commands.put( plugin.getLang("invite.command"), new InviteCommand() );
-        commands.put( plugin.getLang("kick.command"), new KickCommand() );
-        commands.put( plugin.getLang("trust.command"), new TrustCommand() );
-        commands.put( plugin.getLang("untrust.command"), new UntrustCommand() );
-        commands.put( plugin.getLang("promote.command"), new PromoteCommand() );
-        commands.put( plugin.getLang("cape.command"), new CapeCommand() );
-        commands.put( plugin.getLang("demote.command"), new DemoteCommand() );
-        commands.put( plugin.getLang("clanff.command"), new ClanffCommand() );
-        commands.put( plugin.getLang("ff.command"), new FfCommand() );
-        commands.put( plugin.getLang("resign.command"), new ResignCommand() );
-        commands.put( plugin.getLang("disband.command"), new DisbandCommand() );
-        commands.put( plugin.getLang("verify.command"), new VerifyCommand() );
-        commands.put( plugin.getLang("ban.command"), new BanCommand() );
-        commands.put( plugin.getLang("unban.command"), new UnbanCommand() );
-        commands.put( plugin.getLang("reload.command"), new ReloadCommand() );
-        commands.put( plugin.getLang("globalff.command"), new GlobalffCommand() );
-        commands.put( plugin.getLang("war.command"), new WarCommand() );
-        commands.put( plugin.getLang("home.command"), new HomeCommand() );
-        commands.put( plugin.getLang("kills.command"), new KillsCommand() );
-        commands.put( plugin.getLang("mostkilled.command"), new MostKilledCommand() );
-        commands.put( plugin.getLang("setrank.command"), new SetRankCommand() );
-        commands.put( plugin.getLang("bank.command"), new BankCommand() );
-        commands.put( plugin.getLang("place.command"), new PlaceCommand() );
-        commands.put( plugin.getLang("resetkdr.command"), new ResetKDRCommand() );
-        consoleCommands.put( plugin.getLang("verify.command"), new VerifyCommand() );
-        consoleCommands.put( plugin.getLang("reload.command"), new ReloadCommand() );
-        consoleCommands.put( plugin.getLang("place.command"), new PlaceCommand() );
-        consoleCommands.put( plugin.getLang("list.command"), new ListCommand() );
+        commands.put( lang.get("create.command"), new CreateCommand() );
+        commands.put( lang.get("list.command"), new ListCommand() );
+        commands.put( lang.get("profile.command"), new ProfileCommand() );
+        commands.put( lang.get("roster.command"), new RosterCommand() );
+        commands.put( lang.get("lookup.command"), new LookupCommand() );
+        commands.put( lang.get("leaderboard.command"), new LeaderboardCommand() );
+        commands.put( lang.get("alliances.command"), new AlliancesCommand() );
+        commands.put( lang.get("rivalries.command"), new RivalriesCommand() );
+        commands.put( lang.get("vitals.command"), new VitalsCommand() );
+        commands.put( lang.get("coords.command"), new CoordsCommand() );
+        commands.put( lang.get("stats.command"), new StatsCommand() );
+        commands.put( lang.get("ally.command"), new AllyCommand() );
+        commands.put( lang.get("rival.command"), new RivalCommand() );
+        commands.put( lang.get("bb.command"), new BbCommand() );
+        commands.put( lang.get("modtag.command"), new ModtagCommand() );
+        commands.put( lang.get("toggle.command"), new ToggleCommand() );
+        commands.put( lang.get("invite.command"), new InviteCommand() );
+        commands.put( lang.get("kick.command"), new KickCommand() );
+        commands.put( lang.get("trust.command"), new TrustCommand() );
+        commands.put( lang.get("untrust.command"), new UntrustCommand() );
+        commands.put( lang.get("promote.command"), new PromoteCommand() );
+        commands.put( lang.get("cape.command"), new CapeCommand() );
+        commands.put( lang.get("demote.command"), new DemoteCommand() );
+        commands.put( lang.get("clanff.command"), new ClanffCommand() );
+        commands.put( lang.get("ff.command"), new FfCommand() );
+        commands.put( lang.get("resign.command"), new ResignCommand() );
+        commands.put( lang.get("disband.command"), new DisbandCommand() );
+        commands.put( lang.get("verify.command"), new VerifyCommand() );
+        commands.put( lang.get("ban.command"), new BanCommand() );
+        commands.put( lang.get("unban.command"), new UnbanCommand() );
+        commands.put( lang.get("reload.command"), new ReloadCommand() );
+        commands.put( lang.get("globalff.command"), new GlobalffCommand() );
+        commands.put( lang.get("war.command"), new WarCommand() );
+        commands.put( lang.get("home.command"), new HomeCommand() );
+        commands.put( lang.get("kills.command"), new KillsCommand() );
+        commands.put( lang.get("mostkilled.command"), new MostKilledCommand() );
+        commands.put( lang.get("setrank.command"), new SetRankCommand() );
+        commands.put( lang.get("bank.command"), new BankCommand() );
+        commands.put( lang.get("place.command"), new PlaceCommand() );
+        commands.put( lang.get("resetkdr.command"), new ResetKDRCommand() );
+        consoleCommands.put( lang.get("verify.command"), new VerifyCommand() );
+        consoleCommands.put( lang.get("reload.command"), new ReloadCommand() );
+        consoleCommands.put( lang.get("place.command"), new PlaceCommand() );
+        consoleCommands.put( lang.get("list.command"), new ListCommand() );
     }
 
     @Override
@@ -127,7 +129,7 @@ public final class ClanCommandExecutor implements CommandExecutor {
                 return true;
 
             if (plugin.getBansManager().isBanned(player.getUniqueId())) {
-                ChatBlock.sendMessage(player, ChatColor.RED + plugin.getLang("banned"));
+                ChatBlock.sendMessage(player, ChatColor.RED, plugin.getLanguageManager().get("banned"));
                 return true;
             }
 
@@ -151,7 +153,7 @@ public final class ClanCommandExecutor implements CommandExecutor {
             return true;
         }
         catch ( NullPointerException e ) {
-            ChatBlock.sendMessage(sender, ChatColor.RED + plugin.getLang("does.not.match"));
+            ChatBlock.sendMessage(sender, ChatColor.RED, plugin.getLanguageManager().get("does.not.match"));
             return false;
         }
     }

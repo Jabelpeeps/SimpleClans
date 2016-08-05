@@ -19,7 +19,7 @@ public final class Request {
     private ClanPlayer requester;
     private int askCount;
 
-    public Request( SimpleClans plugin, ClanRequest _type, Set<ClanPlayer> _acceptors, 
+    public Request( ClanRequest _type, Set<ClanPlayer> _acceptors, 
                             ClanPlayer _requester, String _target, Clan _clan, String _msg) {
         type = _type;
         target = _target;
@@ -32,7 +32,7 @@ public final class Request {
         cleanVotes();
     }
 
-    public Request( SimpleClans plugin, ClanRequest _type, ClanPlayer _requester, 
+    public Request( ClanRequest _type, ClanPlayer _requester, 
                                             UUID invited, Clan _clan, String _msg ) {
         type = _type;
         target = invited.toString();
@@ -43,17 +43,11 @@ public final class Request {
     }
 
     public ClanRequest getType() { return type; }
-    public void setType(ClanRequest _type) { type = _type; }
     public Set<ClanPlayer> getAcceptors() { return Collections.unmodifiableSet(acceptors); }
-    public void setAcceptors(Set<ClanPlayer> _acceptors) { acceptors = _acceptors; }
     public Clan getClan() { return clan; }
-    public void setClan(Clan _clan) { clan = _clan; }
     public String getMsg() { return msg; }
-    public void setMsg(String _msg) { msg = _msg; }
     public String getTarget() { return target; }
-    public void setTarget(String _target) { target = _target; }
     public ClanPlayer getRequester() { return requester; }
-    public void setRequester(ClanPlayer _requester) { requester = _requester; }
 
     /**
      * Used for leader voting

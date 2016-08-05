@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import net.sacredlabyrinth.phaed.simpleclans.ChatBlock;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.managers.LanguageManager;
 import net.sacredlabyrinth.phaed.simpleclans.managers.SettingsManager;
 
 public class AllyCommandExecutor implements CommandExecutor {
@@ -24,6 +25,7 @@ public class AllyCommandExecutor implements CommandExecutor {
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         Player player = (Player) commandSender;
         SettingsManager settings = plugin.getSettingsManager();
+        LanguageManager lang = plugin.getLanguageManager();
 
         if (!settings.isAllyChatEnable()) return false;
 
@@ -35,34 +37,34 @@ public class AllyCommandExecutor implements CommandExecutor {
 
         String subCommand = strings[0];
 
-        if (subCommand.equals(plugin.getLang("on"))) {
+        if (subCommand.equals(lang.get("on"))) {
             cp.setAllyChat(true);
             plugin.getStorageManager().updateClanPlayer(cp);
-            ChatBlock.sendMessage(player, ChatColor.AQUA + "You have enabled ally chat");
+            ChatBlock.sendMessage(player, ChatColor.AQUA, "You have enabled ally chat");
         }
-        else if (subCommand.equals(plugin.getLang("off"))) {
+        else if (subCommand.equals(lang.get("off"))) {
             cp.setAllyChat(false);
             plugin.getStorageManager().updateClanPlayer(cp);
-            ChatBlock.sendMessage(player, ChatColor.AQUA + "You have disabled ally chat");
+            ChatBlock.sendMessage(player, ChatColor.AQUA, "You have disabled ally chat");
         }
-        else if (subCommand.equals(plugin.getLang("join"))) {
+        else if (subCommand.equals(lang.get("join"))) {
             cp.setChannel(ClanPlayer.Channel.ALLY);
             plugin.getStorageManager().updateClanPlayer(cp);
-            ChatBlock.sendMessage(player, ChatColor.AQUA + "You have joined ally chat");
+            ChatBlock.sendMessage(player, ChatColor.AQUA, "You have joined ally chat");
         }
-        else if (subCommand.equals(plugin.getLang("leave"))) {
+        else if (subCommand.equals(lang.get("leave"))) {
             cp.setChannel(ClanPlayer.Channel.NONE);
             plugin.getStorageManager().updateClanPlayer(cp);
-            ChatBlock.sendMessage(player, ChatColor.AQUA + "You have left ally chat");
+            ChatBlock.sendMessage(player, ChatColor.AQUA, "You have left ally chat");
         }
-        else if (subCommand.equals(plugin.getLang("mute"))) {
+        else if (subCommand.equals(lang.get("mute"))) {
             if (!cp.isMutedAlly()) {
                 cp.setMutedAlly(true);
-                ChatBlock.sendMessage(player, ChatColor.AQUA + "You have muted ally chat");
+                ChatBlock.sendMessage(player, ChatColor.AQUA, "You have muted ally chat");
             }
             else {
                 cp.setMutedAlly(false);
-                ChatBlock.sendMessage(player, ChatColor.AQUA + "You have unmuted ally chat");
+                ChatBlock.sendMessage(player, ChatColor.AQUA, "You have unmuted ally chat");
             }
         }
         else {

@@ -74,7 +74,8 @@ public class SimpleClans extends JavaPlugin {
         storageManager = new StorageManager();
         teleportManager = new TeleportManager();
 
-        logger.info(MessageFormat.format(getLang("version.loaded"), getDescription().getName(), getDescription().getVersion()));
+        logger.info( MessageFormat.format( 
+                languageManager.get( "version.loaded" ), getDescription().getName(), getDescription().getVersion()));
 
         Bukkit.getPluginManager().registerEvents(new SCEntityListener(), this);
         Bukkit.getPluginManager().registerEvents(new SCPlayerListener(), this);

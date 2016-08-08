@@ -47,6 +47,7 @@ public class SimpleClans extends JavaPlugin {
     }
 
     public static void log(String msg, Object... arg) {
+        
         if (arg == null || arg.length == 0) {
             logger.log(Level.INFO, msg);
         } else {

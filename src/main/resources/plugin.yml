@@ -1,8 +1,8 @@
 name: SimpleClans
 main: net.sacredlabyrinth.phaed.simpleclans.SimpleClans
 version: ${project.version}
-depend: Vault
-softdepend: VanishNoPacket
+depend: [Vault]
+softdepend: [VanishNoPacket]
 permissions:
   simpleclans.admin.permissions:
     description: Can grant clans permissions

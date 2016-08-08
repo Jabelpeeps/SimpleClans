@@ -211,19 +211,15 @@ public class MySQLCore extends AbstractDBCore {
      * @param query
      * @return the results of the query or null
      */
+    @SuppressWarnings( "resource" )
     @Override
     public ResultSet getResultSet(PreparedStatement query, Class<?>[] types, Object...params  ) {
         try {
             if (types != null) {
                 query = setupStatement( query, types, params );
-            }
-            try {
-                if (query.execute())
-                    return query.getResultSet();
-            }
-            finally {
-                query.close();
-            }
+            }          
+            if (query.execute())
+                return query.getResultSet();
         }
         catch (SQLException ex) {
             log.severe(ex.getMessage());
